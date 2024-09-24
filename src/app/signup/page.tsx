@@ -2,6 +2,7 @@
 
 import { validationRegistSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert, Box, Button, Container, Divider, TextField, Typography } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -51,45 +52,92 @@ const SignupPage = () => {
     };
 
     return (
-        <>
-            <div>
-                <div>
-                    <p>アカウント登録</p>
-                    <form onSubmit={handleSubmit(handleRegist)}>
-                        <label htmlFor="email">
-                            <p>メールアドレス</p>
-                            <input type="text" id="email" {...register("email")} />
-                            <div>{errors.email?.message as React.ReactNode}
-                                {resError?.email?.map((error, index) => (
-                                    <p key={index}>{error}</p>
-                                ))}
-                            </div>
-                        </label>
-                        <label htmlFor="password">
-                            <p>パスワード</p>
-                            <input type="password" id="password" {...register("password")} />
-                            <div>{errors.password?.message as React.ReactNode}
-                                {resError?.password?.map((error, index) => (
-                                    <p key={index}>{error}</p>
-                                ))}
-                            </div>
-                        </label>
-                        <label htmlFor="passwordConfirm">
-                            <p>再確認パスワード</p>
-                            <input type="password" id="passwordConfirm" {...register("passwordConfirm")} />
-                            <div>{errors.passwordConfirm?.message as React.ReactNode}
-                                {resError?.passwordConfirm?.map((error, index) => (
-                                    <p key={index}>{error}</p>
-                                ))}
-                            </div>
-                        </label>
-                        <button type="submit">登録</button>
-                    </form>
-                    <Link href="/signin">ログインはこちら
+       <Container maxWidth="xs">
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 8,
+                }}
+            >
+                <Typography component="h1" variant="h5">
+                    アカウント登録
+                </Typography>
+                <form onSubmit={handleSubmit(handleRegist)} noValidate>
+                    {/* エラーメッセージ表示 */}
+                    {resError && (
+                        <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
+                            {Object.values(resError).flat().map((error, index) => (
+                                <p key={index}>{error}</p>
+                            ))}
+                        </Alert>
+                    )}
+
+                    {/* メールアドレスフィールド */}
+                    <TextField
+                        margin="normal"
+                        fullWidth
+                        id="email"
+                        label="メールアドレス"
+                        autoComplete="email"
+                        autoFocus
+                        {...register("email")}
+                        error={!!errors.email}
+                        helperText={errors.email?.message as React.ReactNode}
+                    />
+
+                    {/* パスワードフィールド */}
+                    <TextField
+                        margin="normal"
+                        fullWidth
+                        label="パスワード"
+                        type="password"
+                        id="password"
+                        autoComplete="new-password"
+                        {...register("password")}
+                        error={!!errors.password}
+                        helperText={errors.password?.message as React.ReactNode}
+                    />
+
+                    {/* パスワード確認フィールド */}
+                    <TextField
+                        margin="normal"
+                        fullWidth
+                        label="再確認パスワード"
+                        type="password"
+                        id="passwordConfirm"
+                        autoComplete="new-password"
+                        {...register("passwordConfirm")}
+                        error={!!errors.passwordConfirm}
+                        helperText={errors.passwordConfirm?.message as React.ReactNode}
+                    />
+
+                    {/* 登録ボタン */}
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        登録
+                    </Button>
+                </form>
+
+                <Divider sx={{ width: "100%", my: 2 }} />
+
+                {/* ログインリンク */}
+                <Box sx={{ mt: 2 }}>
+                    <Link href="/signin" passHref>
+                        <Typography variant="body2" color="primary">
+                            ログインはこちら
+                        </Typography>
                     </Link>
-                </div>
-            </div>
-        </>
+                </Box>
+            </Box>
+        </Container>
     );
 
 };
