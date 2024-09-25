@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# kcl-hack
+このプロジェクトは、Next.js、Prisma、NextAuth、PostgreSQLを使用したWebアプリケーションです。開発環境はDockerを使用しています。
 
-## Getting Started
+## 目次
+- セットアップ手順
+  - 前提条件
+  - 環境変数の設定
+  - Docker コンテナの起動
+  - DBのマイグレーション
+  - アプリケーションの起動
+- その他
 
-First, run the development server:
+## セットアップ手順
+### 前提条件
+- Node.jsとnpmがインストールされていること
+- DockerとDocker Composeがインストールされていること
+- GitHubアカウント
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 環境変数の設定
+プロジェクトのルートディレクトリに.envファイルを作成します。
+
+以下の内容を.envファイルに記述します。
+```
+# Database
+DATABASE_URL="postgresql://postgres:postgres@db:5432/postgres?schema=public"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-nextauth-secret"
+
+# GitHub OAuth
+GITHUB_ID="your-github-client-id"
+GITHUB_SECRET="your-github-client-secret"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```NEXTAUTH_SECRET```は以下のコマンドで生成できます。
+```
+openssl rand -base64 32
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Docker コンテナの起動
+以下のコマンドでDockerコンテナをビルドして起動します。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+docker-compose up --build
+```
+### データベースのマイグレーション
+Dockerコンテナ内に入ります。
+```
+docker exec -it your-project-name-app-1 sh
+```
 
-## Learn More
+コンテナ内でマイグレーションを実行します。
+```
+npx prisma migrate dev --name init
+```
 
-To learn more about Next.js, take a look at the following resources:
+Prisma Clientを生成します。
+```
+npx prisma generate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+コンテナから退出します。
+```
+exit
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### アプリケーションの起動
+ブラウザでhttp://localhost:3000にアクセスし、アプリケーションが動作していることを確認します。
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## その他
+- **Prismaスキーマの変更**：```prisma/schema.prisma```を編集した後、マイグレーションとクライアントの生成が必要です。
+```
+docker exec -it your-project-name-app-1 sh
+npx prisma migrate dev --name your_migration_name
+npx prisma generate
+exit
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **コンテナの停止**：開発作業が終了したら、以下のコマンドでコンテナを停止できます。
+```
+docker-compose down
+```
+
+- **依存関係の追加**：新しいパッケージを追加した場合、コンテナを再ビルドする必要があります。
+```
+docker-compose up --build
+```
