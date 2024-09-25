@@ -1,9 +1,8 @@
 "use client";
 
 import { validationLoginSchema } from "@/validationSchema";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { Alert, Box, Button, Container, Divider, TextField, Typography } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -56,24 +55,47 @@ const SigninPage = () => {
         <Box
             sx={{
                 background: 'linear-gradient(45deg, #8e44ad, #3498db)',  // グラデーションの背景
-                height: '100vh',  // 高さを画面全体に設定
+                minHeight: '100vh',  // 高さを画面全体に設定
                 display: 'flex',  // Flexbox を使用
                 flexDirection: 'column',
                 justifyContent: 'center',  // 水平方向の中央揃え
                 alignItems: 'center',  // 垂直方向の中央揃え
+                 padding: '50px', // コンテンツが狭い画面でも収まるようにパディングを設定
             }}
         >
-            <Typography variant="h1" color="white" sx={{
-                position: 'relative',
-                top: "-50px",
-                fontFamily: "Monospace"
-            }}>
+            <Typography
+                variant="h1"
+                color="white"
+                sx={{
+                    position: 'relative',
+                    top: '-50px',
+                    fontFamily: 'Monospace',
+                    paddingBottom: '5px',
+                    '&::before': {
+                        background: '#fff',
+                        content: '""',
+                        width: '100%',
+                        height: '5px',
+                        position: 'absolute',
+                        left: 0,
+                        bottom: 0,
+                        margin: 'auto',
+                        transformOrigin: 'right top',
+                        transform: 'scale(0, 1)',
+                        transition: 'transform .3s',
+                    },
+                    '&:hover::before': {
+                        transformOrigin: 'center top',
+                        transform: 'scale(1, 1)',
+                    },
+                }}
+            >
                 ようこそ！
             </Typography>
             <Container maxWidth="xs"
                 sx={{
                     borderRadius: "16px",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.7)",
                     padding: "16px",
                     backgroundColor: "white",
                 }}>
@@ -86,8 +108,7 @@ const SigninPage = () => {
                         mt: 8
                     }}
                 >
-                    <Typography component="h1" variant="h4"
-                        sx={{ position: 'relative', top: '-20px', fontFamily: 'Monospace' }}>
+                    <Typography component="h1" variant="h4" sx={{ position: 'relative', top: '-20px', fontFamily: 'Monospace' }}>
                         ログイン
                     </Typography>
                     <form onSubmit={handleSubmit(handleLogin)} noValidate>
@@ -142,6 +163,7 @@ const SigninPage = () => {
                     <Button
                         fullWidth
                         variant="outlined"
+                        startIcon={<GitHubIcon style={{ color: "#000" }}/>}
                         onClick={() => {
                             signIn("github");
                         }}
@@ -150,20 +172,51 @@ const SigninPage = () => {
 
                         }}
                     >
-                        <FontAwesomeIcon icon={faGithub} size="2x" style={{ marginRight: "8px", color: "#000" }} />
                         Githubでログイン
                     </Button>
-
-                    {/* サインアップリンク */}
-                    <Box sx={{ mt: 2 }}>
-                        <Link href="/signup" passHref>
-                            <Typography variant="body2" color="primary">
-                                新規登録はこちら
-                            </Typography>
-                        </Link>
-                    </Box>
                 </Box>
             </Container>
+            {/* サインアップリンク */}
+            <Link href="/signup" passHref>
+                <Typography
+                    variant="h5"
+                    color="#fff"
+                    position="relative"
+                    top="40px"
+                    fontFamily="monospace"
+                    sx={{
+                        zIndex: 1,
+                        padding: '0 10px',
+                        position: 'relative',
+                        '&::before': {
+                            background: 'linear-gradient(45deg, #8e44ad, #3498db)',
+                            content: '""',
+                            display: 'block',
+                            width: '100%',
+                            height: '100%',
+                            position: 'absolute',
+                            left: 0,
+                            bottom: 0,
+                            margin: 'auto',
+                            transform: 'scale(0, 1)',
+                            transformOrigin: 'right top',
+                            transition: 'transform .3s',
+                            zIndex: -1,
+                        },
+                        '&:hover': {
+                            color: '#fff',
+                            '&::before': {
+                                transformOrigin: 'left top',
+                                transform: 'scale(1, 1)',
+                            },
+                        },
+                    }}
+                >
+                    新規登録はこちら
+                </Typography>
+
+            </Link>
+                    
         </Box>
         //                 {/* <button onClick={() => {
         //                     signIn("google");
