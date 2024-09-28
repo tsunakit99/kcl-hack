@@ -3,9 +3,9 @@
 import { validationRegistSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, Container, TextField, Typography } from "@mui/material";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -16,6 +16,7 @@ interface Error {
 }
 
 const SignupPage = () => {
+    const router = useRouter();
     const { data: session, status } = useSession();
     const [resError, setResError] = useState<Error>();
 
@@ -35,7 +36,7 @@ const SignupPage = () => {
     const handleRegist = async (data: any) => {
         const email = data.email;
         const password = data.password;
-        const res = await fetch("/api/signUp", {
+        const res = await fetch("/api/send-otp", {
             body: JSON.stringify(data),
             headers: {
                 "Content-type": "application/json",
@@ -44,7 +45,12 @@ const SignupPage = () => {
         });
 
         if (res.ok) {
-            signIn("credentials", { email: email, password: password });
+            const query = new URLSearchParams({
+                email: email,
+                password: password,
+            });
+            
+            router.push(`/otp?${query.toString()}`);
         } else {
             const resError = await res.json();
             setResError(resError.errors);

@@ -4,7 +4,10 @@ export const validationRegistSchema = z.object({
     email: z
         .string()
         .min(1,"メールアドレスを入力してください")
-        .email("無効なメールアドレス形式です"),
+        .email("無効なメールアドレス形式です")
+        .refine((email) => email.endsWith("@mail.kyutech.jp"), {
+            message: "許可されていないドメインです。",
+        }),
     password: z
         .string()
         .min(1, "パスワードを入力してください")
