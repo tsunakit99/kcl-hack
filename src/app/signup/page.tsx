@@ -5,9 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, Container, TextField, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import OtpModal from "./_components/OtpModal";
 
 interface Error {
     email: [];
@@ -16,9 +17,11 @@ interface Error {
 }
 
 const SignupPage = () => {
-    const router = useRouter();
     const { data: session, status } = useSession();
     const [resError, setResError] = useState<Error>();
+    const [openOtpModal, setOpenOtpModal] = useState(false);  // OTPモーダルの開閉状態
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     const {
         register,
@@ -36,8 +39,10 @@ const SignupPage = () => {
     const handleRegist = async (data: any) => {
         const email = data.email;
         const password = data.password;
+        const passwordConfirm = data.passwordConfirm;
+        
         const res = await fetch("/api/send-otp", {
-            body: JSON.stringify(data),
+            body: JSON.stringify({ email, password, passwordConfirm }),
             headers: {
                 "Content-type": "application/json",
             },
@@ -45,12 +50,9 @@ const SignupPage = () => {
         });
 
         if (res.ok) {
-            const query = new URLSearchParams({
-                email: email,
-                password: password,
-            });
-            
-            router.push(`/otp?${query.toString()}`);
+            setEmail(email);  // emailを状態に保存
+            setPassword(password);  // passwordを状態に保存
+            setOpenOtpModal(true);  // OTPモーダルを開く
         } else {
             const resError = await res.json();
             setResError(resError.errors);
@@ -118,7 +120,7 @@ const SignupPage = () => {
                     <form onSubmit={handleSubmit(handleRegist)} noValidate>
                         {/* エラーメッセージ表示 */}
                         {resError && (
-                            <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
+                            <Alert severity="error" sx={{ mt: 2, width: "90%" }}>
                                 {Object.values(resError).flat().map((error, index) => (
                                     <p key={index}>{error}</p>
                                 ))}
@@ -177,6 +179,8 @@ const SignupPage = () => {
                     </form>
                 </Box>
             </Container>
+            {/* OTP入力モーダルを表示（propsでemailとpasswordを渡す） */}
+            {openOtpModal && <OtpModal email={email} password={password} open={openOtpModal} onClose={() => setOpenOtpModal(false)} />}
             {/* ログインリンク */}
             <Link href="/signin" passHref>
                 <Typography
@@ -218,7 +222,6 @@ const SignupPage = () => {
             </Link>
         </Box>
     );
-
 };
 
 export default SignupPage;

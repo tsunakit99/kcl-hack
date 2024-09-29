@@ -114,7 +114,7 @@ const SigninPage = () => {
                     <form onSubmit={handleSubmit(handleLogin)} noValidate>
                         {/* エラーメッセージ表示 */}
                         {resError && (
-                            <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
+                            <Alert severity="error" sx={{ mt: 2, width: "90%" }}>
                                 <p>{resError.errors}</p>
                             </Alert>
                         )}

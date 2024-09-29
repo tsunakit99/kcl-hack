@@ -2,11 +2,10 @@
 
 import { Alert, Box, Button, Container, TextField, Typography } from "@mui/material";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 const OtpForm = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const password = searchParams.get("password");

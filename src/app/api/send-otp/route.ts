@@ -31,13 +31,15 @@ async function sendOTPEmail(email:string, otp:string) {
 
 export async function POST(req: NextRequest) {
     const data = await req.json();
-    const { email, password } = data;
+    const { email } = data;
 
     // メールアドレス重複確認とバリテーションを同時に行う
     const [user, validationResult] = await Promise.all([
         prisma.user.findFirst({ where: { email } }),
         validationRegistSchema.safeParseAsync(data)
     ]);
+
+    console.log(data);
 
     let errors = validationResult.success ? {} : validationResult.error.flatten().fieldErrors;
     // スプレッド構文で広げてから代入
@@ -46,8 +48,11 @@ export async function POST(req: NextRequest) {
     }
     
     if (Object.keys(errors).length > 0) {
+         console.log("Validation Errors:", errors); 
         return new NextResponse(JSON.stringify({ errors }), { status: 400 });
     }
+
+    console.log("a");
 
     // OTP生成
     const otp = generateOTP();
@@ -55,14 +60,25 @@ export async function POST(req: NextRequest) {
     // OTPをユーザにメールで送信
     await sendOTPEmail(email, otp);
 
-    // OTPをDBに一時的に保存
-    await prisma.otp.create({
-        data: {
-            email,
-            otp,
-            expires_at: new Date(Date.now() + 10 * 60 * 1000), // 10分後にOTP無効
-        },
-    });
+    if (await prisma.otp.findFirst({ where: { email } })) {
+        await prisma.otp.update({
+            where: { email },
+            data: {
+                email,
+                otp,
+                expires_at: new Date(Date.now() + 10 * 60 * 1000),
+            }
+        });
+    } else {
+        // OTPをDBに一時的に保存
+        await prisma.otp.create({
+            data: {
+                email,
+                otp,
+                expires_at: new Date(Date.now() + 10 * 60 * 1000), // 10分後にOTP無効
+            },
+        });
+    }
 
     return new NextResponse(JSON.stringify({ message: "OTP sent to your email" }), { status: 200 });
     
