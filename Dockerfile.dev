@@ -1,0 +1,23 @@
+# ベースイメージとしてNode.jsを使用
+FROM node:18-alpine
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# パッケージファイルをコピー
+COPY package.json package-lock.json ./
+
+# 依存関係をインストール
+RUN npm install
+
+# 残りのアプリケーションファイルをコピー
+COPY . .
+
+# Prisma generate を実行してクライアントを生成
+RUN npx prisma generate
+
+# ポートを公開
+EXPOSE 3000
+
+# Next.jsを開発モードで起動
+CMD ["npm", "run", "dev"]
