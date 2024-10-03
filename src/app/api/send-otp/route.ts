@@ -52,8 +52,6 @@ export async function POST(req: NextRequest) {
         return new NextResponse(JSON.stringify({ errors }), { status: 400 });
     }
 
-    console.log("a");
-
     // OTP生成
     const otp = generateOTP();
 

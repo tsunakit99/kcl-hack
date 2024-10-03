@@ -16,6 +16,7 @@ const SignupPage = () => {
     const { data: session, status } = useSession();
     const [resError, setResError] = useState<FormError>();
     const [openOtpModal, setOpenOtpModal] = useState(false);
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -35,6 +36,7 @@ const SignupPage = () => {
     const handleRegist = async (data: SignupFormData) => {
         const result = await sendOtp(data);
         if (result.success) {
+            setName(data.name);
             setEmail(data.email);  // emailを状態に保存
             setPassword(data.password);  // passwordを状態に保存
             setOpenOtpModal(true);  // OTPモーダルを開く
@@ -111,6 +113,19 @@ const SignupPage = () => {
                             </Alert>
                         )}
 
+                        {/* 名前フィールド */}
+                        <TextField
+                            margin="normal"
+                            fullWidth
+                            id="name"
+                            label="名前"
+                            autoComplete="name"
+                            autoFocus
+                            {...register("name")}
+                            error={!!errors.name}
+                            helperText={errors.name?.message as React.ReactNode}
+                        />
+
                         {/* メールアドレスフィールド */}
                         <TextField
                             margin="normal"
@@ -163,8 +178,8 @@ const SignupPage = () => {
                     </form>
                 </Box>
             </Container>
-            {/* OTP入力モーダルを表示（propsでemailとpasswordを渡す） */}
-            {openOtpModal && <OtpModal email={email} password={password} open={openOtpModal} onClose={() => setOpenOtpModal(false)} />}
+            {/* OTP入力モーダルを表示（propsでnameとemailとpasswordを渡す） */}
+            {openOtpModal && <OtpModal name={name} email={email} password={password} open={openOtpModal} onClose={() => setOpenOtpModal(false)} />}
             {/* ログインリンク */}
             <Link href="/signin" passHref>
                 <Typography
