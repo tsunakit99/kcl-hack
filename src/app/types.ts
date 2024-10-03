@@ -2,6 +2,7 @@
 
 // エラーメッセージの型定義
 export interface FormError {
+    name?: string[];
     email?: string[];
     password?: string[];
     passwordConfirm?: string[];
@@ -9,6 +10,7 @@ export interface FormError {
 
 // サインアップフォームの型定義
 export interface SignupFormData {
+    name: string;
     email: string;
     password: string;
     passwordConfirm: string;
