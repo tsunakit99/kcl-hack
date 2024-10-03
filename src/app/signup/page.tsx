@@ -8,18 +8,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FormError, SignupFormData } from "../types";
 import OtpModal from "./_components/OtpModal";
-
-interface Error {
-    email: [];
-    password: [];
-    passwordConfirm: [];
-}
+import { sendOtp } from "./actions";
 
 const SignupPage = () => {
     const { data: session, status } = useSession();
-    const [resError, setResError] = useState<Error>();
-    const [openOtpModal, setOpenOtpModal] = useState(false);  // OTPモーダルの開閉状態
+    const [resError, setResError] = useState<FormError>();
+    const [openOtpModal, setOpenOtpModal] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -28,7 +24,7 @@ const SignupPage = () => {
         handleSubmit,
         getValues,
         formState: { errors },
-    } = useForm({
+    } = useForm<SignupFormData>({
         mode: "onBlur",
         resolver: zodResolver(validationRegistSchema),
     });
@@ -36,26 +32,14 @@ const SignupPage = () => {
     if (session) redirect("/");
 
     // 登録処理
-    const handleRegist = async (data: any) => {
-        const email = data.email;
-        const password = data.password;
-        const passwordConfirm = data.passwordConfirm;
-        
-        const res = await fetch("/api/send-otp", {
-            body: JSON.stringify({ email, password, passwordConfirm }),
-            headers: {
-                "Content-type": "application/json",
-            },
-            method: "POST",
-        });
-
-        if (res.ok) {
-            setEmail(email);  // emailを状態に保存
-            setPassword(password);  // passwordを状態に保存
+    const handleRegist = async (data: SignupFormData) => {
+        const result = await sendOtp(data);
+        if (result.success) {
+            setEmail(data.email);  // emailを状態に保存
+            setPassword(data.password);  // passwordを状態に保存
             setOpenOtpModal(true);  // OTPモーダルを開く
         } else {
-            const resError = await res.json();
-            setResError(resError.errors);
+            setResError(result.error);
         }
     };
 

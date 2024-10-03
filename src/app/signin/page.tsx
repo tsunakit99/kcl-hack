@@ -11,45 +11,34 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import AuthLayout from "../components/AuthLayout";
 import LeftLineText from "../components/LeftLineText";
+import { FormError, SigninFormData } from "../types";
+import { logIn } from "./actions";
 
 
-interface ResError {
-    errors: string;
-}
+
 
 const SigninPage = () => {
     const { data: session, status } = useSession();
-    const [resError, setResError] = useState<ResError | undefined>();
+    const [resError, setResError] = useState<FormError>();
     const {
         register,
         handleSubmit,
         getValues,
         formState: { errors },
         
-    } = useForm({
+    } = useForm<SigninFormData>({
         mode: "onBlur",
         resolver: zodResolver(validationLoginSchema),
     });
 
-    // セッション判定
     if (session) redirect("/");
 
-    const handleLogin = async (data: any) => {
-        const email = data.email;
-        const password = data.password;
-        const res = await fetch("/api/signIn", {
-            body: JSON.stringify(data),
-            headers: {
-                "Content-type": "application/json",
-            },
-            method: "POST",
-        });
-
-        if (res.ok) {
-            signIn("credentials", { email: email, password: password });
+    const handleLogin = async (data: SigninFormData) => {
+        const result = await logIn(data);
+        if (result.success) {
+            signIn("credentials", { email: data.email, password: data.password });
         } else {
-            const resError = await res.json();
-            setResError(resError);
+            setResError(result.errors);
         }
     };
 
@@ -63,7 +52,9 @@ const SigninPage = () => {
                         {/* エラーメッセージ表示 */}
                         {resError && (
                             <Alert severity="error" sx={{ mt: 2, width: "90%" }}>
-                                <p>{resError.errors}</p>
+                                {Object.values(resError).flat().map((error, index) => (
+                                    <p key={index}>{error}</p>
+                                ))}
                             </Alert>
                         )}
 
