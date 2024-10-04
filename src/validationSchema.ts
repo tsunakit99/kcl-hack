@@ -1,6 +1,10 @@
 import { z } from "zod"
 
 export const validationRegistSchema = z.object({
+    name: z
+        .string()
+        .min(1, "名前を入力してください")
+        .max(20, "名前は20文字以下です"),
     email: z
         .string()
         .min(1,"メールアドレスを入力してください")

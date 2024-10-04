@@ -1,37 +1,33 @@
 import Modal from "@/app/components/Modal";
 import { Alert, Button, TextField, Typography } from "@mui/material";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { verifyAndCreateUser } from "../actions";
 
 interface OtpModalProps {
+    name: string;
     email: string;
     password: string;
     open: boolean;
     onClose: () => void;
 }
 
-const OtpModal = ({ email, password, open, onClose }: OtpModalProps) => {
+const OtpModal = ({ name, email, password, open, onClose }: OtpModalProps) => {
     const [otp, setOtp] = useState("");
     const [resError, setResError] = useState<string | null>(null);
-    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const res = await fetch("/api/verify-and-create-user", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ otp, email, password }),
-        });
+        const result = await verifyAndCreateUser(otp, name, email, password);
 
-        if (res.ok) {
-            signIn("credentials", { email, password }); // OTP検証成功後に自動サインイン
+        if (result.success) {
+            // OTP検証成功後に自動サインイン
+            signIn("credentials", { name, email, password });
         } else {
-            const errorData = await res.json();
-            setResError(errorData.error);
+            setResError(result.error || "エラーが発生しました。");
         }
-    };
+    }
 
     return (
         <Modal open={open} onClose={onClose}>
