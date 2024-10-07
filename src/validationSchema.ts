@@ -38,3 +38,10 @@ export const validationLoginSchema = z.object({
         .string()
         .min(1, "パスワードを入力してください")
 })
+
+export const validationEditSchema = z.object({
+    name: z
+        .string()
+        .min(1, "名前を入力してください")
+        .max(20, "名前は20文字以下です"),
+})

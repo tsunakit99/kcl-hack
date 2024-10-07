@@ -21,3 +21,8 @@ export interface SigninFormData {
   email: string;
   password: string;
 }
+
+// ユーザ情報編集の型定義
+export interface EditUserFormData {
+    name: string;
+}
