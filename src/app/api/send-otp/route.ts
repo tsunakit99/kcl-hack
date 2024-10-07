@@ -39,8 +39,6 @@ export async function POST(req: NextRequest) {
         validationRegistSchema.safeParseAsync(data)
     ]);
 
-    console.log(data);
-
     let errors = validationResult.success ? {} : validationResult.error.flatten().fieldErrors;
     // スプレッド構文で広げてから代入
     if (user) {
