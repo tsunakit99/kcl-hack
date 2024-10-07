@@ -2,6 +2,7 @@
 import { AccountCircle, Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
 import { AppBar, Box, IconButton, InputBase, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import { useSession } from "next-auth/react";
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -41,7 +42,7 @@ export default function Header() {
             onClose={handleMenuClose}
         >
             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
         </Menu>
     );
   
@@ -49,9 +50,9 @@ export default function Header() {
   const fetchUpdatedUser = async () => {
     if (!session?.user?.id) return; // ユーザーがログインしていない場合、何もしない
     try {
-      const response = await fetch(`/api/users/${session.user.id}`); // APIにリクエストを送る
-      const data = await response.json(); // レスポンスをJSONとして取得
-      setName(data.name); // 最新のユーザー名を状態にセット
+      const response = await fetch(`/api/users/${session.user.id}`);
+      const data = await response.json();
+      setName(data.name);
     } catch (error) {
       console.error("ユーザー情報の取得に失敗しました", error);
     }
@@ -80,13 +81,15 @@ export default function Header() {
           >
             <MenuIcon />
           </IconButton>
+          <Link href="/" passHref style={{textDecoration: 'none', color: 'inherit'}}>
           <Typography
             variant="h6"
             noWrap
-            sx={{ display: "block" }}
+            sx={{ display: "block", cursor: "pointer" }}
           >
             過去問データベース
-          </Typography>
+            </Typography>
+            </Link>
           <Box
             sx={{
               position: "relative",
