@@ -2,11 +2,14 @@
 import { AccountCircle, Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
 import { AppBar, Box, IconButton, InputBase, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import { useSession } from "next-auth/react";
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const { data: session } = useSession();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [name, setName] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const router = useRouter();
 
     const isMenuOpen = Boolean(anchorEl);
 
@@ -17,6 +20,14 @@ export default function Header() {
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
+  
+  const handleProfileClick = () => {
+    const userId = session?.user?.id;
+    if (userId) {
+      router.push(`/profile/${userId}`); // ユーザーのプロフィールページに遷移
+    }
+    handleMenuClose(); // メニューを閉じる
+  };
 
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
@@ -29,13 +40,32 @@ export default function Header() {
             open={isMenuOpen}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>My account</MenuItem>
         </Menu>
     );
+  
+// APIから最新のユーザー情報を取得する関数
+  const fetchUpdatedUser = async () => {
+    if (!session?.user?.id) return; // ユーザーがログインしていない場合、何もしない
+    try {
+      const response = await fetch(`/api/users/${session.user.id}`); // APIにリクエストを送る
+      const data = await response.json(); // レスポンスをJSONとして取得
+      setName(data.name); // 最新のユーザー名を状態にセット
+    } catch (error) {
+      console.error("ユーザー情報の取得に失敗しました", error);
+    }
+  };
 
-    if (!session) return null; // ログインしていない場合は表示しない
-
+  // コンポーネントがマウントされた時、もしくはセッションが変更された時にAPIを呼び出す
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchUpdatedUser(); // APIを呼び出してユーザー名を取得
+    }
+  }, [session]);
+  
+  
+  if (!session) return null; // ログインしていない場合は表示しない
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -95,7 +125,7 @@ export default function Header() {
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Typography>
-            {session?.user?.name}
+            {name || "Guest"} {/* APIから取得したユーザー名を表示。なければ"Guest"を表示 */}
           </Typography>
           <IconButton
             edge="end"
@@ -110,4 +140,4 @@ export default function Header() {
       {renderMenu}
     </Box>
   );
-}
+};
