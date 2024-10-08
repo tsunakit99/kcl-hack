@@ -1,7 +1,7 @@
-import { FormError, SignupFormData } from '../types';
+import { SignupFormData } from '../types';
 
 // OTPを送信するための関数
-export const sendOtp = async (data: SignupFormData): Promise<{ success: boolean; error?: FormError }> => {
+export const sendOtp = async (data: SignupFormData) => {
     const { name, email, password, passwordConfirm } = data;
     
     const res = await fetch("/api/send-otp", {
@@ -26,7 +26,7 @@ export const verifyAndCreateUser = async (
     name: string,
     email: string,
     password: string
-): Promise<{ success: boolean; error?: string | null }> => {
+) => {
     const res = await fetch("/api/verify-and-create-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -36,7 +36,7 @@ export const verifyAndCreateUser = async (
     if (res.ok) {
         return { success: true };
     } else {
-        const errorData = await res.json();
-        return { success: false, error: errorData.error };
+        const resError = await res.json();
+        return { success: false, error: resError.error };
     }
 };
