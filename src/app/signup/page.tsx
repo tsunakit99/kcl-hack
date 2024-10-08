@@ -8,13 +8,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FormError, SignupFormData } from "../types";
+import { SignupFormData } from "../types";
 import OtpModal from "./_components/OtpModal";
 import { sendOtp } from "./actions";
 
 const SignupPage = () => {
     const { data: session, status } = useSession();
-    const [resError, setResError] = useState<FormError>();
+    const [resError, setResError] = useState<string | null>(null);
     const [openOtpModal, setOpenOtpModal] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");

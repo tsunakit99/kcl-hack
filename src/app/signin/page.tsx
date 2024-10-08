@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import AuthLayout from "../components/AuthLayout";
 import LeftLineText from "../components/LeftLineText";
-import { FormError, SigninFormData } from "../types";
+import { SigninFormData } from "../types";
 import { logIn } from "./actions";
 
 
@@ -19,7 +19,7 @@ import { logIn } from "./actions";
 
 const SigninPage = () => {
     const { data: session, status } = useSession();
-    const [resError, setResError] = useState<FormError>();
+    const [resError, setResError] = useState<string | null>(null);
     const {
         register,
         handleSubmit,
@@ -38,7 +38,7 @@ const SigninPage = () => {
         if (result.success) {
             signIn("credentials", { email: data.email, password: data.password });
         } else {
-            setResError(result.errors);
+            setResError(result.error);
         }
     };
 

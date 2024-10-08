@@ -1,13 +1,3 @@
-// types.ts
-
-// エラーメッセージの型定義
-export interface FormError {
-    name?: string[];
-    email?: string[];
-    password?: string[];
-    passwordConfirm?: string[];
-}
-
 // サインアップフォームの型定義
 export interface SignupFormData {
     name: string;
@@ -20,4 +10,9 @@ export interface SignupFormData {
 export interface SigninFormData {
   email: string;
   password: string;
+}
+
+// ユーザ情報編集の型定義
+export interface EditUserFormData {
+    name: string;
 }

@@ -14,6 +14,6 @@ export const logIn = async (data: SigninFormData) => {
     return { success: true };
   } else {
     const resError = await res.json();
-    return { success: false, errors: resError };
+    return { success: false, error: resError.errors };
   }
 };
