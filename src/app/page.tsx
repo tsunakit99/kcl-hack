@@ -34,6 +34,8 @@ export default function Home() {
               <>
               <p> {session?.user?.email}</p>
               <p> {session?.user?.name}</p>
+              <p>ウンチ</p>
+              <p>ほうしんばか</p>
               </>
           )}
         </div>
