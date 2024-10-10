@@ -2,9 +2,12 @@
 
 import Skeleton from '@mui/material/Skeleton';
 import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { data: session, status } = useSession();
+
+  const router = useRouter();
 
   // if (session) {
   //   return (
@@ -36,9 +39,11 @@ export default function Home() {
               <p> {session?.user?.name}</p>
               <p>ウンチ</p>
               <p>ほうしんばか</p>
+              <p>おまえらみんなハゲてしまえ</p>
               </>
           )}
         </div>
+        <button onClick={() => {router.push('/exam/upload')}}>過去問登録へ</button><br/>
         <button onClick={() => signOut()}>サインアウト</button>
       </div>
     </>
