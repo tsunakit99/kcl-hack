@@ -43,6 +43,7 @@ export default function Home() {
               </>
           )}
         </div>
+        {/* ヘッダーに遷移リンクがあれば削除してよい */}
         <button onClick={() => {router.push('/exam/upload')}}>過去問登録へ</button><br/>
         <button onClick={() => signOut()}>サインアウト</button>
       </div>

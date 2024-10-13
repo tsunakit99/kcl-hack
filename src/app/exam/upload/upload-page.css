@@ -7,27 +7,27 @@
     margin: 100px;
 } */
 
-.exam-image{
+#exam-image{
     margin: 20px;
 }
 
-.exam-information{
+#exam-information{
     display: flex;
     flex-direction: column;
 }
 
-.title{
+#title{
     margin: 20px;
 }
 
-.department{
+#department{
     margin: 20px;
 }
 
-.professor{
+#professor{
     margin: 20px;
 }
 
-.year{
+#year{
     margin: 20px;
 }
