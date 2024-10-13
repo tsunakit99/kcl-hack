@@ -1,0 +1,33 @@
+.exam-container{
+    display: flex;
+}
+
+/* ドロップボックス用
+    .exam-image{
+    margin: 100px;
+} */
+
+.exam-image{
+    margin: 20px;
+}
+
+.exam-information{
+    display: flex;
+    flex-direction: column;
+}
+
+.title{
+    margin: 20px;
+}
+
+.department{
+    margin: 20px;
+}
+
+.professor{
+    margin: 20px;
+}
+
+.year{
+    margin: 20px;
+}
