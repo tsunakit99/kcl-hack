@@ -9,7 +9,7 @@ export async function GET(req:NextRequest) {
         return new NextResponse(JSON.stringify({ title: [] }));
     }
 
-    const exams = await prisma.exams.findMany({
+    const exams = await prisma.exam.findMany({
         where: {
             title: {
                 contains: query,
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
         }
 
         // データベースに挿入
-        const exams = await prisma.exams.create({
+        const exams = await prisma.exam.create({
             data: {
                 title,
                 departmentId,
