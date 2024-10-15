@@ -47,7 +47,7 @@ export const validationEditSchema = z.object({
 })
 
 export const validationUploadExamSchema = z.object({
-    title: z.string().min(1, '講義名は必須です'),
+    lectureName: z.string().min(1, '講義名は必須です'),
     departmentId: z.string().min(1, '学科を選択してください'),
     year: z
         .number({ invalid_type_error: '年度は数値で入力してください' })
@@ -55,11 +55,5 @@ export const validationUploadExamSchema = z.object({
         .min(1900, '年度が不正です')
         .max(new Date().getFullYear(), '年度が不正です'),
     professor: z.string().optional(),
-    file: z
-        .any()
-        .refine((file) => file?.length > 0, 'ファイルは必須です')
-        .refine(
-            (file) => file?.[0]?.type === 'application/pdf',
-            'PDFファイルを選択してください'
-        ),
+    file: z.any(), 
 });
