@@ -31,7 +31,10 @@ export default function Home() {
           {status === "loading" ? (
             <Skeleton variant="text" animation="wave" width={175} height={25} />  
           ) : (
-            <p> {session?.user?.email}</p>
+              <>
+              <p> {session?.user?.email}</p>
+              <p> {session?.user?.name}</p>
+              </>
           )}
         </div>
         <button onClick={() => signOut()}>サインアウト</button>
