@@ -76,17 +76,18 @@ model Otp {
 }
 
 model Exam {
-  id           String      @id @default(cuid())
-  title        String
+  id           String    @id @default(cuid())
   year         Int
-  professor    String?     // オプショナルに変更
+  professor    String?
   fileUrl      String
-  uploader     User        @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  uploader     User      @relation(fields: [uploaderId], references: [id])
   uploaderId   String
-  department   Department  @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  department   Department  @relation(fields: [departmentId], references: [id])
   departmentId String
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  lecture      Lecture   @relation(fields: [lectureId], references: [id])
+  lectureId    String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@map("exams")
 }
@@ -97,5 +98,13 @@ model Department {
   exams Exam[]
 
   @@map("departments")
+}
+
+model Lecture {
+  id     String @id @default(cuid())
+  name   String @unique
+  exams  Exam[]
+
+  @@map("lectures")
 }
 

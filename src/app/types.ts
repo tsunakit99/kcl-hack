@@ -19,9 +19,9 @@ export interface EditUserFormData {
 
 // 過去問登録フォームの型定義
 export interface UploadExamFormData {
-  title: string;
+  lectureName: string;
   departmentId: string;
   year: number;
   professor?: string;
-  file: FileList;
+  file: File[];
 }
