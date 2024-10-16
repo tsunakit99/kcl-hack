@@ -1,10 +1,6 @@
 import { z } from "zod"
 
 export const validationRegistSchema = z.object({
-    name: z
-        .string()
-        .min(1, "名前を入力してください")
-        .max(20, "名前は20文字以下です"),
     email: z
         .string()
         .min(1,"メールアドレスを入力してください")
@@ -38,30 +34,3 @@ export const validationLoginSchema = z.object({
         .string()
         .min(1, "パスワードを入力してください")
 })
-
-export const validationEditSchema = z.object({
-    name: z
-        .string()
-        .min(1, "名前を入力してください")
-        .max(20, "名前は20文字以下です"),
-})
-
-export const validationUploadExamSchema = z.object({
-    lectureName: z.string().min(1, '講義名は必須です'),
-    departmentId: z.string().min(1, '学科を選択してください'),
-    year: z
-        .number({ invalid_type_error: '年度は数値で入力してください' })
-        .int('年度は整数で入力してください')
-        .min(1900, '年度が不正です')
-        .max(new Date().getFullYear(), '年度が不正です'),
-    professor: z.string().optional(),
-    file: z.custom<File[] | null>((file) => {
-        // ファイルが null または空かどうかをチェック
-        if (!file || file.length === 0) {
-            return false;
-        }
-        return true;
-    }, {
-        message: 'ファイルは必須です'
-    }) 
-});

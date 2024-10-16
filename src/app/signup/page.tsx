@@ -8,15 +8,18 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { SignupFormData } from "../types";
 import OtpModal from "./_components/OtpModal";
-import { sendOtp } from "./actions";
+
+interface Error {
+    email: [];
+    password: [];
+    passwordConfirm: [];
+}
 
 const SignupPage = () => {
     const { data: session, status } = useSession();
-    const [resError, setResError] = useState<string | null>(null);
-    const [openOtpModal, setOpenOtpModal] = useState(false);
-    const [name, setName] = useState("");
+    const [resError, setResError] = useState<Error>();
+    const [openOtpModal, setOpenOtpModal] = useState(false);  // OTPモーダルの開閉状態
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -25,7 +28,7 @@ const SignupPage = () => {
         handleSubmit,
         getValues,
         formState: { errors },
-    } = useForm<SignupFormData>({
+    } = useForm({
         mode: "onBlur",
         resolver: zodResolver(validationRegistSchema),
     });
@@ -33,15 +36,26 @@ const SignupPage = () => {
     if (session) redirect("/");
 
     // 登録処理
-    const handleRegist = async (data: SignupFormData) => {
-        const result = await sendOtp(data);
-        if (result.success) {
-            setName(data.name);
-            setEmail(data.email);  // emailを状態に保存
-            setPassword(data.password);  // passwordを状態に保存
+    const handleRegist = async (data: any) => {
+        const email = data.email;
+        const password = data.password;
+        const passwordConfirm = data.passwordConfirm;
+        
+        const res = await fetch("/api/send-otp", {
+            body: JSON.stringify({ email, password, passwordConfirm }),
+            headers: {
+                "Content-type": "application/json",
+            },
+            method: "POST",
+        });
+
+        if (res.ok) {
+            setEmail(email);  // emailを状態に保存
+            setPassword(password);  // passwordを状態に保存
             setOpenOtpModal(true);  // OTPモーダルを開く
         } else {
-            setResError(result.error);
+            const resError = await res.json();
+            setResError(resError.errors);
         }
     };
 
@@ -113,19 +127,6 @@ const SignupPage = () => {
                             </Alert>
                         )}
 
-                        {/* 名前フィールド */}
-                        <TextField
-                            margin="normal"
-                            fullWidth
-                            id="name"
-                            label="名前"
-                            autoComplete="name"
-                            autoFocus
-                            {...register("name")}
-                            error={!!errors.name}
-                            helperText={errors.name?.message as React.ReactNode}
-                        />
-
                         {/* メールアドレスフィールド */}
                         <TextField
                             margin="normal"
@@ -178,8 +179,8 @@ const SignupPage = () => {
                     </form>
                 </Box>
             </Container>
-            {/* OTP入力モーダルを表示（propsでnameとemailとpasswordを渡す） */}
-            {openOtpModal && <OtpModal name={name} email={email} password={password} open={openOtpModal} onClose={() => setOpenOtpModal(false)} />}
+            {/* OTP入力モーダルを表示（propsでemailとpasswordを渡す） */}
+            {openOtpModal && <OtpModal email={email} password={password} open={openOtpModal} onClose={() => setOpenOtpModal(false)} />}
             {/* ログインリンク */}
             <Link href="/signin" passHref>
                 <Typography
