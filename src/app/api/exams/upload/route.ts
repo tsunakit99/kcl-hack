@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         const { lectureName: validLectureName, departmentId: validDepartmentId, year: validYear, professor: validProfessor, file: validFile } = validationResult.data;
 
         // ファイルのバリデーション
-        if (validFile.type !== 'application/pdf') {
+        if (validFile?.length === 0 ) {
             return new NextResponse(JSON.stringify({ message: 'PDFファイルをアップロードしてください。' }), { status: 400 });
         }
 
