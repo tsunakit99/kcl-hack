@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   CardContent,
+  Divider,
   FormControl,
   InputBase,
   MenuItem,
@@ -115,21 +116,6 @@ export default function Home() {
     loadExams();
   }, []);
 
-  // if (session) {
-  //   return (
-  //     <>
-  //       <p>Signed in as {session.user?.email}</p>
-  //       <button onClick={() => signOut()}>Sign out</button>
-  //     </>
-  //   );
-  // } else {
-  //   return (
-  //     <>
-  //       <p>Not signed in</p>
-  //       <button onClick={() => signIn("github")}>Sign in with GitHub</button>
-  //     </>
-  //   );
-  // }
 
   return (
     <>
@@ -191,11 +177,15 @@ export default function Home() {
               scrollbarWidth: "none", // Firefox対応
             }}
           >
+            <Divider textAlign="center" sx={{
+              marginBottom: "20px",
+              marginTop: "-15px"
+            }}>直近に投稿された過去問一覧</Divider>
             <Box
               sx={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: 2, // カード間のスペース
+                gap: 2,
               }}
             >
               {exams.map((exam) => (
@@ -205,10 +195,12 @@ export default function Home() {
                     width: 'calc(50% - 16px)', // 2列レイアウト
                   }}
                 >
+                  {/* リンクを追加するときはこのコメントを外す */}
+                  {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */} 
                   <Card
                     sx={{
-                      height: "25vh", // viewport heightの25%
-                      marginBottom: "2vh", // viewport heightの2%
+                      height: "25vh",
+                      marginBottom: "2vh",
                       backgroundColor: "#ffffff",
                       boxShadow: 3,
                       display: "flex",
@@ -237,7 +229,8 @@ export default function Home() {
                         教授名: {exam.professor || '不明'}
                       </Typography>
                     </CardContent>
-                  </Card>
+                    </Card>
+                    {/* </Link> */}
 
                 </Box>
               ))}
@@ -268,7 +261,8 @@ export default function Home() {
                 height: "100%",
                 boxShadow: "0px 2px 10px 4px rgba(0, 0, 0, 0.2)",
                 overflow: "visible",
-                padding: "10px"
+                padding: "10px",
+                marginTop: "-7px"
               }}
             >
               <div
