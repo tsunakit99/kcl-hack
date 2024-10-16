@@ -1,10 +1,24 @@
 "use client";
-import { AccountCircle, Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
-import { AppBar, Box, IconButton, InputBase, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import {
+  AccountCircle,
+  Menu as MenuIcon,
+  Search as SearchIcon,
+} from "@mui/icons-material";
+import {
+  AppBar,
+  Box,
+  IconButton,
+  InputBase,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { useSession } from "next-auth/react";
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import HoverLink from "./HoverLink";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -12,16 +26,16 @@ export default function Header() {
   const { data: session } = useSession();
   const router = useRouter();
 
-    const isMenuOpen = Boolean(anchorEl);
+  const isMenuOpen = Boolean(anchorEl);
 
-    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-  
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   const handleProfileClick = () => {
     const userId = session?.user?.id;
     if (userId) {
@@ -30,23 +44,23 @@ export default function Header() {
     handleMenuClose(); // メニューを閉じる
   };
 
-    const menuId = 'primary-search-account-menu';
-    const renderMenu = (
-        <Menu
-            anchorEl={anchorEl}
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            id={menuId}
-            keepMounted
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            open={isMenuOpen}
-            onClose={handleMenuClose}
-        >
-            <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-            {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
-        </Menu>
-    );
-  
-// APIから最新のユーザー情報を取得する関数
+  const menuId = "primary-search-account-menu";
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+      {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
+    </Menu>
+  );
+
+  // APIから最新のユーザー情報を取得する関数
   const fetchUpdatedUser = async () => {
     if (!session?.user?.id) return; // ユーザーがログインしていない場合、何もしない
     try {
@@ -64,71 +78,48 @@ export default function Header() {
       fetchUpdatedUser(); // APIを呼び出してユーザー名を取得
     }
   }, [session]);
-  
-  
+
   if (!session) return null; // ログインしていない場合は表示しない
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
+      <AppBar position="static" sx={{ height: "90px" }}>
+        <Toolbar style={{ backgroundColor: "#444f7c" }}>
+          {/* <IconButton
             edge="start"
             sx={{
               marginRight: 2,
-              marginLeft: 2
+              marginLeft: 2,
             }}
             color="inherit"
           >
             <MenuIcon />
-          </IconButton>
-          <Link href="/" passHref style={{textDecoration: 'none', color: 'inherit'}}>
-          <Typography
-            variant="h6"
-            noWrap
-            sx={{ display: "block", cursor: "pointer" }}
+          </IconButton> */}
+          <Link
+            href="/"
+            passHref
+            style={{ textDecoration: "none", color: "inherit" }}
           >
-            過去問データベース
-            </Typography>
-            </Link>
-          <Box
-            sx={{
-              position: "relative",
-              borderRadius: 1,
-              backgroundColor: "rgba(255,255,255,0.15)",
-              "&:hover": {
-                backgroundColor: "rgba(255,255,255,0.25)",
-              },
-              marginLeft: 3,
-              marginRight: 2,
-              width: "auto",
-            }}
-          >
-            <Box
+            <Typography
+              variant="h6"
+              noWrap
               sx={{
-                padding: "0 16px",
-                height: "100%",
-                position: "absolute",
-                pointerEvents: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: "block",
+                cursor: "pointer",
+                fontSize: "25px",
+                padding: "30px",
               }}
             >
-              <SearchIcon />
-            </Box>
-            <InputBase
-              placeholder="Search…"
-              sx={{
-                color: "inherit",
-                paddingLeft: `calc(1em + 32px)`,
-                transition: "width 0.2s",
-                width: "20ch",
-              }}
-            />
-          </Box>
+              過去問データベース
+            </Typography>
+          </Link>
+          <HoverLink href="/" text="検索" underlineColor="#ffffff" />
+          <HoverLink href="/" text="投稿" underlineColor="#ffffff" />
+          <HoverLink href="/" text="修正・削除" underlineColor="#ffffff" />
+
           <Box sx={{ flexGrow: 1 }} />
-          <Typography>
-            {name || "Guest"} {/* APIから取得したユーザー名を表示。なければ"Guest"を表示 */}
+          <Typography sx={{ fontSize: "25px" }}>
+            {name || "Guest"}{" "}
+            {/* APIから取得したユーザー名を表示。なければ"Guest"を表示 */}
           </Typography>
           <IconButton
             edge="end"
@@ -143,4 +134,4 @@ export default function Header() {
       {renderMenu}
     </Box>
   );
-};
+}
