@@ -3,7 +3,7 @@
 import { UploadExamFormData } from "@/app/types";
 import { validationUploadExamSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Autocomplete, Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from 'react-dropzone';
@@ -49,16 +49,15 @@ const UploadExamForm = () => {
         fetchLectureSuggestions();
     }, [watchLectureName]);
 
-    // Dropzoneの設定
     const onDrop = (acceptedFiles: File[]) => {
-        setFiles(acceptedFiles); // ドロップされたファイルをstateに保存
-        setValue('file', acceptedFiles); // React Hook Formにセット
+        setFiles(acceptedFiles);
+        setValue('file', acceptedFiles);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { 'application/pdf': [] }, // PDFのみを受け付ける
-        multiple: false, // 一度に1ファイルのみ
+        accept: { 'application/pdf': [] },
+        multiple: false,
     });
 
     const onSubmit = async (data: UploadExamFormData) => {
@@ -74,24 +73,6 @@ const UploadExamForm = () => {
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
             <Stack spacing={10}>
                 {resError && <Alert severity="error">{resError}</Alert>}
-
-                <FormControl fullWidth required error={!!errors.departmentId}>
-                    <InputLabel id="department-label">学科</InputLabel>
-                    <Controller
-                        name="departmentId"
-                        control={control}
-                        render={({ field }) => (
-                            <Select labelId="department-label" label="学科" {...field} value={field.value || ""}>
-                                {departments.map((dept) => (
-                                    <MenuItem key={dept.id} value={dept.id}>
-                                        {dept.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        )}
-                    />
-                    {errors.departmentId && <p style={{ color: 'red' }}>{errors.departmentId.message}</p>}
-                </FormControl>
 
                 <Controller
                     name="lectureName"
@@ -113,15 +94,41 @@ const UploadExamForm = () => {
                         />
                     )}
                 />
-
-                <TextField
-                    label="年度"
-                    type="number"
-                    required
-                    {...register('year', { valueAsNumber: true })}
-                    error={!!errors.year}
-                    helperText={errors.year?.message as React.ReactNode}
-                />
+                <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "30px"
+                    
+                }}>
+                    <TextField
+                        label="年度"
+                        type="number"
+                        required
+                        {...register('year', { valueAsNumber: true })}
+                        error={!!errors.year}
+                        helperText={errors.year?.message as React.ReactNode}
+                    />
+                    <FormControl fullWidth required error={!!errors.departmentId}>
+                        <InputLabel id="department-label">学科</InputLabel>
+                        <Controller
+                            name="departmentId"
+                            control={control}
+                            defaultValue={departments[0]?.id || ""}
+                            render={({ field }) => (
+                                <Select labelId="department-label" label="学科" {...field} value={field.value || ""}>
+                                    {departments.map((dept) => (
+                                        <MenuItem key={dept.id} value={dept.id}>
+                                            {dept.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            )}
+                        />
+                        {errors.departmentId && (
+                            <FormHelperText>{errors.departmentId.message}</FormHelperText>
+                        )}
+                    </FormControl>
+                </div>
 
                 <TextField
                     label="教授名（任意）"
@@ -135,19 +142,36 @@ const UploadExamForm = () => {
                     {...getRootProps()}
                     sx={{
                         border: '2px dashed #ccc',
-                        padding: '20px',
-                        textAlign: 'center',
+                        borderRadius: '10px',
+                        padding: '50px',
                         cursor: 'pointer',
                         backgroundColor: isDragActive ? '#f0f0f0' : 'transparent',
                     }}
                 >
                     <input {...getInputProps()} />
-                    <Typography>{files.length > 0 ? files[0].name : 'PDFファイルをドラッグ＆ドロップまたはクリックして選択'}</Typography>
+                    <Box>
+                        {files.length > 0 ? (
+                            <>
+                                <Typography variant="h4" align="center" color="blue">
+                                    <img
+                                        src="/icon/pdf.png"
+                                        alt="PDF Icon"
+                                        style={{ width: 30, height: 30, marginRight: 8 }}
+                                    />
+                                    {files[0].name}</Typography>
+                            </>
+                        ) : (
+                            <Typography align="center">PDFファイルをドラッグ&ドロップまたはクリックして選択</Typography>
+                        )}
+                    </Box>
+
+                    {errors.file && (
+                        <FormHelperText error>{errors.file.message}</FormHelperText>
+                    )}
                 </Box>
-                {errors.file && <p style={{ color: 'red' }}>{errors.file.message}</p>}
 
                 <Button type="submit" variant="contained" color="primary">
-                    アップロード
+                    投稿
                 </Button>
             </Stack>
         </Box>
