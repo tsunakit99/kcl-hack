@@ -1,24 +1,24 @@
 "use client";
 import {
-  AccountCircle,
-  Menu as MenuIcon,
-  Search as SearchIcon,
+  AccountCircle
 } from "@mui/icons-material";
 import {
   AppBar,
   Box,
   IconButton,
-  InputBase,
   Menu,
   MenuItem,
   Toolbar,
-  Typography,
+  Typography
 } from "@mui/material";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import HoverLink from "./HoverLink";
+
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import HoverIconLink from "./HoverIconLink";
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -113,7 +113,7 @@ export default function Header() {
             </Typography>
           </Link>
           <HoverLink href="/" text="検索" underlineColor="#ffffff" />
-          <HoverLink href="/" text="投稿" underlineColor="#ffffff" />
+          <HoverIconLink href="/exam/upload" icon={PostAddIcon} underlineColor="#ffffff"></HoverIconLink>
           <HoverLink href="/" text="修正・削除" underlineColor="#ffffff" />
 
           <Box sx={{ flexGrow: 1 }} />
