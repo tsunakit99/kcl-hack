@@ -11,7 +11,7 @@ import {
   Toolbar,
   Typography
 } from "@mui/material";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -44,6 +44,11 @@ export default function Header() {
     handleMenuClose(); // メニューを閉じる
   };
 
+  const handleLogOut = () => {
+    signOut();
+    handleMenuClose();
+  }
+
   const menuId = "primary-search-account-menu";
   const renderMenu = (
     <Menu
@@ -56,7 +61,7 @@ export default function Header() {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-      {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
+      <MenuItem onClick={handleLogOut}>LogOut</MenuItem>
     </Menu>
   );
 
