@@ -17,20 +17,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { getExams } from "./actions";
 import CircleIcon from "./components/CircleIcon";
-
-const cardData = [
-  { id: 1, title: "Card 1", content: "This is card 1 content" },
-  { id: 2, title: "Card 2", content: "This is card 2 content" },
-  { id: 3, title: "Card 3", content: "This is card 3 content" },
-  { id: 4, title: "Card 4", content: "This is card 4 content" },
-  { id: 5, title: "Card 5", content: "This is card 5 content" },
-  { id: 6, title: "Card 6", content: "This is card 6 content" },
-  { id: 7, title: "Card 7", content: "This is card 7 content" },
-  { id: 8, title: "Card 8", content: "This is card 8 content" },
-  { id: 9, title: "Card 9", content: "This is card 9 content" },
-  { id: 10, title: "Card 10", content: "This is card 10 content" },
-  // 必要に応じてデータを追加
-];
+import { getLectureNames } from "./exam/upload/actions";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -98,6 +85,8 @@ export default function Home() {
 
   const [subject, setSubject] = useState("");
   const [year, setYear] = useState("");
+  const [lectureName, setLectureName] = useState('');
+  const [lectureOptions, setLectureOptions] = useState<string[]>([]);
   const [exams, setExams] = useState<{ id: string; lecture: { name: string }; department: { name: string }; year: number; professor: string; }[]>([]);
 
   const handleSubjectChange = (event: SelectChangeEvent) => {
@@ -115,6 +104,16 @@ export default function Home() {
     };
     loadExams();
   }, []);
+
+  useEffect(() => {
+    const fetchLectureNames = async () => {
+      if (lectureName.length > 0) {
+        const data = await getLectureNames(lectureName);
+        setLectureOptions(data);
+      }
+    };
+    fetchLectureNames();
+  }, [lectureName]);
 
 
   return (
@@ -196,7 +195,7 @@ export default function Home() {
                   }}
                 >
                   {/* リンクを追加するときはこのコメントを外す */}
-                  {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */} 
+                  {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */}
                   <Card
                     sx={{
                       height: "25vh",
@@ -229,8 +228,8 @@ export default function Home() {
                         教授名: {exam.professor || '不明'}
                       </Typography>
                     </CardContent>
-                    </Card>
-                    {/* </Link> */}
+                  </Card>
+                  {/* </Link> */}
 
                 </Box>
               ))}
@@ -319,6 +318,14 @@ export default function Home() {
               </Typography>
               <CardContent sx={{ paddingTop: "20px" }}>
                 <Search>
+                  {/* <Autocomplete
+                    freeSolo
+                    options={lectureOptions}
+                    onInputChange={(event, newValue) => setLectureName(newValue)}
+                    renderInput={(params) => (
+                      <TextField {...params} label="講義名" variant="outlined" />
+                    )}
+                  /> */}
                   <StyledInputBase
                     placeholder=""
                     inputProps={{ "aria-label": "search" }}
