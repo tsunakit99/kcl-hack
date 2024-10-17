@@ -1,36 +1,23 @@
 "use client";
 
-import Skeleton from "@mui/material/Skeleton";
-import { signOut, useSession } from "next-auth/react";
-import React from "react";
 import {
-  Card,
-  CardContent,
-  Typography,
-  InputBase,
   Box,
   Button,
-  Container,
-  Grid,
-  InputLabel,
-  MenuItem,
+  Card,
+  CardContent,
+  Divider,
   FormControl,
+  InputBase,
+  MenuItem,
+  Typography
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import { styled, alpha } from "@mui/material/styles";
-import CircleIcon from "./components/CircleIcon";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-
-const cardData = [
-  { id: 1, title: "Card 1", content: "This is card 1 content" },
-  { id: 2, title: "Card 2", content: "This is card 2 content" },
-  { id: 3, title: "Card 3", content: "This is card 3 content" },
-  { id: 4, title: "Card 4", content: "This is card 4 content" },
-  { id: 5, title: "Card 5", content: "This is card 5 content" },
-  { id: 6, title: "Card 6", content: "This is card 6 content" },
-  { id: 7, title: "Card 7", content: "This is card 7 content" },
-  // 必要に応じてデータを追加
-];
+import { alpha, styled } from "@mui/material/styles";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { getExams } from "./actions";
+import CircleIcon from "./components/CircleIcon";
+import { getLectureNames } from "./exam/upload/actions";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -96,8 +83,11 @@ const SearchButton = styled(Button)(({ theme }) => ({
 export default function Home() {
   const { data: session, status } = useSession();
 
-  const [subject, setSubject] = React.useState("");
-  const [year, setYear] = React.useState("");
+  const [subject, setSubject] = useState("");
+  const [year, setYear] = useState("");
+  const [lectureName, setLectureName] = useState('');
+  const [lectureOptions, setLectureOptions] = useState<string[]>([]);
+  const [exams, setExams] = useState<{ id: string; lecture: { name: string }; department: { name: string }; year: number; professor: string; }[]>([]);
 
   const handleSubjectChange = (event: SelectChangeEvent) => {
     setSubject(event.target.value as string);
@@ -107,21 +97,24 @@ export default function Home() {
     setYear(event.target.value as string);
   };
 
-  // if (session) {
-  //   return (
-  //     <>
-  //       <p>Signed in as {session.user?.email}</p>
-  //       <button onClick={() => signOut()}>Sign out</button>
-  //     </>
-  //   );
-  // } else {
-  //   return (
-  //     <>
-  //       <p>Not signed in</p>
-  //       <button onClick={() => signIn("github")}>Sign in with GitHub</button>
-  //     </>
-  //   );
-  // }
+  useEffect(() => {
+    const loadExams = async () => {
+      const data = await getExams();
+      setExams(data);
+    };
+    loadExams();
+  }, []);
+
+  useEffect(() => {
+    const fetchLectureNames = async () => {
+      if (lectureName.length > 0) {
+        const data = await getLectureNames(lectureName);
+        setLectureOptions(data);
+      }
+    };
+    fetchLectureNames();
+  }, [lectureName]);
+
 
   return (
     <>
@@ -129,12 +122,11 @@ export default function Home() {
         <div style={{ display: "flex" }}>
           <Box
             sx={{
-              width: "18%",
+              width: "10%",
               flexDirection: "column",
               justifyContent: "center",
               backgroundColor: "#c0d7d2",
               padding: "10px",
-              height: "800px",
               borderRadius: 2,
             }}
           >
@@ -164,18 +156,18 @@ export default function Home() {
             style={{
               width: "2px", // 線の幅
               marginLeft: "2%",
-              height: "800px", // 線の高さ
               backgroundColor: "#ccc", // 線の色
               margin: "0 20px", // 両Boxとの間隔
+              alignSelf: "stretch"
             }}
           ></div>
           <Box
             sx={{
-              width: "75%",
+              width: "50%",
               marginLeft: "0.5%",
-              height: "800px",
               overflowY: "auto",
               padding: 2,
+              maxHeight: "1000px",
               borderRadius: 2,
               // スクロールバーを非表示にするためのCSS
               "&::-webkit-scrollbar": {
@@ -184,68 +176,92 @@ export default function Home() {
               scrollbarWidth: "none", // Firefox対応
             }}
           >
-            <Grid container spacing={2}>
-              {cardData.map((card) => (
-                <Grid item xs={6} key={card.id}>
+            <Divider textAlign="center" sx={{
+              marginBottom: "20px",
+              marginTop: "-15px"
+            }}>直近に投稿された過去問一覧</Divider>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 2,
+              }}
+            >
+              {exams.map((exam) => (
+                <Box
+                  key={exam.id}
+                  sx={{
+                    width: 'calc(50% - 16px)', // 2列レイアウト
+                  }}
+                >
+                  {/* リンクを追加するときはこのコメントを外す */}
+                  {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */}
                   <Card
                     sx={{
-                      height: "200px",
-                      marginBottom: 2,
+                      height: "25vh",
+                      marginBottom: "2vh",
                       backgroundColor: "#ffffff",
                       boxShadow: 3,
                       display: "flex",
                     }}
                   >
-                    <img
+                    <Box
+                      component="img"
                       src="/icon/book.png"
                       alt="book"
-                      style={{
+                      sx={{
                         position: "relative",
-                        top: "15%",
-                        width: "100%",
-                        height: "100%",
+                        top: "15%", // カード内で位置調整
+                        width: "30%", // 相対的にサイズを設定
+                        height: "auto", // アスペクト比を保つ
+                        objectFit: "contain", // 画像がコンテナに収まるようにする
                       }}
-                    ></img>
+                    />
                     <CardContent>
                       <Typography variant="h5" component="div">
-                        {card.title}
+                        {exam.lecture.name} ({exam.year})
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {card.content}
+                        学科: {exam.department.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        教授名: {exam.professor || '不明'}
                       </Typography>
                     </CardContent>
                   </Card>
-                </Grid>
+                  {/* </Link> */}
+
+                </Box>
               ))}
-            </Grid>
+            </Box>
           </Box>
           <div
             style={{
               width: "2px", // 線の幅
-              height: "800px", // 線の高さ
               backgroundColor: "#ccc", // 線の色
               margin: "0 20px", // 両Boxとの間隔
+              alignSelf: "stretch"
             }}
           ></div>
           <Box
             sx={{
-              width: "75%",
+              width: "40%",
               marginLeft: "12px",
               flexDirection: "column",
               justifyContent: "center",
               backgroundColor: "#c0d7d2",
-              padding: "10px",
-              height: "800px",
+              padding: "30px",
               borderRadius: 2,
             }}
           >
             <Card
               sx={{
                 position: "relative",
-                height: "760px",
+                height: "100%",
                 boxShadow: "0px 2px 10px 4px rgba(0, 0, 0, 0.2)",
-                margin: "20px",
                 overflow: "visible",
+                padding: "10px",
+                marginTop: "-7px"
               }}
             >
               <div
@@ -302,6 +318,14 @@ export default function Home() {
               </Typography>
               <CardContent sx={{ paddingTop: "20px" }}>
                 <Search>
+                  {/* <Autocomplete
+                    freeSolo
+                    options={lectureOptions}
+                    onInputChange={(event, newValue) => setLectureName(newValue)}
+                    renderInput={(params) => (
+                      <TextField {...params} label="講義名" variant="outlined" />
+                    )}
+                  /> */}
                   <StyledInputBase
                     placeholder=""
                     inputProps={{ "aria-label": "search" }}
@@ -316,7 +340,7 @@ export default function Home() {
                   backgroundColor: "#c0d7d2",
                   position: "relative",
                   top: "20px",
-                  margin: "0 auto",
+                  margin: "20px auto",
                 }}
               ></div>
               <div
@@ -334,7 +358,7 @@ export default function Home() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginTop: "30px",
+                  marginTop: "70px",
                 }}
               >
                 <img
@@ -574,36 +598,6 @@ export default function Home() {
             </Card>
           </Box>
         </div>
-        <Box
-          component="footer"
-          flexGrow={0}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            width: "100%",
-            margin: "20px 0",
-          }}
-        >
-          <div
-            style={{
-              width: "100%", // 線の幅
-              height: "2px", // 線の高さ
-              backgroundColor: "#c0d7d2", // 線の色
-              marginBottom: "15px",
-            }}
-          ></div>
-          <div
-            style={{
-              width: "100%", // 線の幅
-              height: "20px", // 線の高さ
-              backgroundColor: "#444f7c", // 線の色
-              marginBottom: "8px",
-            }}
-          ></div>
-          {/* <button onClick={() => signOut()}>サインアウト</button> */}
-        </Box>
       </div>
     </>
   );

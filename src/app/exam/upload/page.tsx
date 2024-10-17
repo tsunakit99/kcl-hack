@@ -7,7 +7,10 @@ const UploadExam = () => {
         flexDirection: "column",
         padding: "30px",
         alignItems: "center",
-        backgroundColor: "#c0d7d2"
+        height: "100%",
+        backgroundColor: "#c0d7d2",
+        borderRadius: "20px",
+        margin: "20px"
     }}>
           
         <Typography variant="h2" align="center">過去問投稿</Typography>
