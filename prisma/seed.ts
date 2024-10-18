@@ -2,15 +2,15 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  // const departments = ['共通', '知能情報工学科', '情報通信工学科', '知的システム工学科', '物理情報工学科', '生命化学情報工学科']; // 事前に用意した学科名
+  const departments = ['共通', '知能情報工学科', '情報通信工学科', '知的システム工学科', '物理情報工学科', '生命化学情報工学科']; // 事前に用意した学科名
 
-  // for (const name of departments) {
-  //   await prisma.department.upsert({
-  //     where: { name },
-  //     update: {},
-  //     create: { name },
-  //   });
-  // }
+  for (const name of departments) {
+    await prisma.department.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+  }
   const lectureNames = [
     "教職論", "教育原理", "教育心理学", "解析Ⅰ・同演習", "線形代数Ⅰ", "離散数学Ⅰ", "解析Ⅱ", "線形代数Ⅱ・同演習", "離散数学Ⅱ",
     "力学Ⅰ", "電磁気学Ⅰ", "化学Ⅰ", "生物学Ⅰ", "情報工学基礎実験", "プログラミング", "計算機システムⅠ", "情報工学概論", 
