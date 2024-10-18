@@ -14,13 +14,14 @@ interface EditUserFormProps {
   currentName: string;
   currentDepartmentId: string;
   currentIntroduction: string;
-  currentIcon: File;
+  currentIcon?: string;
 }
 
 const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroduction, currentIcon}: EditUserFormProps) => {
   const [resError, setResError] = useState<string | null>(null);
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
   const router = useRouter();
+  const [imagePreview, setImagePreview] = useState<string>(currentIcon || "");
 
   const {
     control,
@@ -34,7 +35,7 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
       name: currentName,
       departmentId: currentDepartmentId,
       introduction: currentIntroduction,
-      image: currentIcon,
+      image: undefined,
     },
   });
 
@@ -62,8 +63,17 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
   } else {
     setResError(result.error);
   }
-};
+  };
 
+  useEffect(() => {
+  // imagePreview が変更されるたびに前回のプレビューURLを解放
+  return () => {
+    if (imagePreview && imagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreview);
+    }
+  };
+  }, [imagePreview]);
+  
   return (
     <Box component="form" onSubmit={handleSubmit(handleEdit)} sx={{ maxWidth: "80%", margin: "auto", mt: 10 }} noValidate>
       <Stack direction="row" spacing={2}>
@@ -77,6 +87,25 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
           </Alert>
         )}
         <Stack>
+          {imagePreview && (
+            <Box
+              sx={{
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                overflow: "hidden",
+                marginTop: "20px",
+                marginLeft: "23px",
+                border: "2px solid #000",
+              }}
+            >
+              <img
+                src={imagePreview}
+                alt="プロフィール画像プレビュー"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </Box>
+          )}
           <Controller
             control={control}
             name="image"
@@ -88,6 +117,12 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
                 onChange={(e) => {
                   const file = e.target.files?.[0] || undefined;
                   field.onChange(file);
+
+                  // 画像プレビューを更新
+                  if (file) {
+                    const previewUrl = URL.createObjectURL(file);
+                    setImagePreview(previewUrl);
+                  }
                 }}
               />
             )}
