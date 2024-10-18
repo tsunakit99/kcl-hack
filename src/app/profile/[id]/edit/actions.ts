@@ -1,18 +1,15 @@
-export const UpdateUserInfo = async (id: string, name: string, departmentId: string, introduction: string, image: File) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, departmentId, introduction, image}),
-    });
+export const UpdateUserInfo = async (id: string, formData: FormData) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
+    method: 'PUT',
+    body: formData,
+  });
 
-    if (res.ok) {
-        return { success: true };
-    } else {
-        const resError = await res.json();
-        return { success: false, error: resError };
-    }
+  if (res.ok) {
+    return { success: true };
+  } else {
+    const resError = await res.json();
+    return { success: false, error: resError.message || 'エラーが発生しました。' };
+  }
 };
 
 export const getDepartments = async () => {
