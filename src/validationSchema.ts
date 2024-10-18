@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 export const validationRegistSchema = z.object({
     name: z
@@ -50,9 +50,20 @@ export const validationEditSchema = z.object({
     introduction: z
         .string()
         .max(500, "紹介文は500文字以下です"),
-    image: z
-        .any().optional(),
-})
+    image: z.custom<File | null>((value) => {
+    if (value === null || value === undefined) {
+      // 画像は任意なので、nullまたはundefinedを許可
+      return true;
+    }
+    // ファイルタイプがimage/jpegであることを確認
+    if (value.type !== 'image/jpeg') {
+      return false;
+    }
+    return true;
+  }, {
+    message: 'JPEG画像ファイルを選択してください。',
+  }),
+});
 
 export const validationUploadExamSchema = z.object({
     lectureName: z.string().min(1, '講義名は必須です'),
