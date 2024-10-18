@@ -33,7 +33,7 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
     resolver: zodResolver(validationEditSchema),
     defaultValues: {
       name: currentName,
-      departmentId: currentDepartmetId,
+      departmentId: currentDepartmentId,
       introduction: currentIntroduction,
       image: currentIcon,
     },
