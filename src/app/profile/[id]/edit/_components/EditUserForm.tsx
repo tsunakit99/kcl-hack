@@ -3,12 +3,11 @@
 import { EditUserFormData } from "@/app/types";
 import { validationEditSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, CardContent, Box, Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import { Alert, Box, Button, CardContent, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { UpdateUserInfo } from "../actions";
-import { getDepartments } from "../actions";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { getDepartments, UpdateUserInfo } from "../actions";
 
 interface EditUserFormProps {
   id: string;
@@ -45,19 +44,28 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
             setDepartments(data);
         };
         loadDepartments();
-    }, []);
-
+  }, []);
+  
   const handleEdit = async (data: EditUserFormData) => {
-    const result = await UpdateUserInfo(id, data.name, data.departmentId, data.introduction, data.image);
-    if (result.success) {
-      router.push(`/profile/${id}`);
-    } else {
-      setResError(result.error);
-    }
-  };
+  const formData = new FormData();
+  formData.append("name", data.name);
+  formData.append("departmentId", data.departmentId);
+  formData.append("introduction", data.introduction);
+  if (data.image) {
+    formData.append("image", data.image);
+  }
+
+  const result = await UpdateUserInfo(id, formData);
+
+  if (result.success) {
+    router.push(`/profile/${id}`);
+  } else {
+    setResError(result.error);
+  }
+};
 
   return (
-    <Box component="form" onSubmit={handleSubmit(handleEdit)} sx={{ maxWidth: "80%", margin: "auto", mt: 10 } } noValidate>
+    <Box component="form" onSubmit={handleSubmit(handleEdit)} sx={{ maxWidth: "80%", margin: "auto", mt: 10 }} noValidate>
       <Stack direction="row" spacing={2}>
         {resError && (
           <Alert severity="error">
@@ -69,19 +77,23 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
           </Alert>
         )}
         <Stack>
-          <input
-            type="file"
-            {...register("image")}
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) {
-                console.log(file);
-              }
-            }}
+          <Controller
+            control={control}
+            name="image"
+            defaultValue={undefined}
+            render={({ field }) => (
+              <input
+                type="file"
+                accept="image/jpeg"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || undefined;
+                  field.onChange(file);
+                }}
+              />
+            )}
           />
-          {errors.image && (
-            <p>{errors.image.message}</p>
-          )}
+          {errors.image && (<FormHelperText error> {errors.image.message}</FormHelperText>)}
+
         </Stack>
         <Stack>
           <CardContent>
@@ -95,23 +107,23 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
             {/* 学科はセレクトボックス？を使いたい */}
             <FormControl fullWidth required error={!!errors.departmentId}>
               <InputLabel id="department-label">学科</InputLabel>
-                <Controller
-                  name="departmentId"
-                    control={control}
-                    defaultValue={departments[0]?.id || ""}
-                    render={({ field }) => (
-                        <Select labelId="department-label" label="学科" {...field} value={field.value || ""}>
-                            {departments.map((dept) => (
-                                <MenuItem key={dept.id} value={dept.id}>
-                                    {dept.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    )}
-                />
-                {errors.departmentId && (
-                    <FormHelperText>{errors.departmentId.message}</FormHelperText>
+              <Controller
+                name="departmentId"
+                control={control}
+                defaultValue={departments[0]?.id || ""}
+                render={({ field }) => (
+                  <Select labelId="department-label" label="学科" {...field} value={field.value || ""}>
+                    {departments.map((dept) => (
+                      <MenuItem key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 )}
+              />
+              {errors.departmentId && (
+                <FormHelperText>{errors.departmentId.message}</FormHelperText>
+              )}
             </FormControl>
             <TextField
               label="自己紹介"
