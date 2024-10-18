@@ -11,6 +11,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             id: true,
             name: true,
             email: true,
+            introduction: true,
+            image: true,
         },
     });
 
@@ -23,7 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
 export async function PUT(req: NextRequest, {params}: {params: {id: string}}) {
     const { id } = params;
-    const { name } = await req.json();
+    const { name, introduction, departmentId, image } = await req.json();
     const currentUserId = await getCurrentUserId();
 
     if (id !== currentUserId) {
@@ -44,7 +46,12 @@ export async function PUT(req: NextRequest, {params}: {params: {id: string}}) {
     try {
         const updateUser = await prisma.user.update({
             where: { id },
-            data: { name },
+            data: {
+                name,
+                departmentId,
+                introduction,
+                image,
+             },
         });
         return new NextResponse(JSON.stringify(updateUser), {status: 200});
     } catch (error) {

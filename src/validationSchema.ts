@@ -44,6 +44,14 @@ export const validationEditSchema = z.object({
         .string()
         .min(1, "名前を入力してください")
         .max(20, "名前は20文字以下です"),
+    departmentId: z
+        .string()
+        .min(1, "学科を選択してください"),
+    introduction: z
+        .string()
+        .max(500, "紹介文は500文字以下です"),
+    image: z
+        .any().optional(),
 })
 
 export const validationUploadExamSchema = z.object({
@@ -63,5 +71,5 @@ export const validationUploadExamSchema = z.object({
         return true;
     }, {
         message: 'ファイルは必須です'
-    }) 
+    })
 });

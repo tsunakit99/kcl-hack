@@ -26,7 +26,13 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
         <Typography variant="h4" gutterBottom>
           プロフィール編集
         </Typography>
-        <EditUserForm id={user.id} currentName={user.name || ""} />
+        <EditUserForm
+          id={user.id}
+          currentName={user.name || ""}
+          currentDepartmentId={user.departmentId || ""}
+          currentIntroduction={user.introduction || ""}
+          currentIcon={user.image || ""}
+        />
       </CardContent>
     </Card>
   );
