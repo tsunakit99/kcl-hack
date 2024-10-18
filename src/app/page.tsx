@@ -5,11 +5,12 @@ import {
   Button,
   Card,
   CardContent,
+  Container,
   Divider,
   FormControl,
   InputBase,
   MenuItem,
-  Typography
+  Typography,
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
@@ -85,9 +86,20 @@ export default function Home() {
 
   const [subject, setSubject] = useState("");
   const [year, setYear] = useState("");
-  const [lectureName, setLectureName] = useState('');
+  const [lectureName, setLectureName] = useState("");
+
   const [lectureOptions, setLectureOptions] = useState<string[]>([]);
-  const [exams, setExams] = useState<{ id: string; lecture: { name: string }; department: { name: string }; year: number; professor: string; }[]>([]);
+  const [exams, setExams] = useState<
+    {
+      id: string;
+      lecture: { name: string };
+      department: { name: string };
+      year: number;
+      professor: string;
+    }[]
+  >([]);
+
+  const [searchedExams, setSearchedExams] = useState<typeof exams>([]);
 
   const handleSubjectChange = (event: SelectChangeEvent) => {
     setSubject(event.target.value as string);
@@ -96,6 +108,29 @@ export default function Home() {
   const handleYearChange = (event: SelectChangeEvent) => {
     setYear(event.target.value as string);
   };
+
+  const handleSearch = async () => {
+    // ここでAPIコールを行い、検索結果を取得する
+    // 例: const result = await fetch('/api/search', { method: 'POST', body: JSON.stringify({ subject, year, lectureName }) });
+    // const data = await result.json();
+    // setSearchedExams(data);
+    // 今はモックデータで代用
+    const mockData = exams.filter(
+      (exam) =>
+        (!subject || exam.department.name.includes(subject)) &&
+        (!year || exam.year.toString() === year) &&
+        (!lectureName || exam.lecture.name.includes(lectureName))
+    );
+    console.log(mockData);
+    setSearchedExams(mockData);
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden"; // スクロール無効化
+    return () => {
+      document.body.style.overflow = "auto"; // クリーンアップで元に戻す
+    };
+  }, []);
 
   useEffect(() => {
     const loadExams = async () => {
@@ -115,60 +150,25 @@ export default function Home() {
     fetchLectureNames();
   }, [lectureName]);
 
-
   return (
     <>
-      <div style={{ margin: "30px" }}>
-        <div style={{ display: "flex" }}>
-          <Box
-            sx={{
-              width: "10%",
-              flexDirection: "column",
-              justifyContent: "center",
-              backgroundColor: "#c0d7d2",
-              padding: "10px",
-              borderRadius: 2,
-            }}
-          >
-            <CircleIcon
-              src="/icon/school-icon.png"
-              alt="School Icon"
-              text="シラバス"
-              size={100}
-              linkUrl="https://edragon-syllabus.jimu.kyutech.ac.jp/guest/syllabuses"
-            />
-            <CircleIcon
-              src="/icon/pen.png"
-              alt="Pen"
-              text="Live Campus"
-              size={100}
-              linkUrl="https://virginia.jimu.kyutech.ac.jp/lcu-web/"
-            />
-            <CircleIcon
-              src="/icon/note.png"
-              alt="Note"
-              text="Moodle"
-              size={100}
-              linkUrl="https://ict-i.el.kyutech.ac.jp/login/index.php"
-            />
-          </Box>
-          <div
-            style={{
-              width: "2px", // 線の幅
-              marginLeft: "2%",
-              backgroundColor: "#ccc", // 線の色
-              margin: "0 20px", // 両Boxとの間隔
-              alignSelf: "stretch"
-            }}
-          ></div>
+      <div
+        style={{
+          margin: "30px",
+          overflow: "hidden",
+          height: "100vh",
+        }}
+      >
+        <div style={{ display: "flex", height: "95%" }}>
           <Box
             sx={{
               width: "50%",
-              marginLeft: "0.5%",
+              height: "100vh",
+              marginLeft: "6%",
               overflowY: "auto",
               padding: 2,
-              maxHeight: "1000px",
               borderRadius: 2,
+              zIndex: 999,
               // スクロールバーを非表示にするためのCSS
               "&::-webkit-scrollbar": {
                 display: "none",
@@ -176,71 +176,80 @@ export default function Home() {
               scrollbarWidth: "none", // Firefox対応
             }}
           >
-            <Divider textAlign="center" sx={{
-              marginBottom: "20px",
-              marginTop: "-15px"
-            }}>直近に投稿された過去問一覧</Divider>
+            <Divider
+              textAlign="center"
+              sx={{
+                marginBottom: "20px",
+                marginTop: "-15px",
+              }}
+            >
+              {searchedExams.length > 0
+                ? "検索結果"
+                : "直近に投稿された過去問一覧"}
+            </Divider>
             <Box
               sx={{
-                display: 'flex',
-                flexWrap: 'wrap',
+                display: "flex",
+                flexWrap: "wrap",
                 gap: 2,
               }}
             >
-              {exams.map((exam) => (
-                <Box
-                  key={exam.id}
-                  sx={{
-                    width: 'calc(50% - 16px)', // 2列レイアウト
-                  }}
-                >
-                  {/* リンクを追加するときはこのコメントを外す */}
-                  {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */}
-                  <Card
+              {(searchedExams.length > 0 ? searchedExams : exams).map(
+                (exam) => (
+                  <Box
+                    key={exam.id}
                     sx={{
-                      height: "25vh",
-                      marginBottom: "2vh",
-                      backgroundColor: "#ffffff",
-                      boxShadow: 3,
-                      display: "flex",
+                      width: "calc(50% - 16px)", // 2列レイアウト
                     }}
                   >
-                    <Box
-                      component="img"
-                      src="/icon/book.png"
-                      alt="book"
+                    {/* リンクを追加するときはこのコメントを外す */}
+                    {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */}
+                    <Card
                       sx={{
-                        position: "relative",
-                        top: "15%", // カード内で位置調整
-                        width: "30%", // 相対的にサイズを設定
-                        height: "auto", // アスペクト比を保つ
-                        objectFit: "contain", // 画像がコンテナに収まるようにする
+                        height: "25vh",
+                        marginBottom: "2vh",
+                        backgroundColor: "#ffffff",
+                        boxShadow: 3,
+                        display: "flex",
                       }}
-                    />
-                    <CardContent>
-                      <Typography variant="h5" component="div">
-                        {exam.lecture.name} ({exam.year})
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        学科: {exam.department.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        教授名: {exam.professor || '不明'}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                  {/* </Link> */}
-
-                </Box>
-              ))}
+                    >
+                      <Box
+                        component="img"
+                        src="/icon/book.png"
+                        alt="book"
+                        sx={{
+                          position: "relative",
+                          top: "15%", // カード内で位置調整
+                          width: "30%", // 相対的にサイズを設定
+                          height: "auto", // アスペクト比を保つ
+                          objectFit: "contain", // 画像がコンテナに収まるようにする
+                        }}
+                      />
+                      <CardContent>
+                        <Typography variant="h5" component="div">
+                          {exam.lecture.name} ({exam.year})
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          学科: {exam.department.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          教授名: {exam.professor || "不明"}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                    {/* </Link> */}
+                  </Box>
+                )
+              )}
             </Box>
           </Box>
+
           <div
             style={{
               width: "2px", // 線の幅
               backgroundColor: "#ccc", // 線の色
               margin: "0 20px", // 両Boxとの間隔
-              alignSelf: "stretch"
+              alignSelf: "stretch",
             }}
           ></div>
           <Box
@@ -259,9 +268,13 @@ export default function Home() {
                 position: "relative",
                 height: "100%",
                 boxShadow: "0px 2px 10px 4px rgba(0, 0, 0, 0.2)",
-                overflow: "visible",
                 padding: "10px",
-                marginTop: "-7px"
+                marginTop: "-7px",
+                overflowY: "auto", // スクロール可能にする
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+                scrollbarWidth: "none", // Firefox対応
               }}
             >
               <div
@@ -307,6 +320,7 @@ export default function Home() {
                 sx={{
                   textAlign: "center",
                   marginTop: "5px",
+                  padding: "0 5px",
                   color: "#444f7c",
                   fontWeight: 550,
                   fontSize: "16px",
@@ -330,7 +344,9 @@ export default function Home() {
                     placeholder=""
                     inputProps={{ "aria-label": "search" }}
                   />
-                  <SearchButton variant="contained">検索</SearchButton>
+                  <SearchButton variant="contained" onClick={handleSearch}>
+                    検索
+                  </SearchButton>
                 </Search>
               </CardContent>
               <div
@@ -358,7 +374,7 @@ export default function Home() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  marginTop: "70px",
+                  marginTop: "40px",
                 }}
               >
                 <img
