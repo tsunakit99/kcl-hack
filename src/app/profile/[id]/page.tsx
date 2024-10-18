@@ -1,5 +1,5 @@
 import { getCurrentUserId } from "@/app/lib/auth";
-import { Button, Box, CardContent, Stack, Typography, IconButton } from "@mui/material";
+import { Box, Button, CardContent, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { getUserById } from "./actions";
 
@@ -24,17 +24,23 @@ const UserProfile = async ({ params }: UserProfileProps) => {
       <CardContent>
         <Stack direction="row" spacing={2}>
           <Stack>
-            <IconButton
-              style={{
-                borderRadius: '50%',
-                backgroundColor: '#000000',
-                padding: '75px',
-                marginTop: '20px',
-                marginLeft: '23px',
+            <Box
+              sx={{
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                overflow: "hidden",
+                marginTop: "20px",
+                marginLeft: "23px",
+                border: "2px solid #000",
               }}
             >
-              {user.image}
-            </IconButton>
+              <img
+                src={user.image || '/default-profile.png'} // デフォルト画像を設定
+                alt="プロフィール画像"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </Box>
           </Stack>
           <Stack>
             <CardContent>
