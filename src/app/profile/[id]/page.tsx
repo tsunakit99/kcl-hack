@@ -1,25 +1,35 @@
 import { getCurrentUserId } from "@/app/lib/auth";
-import { Card, CardContent, Box, Button, Stack, Typography, List } from "@mui/material";
+import { Card, CardContent, Box, Button, Stack, Typography, List, ListItem, ListItemText } from "@mui/material";
 import Link from "next/link";
 import { getUserById, getYourExamByUploaderId } from "./actions";
 
 interface UserProfileProps {
   params: { id: string };
+  params_exam?: { uploaderId: string }; //paramsオブジェクトを受け取り、その中にparams_examオブジェクトを含める形にする(TypeScriptでは複数のオブジェクトの受け取りは直接できない)
 }
 
-const UserProfile = async ({ params }: UserProfileProps) => {
+const UserProfile = async ({ params, params_exam }: UserProfileProps) => {
   const { id } = params;
   const user = await getUserById(id);
   const currentUserId = await getCurrentUserId();
-
-  // const exams = await getYourExamByUploaderId(id);
+  // const exams = await getYourExamByUploaderId(uploaderId);
+  let exams = []; //params_examに何も入っていないときのためにデフォルト定義する
 
   if (!user) {
     return <Typography>ユーザーが見つかりません。</Typography>;
   }
 
+  //デバッグ用
+  console.log('params_exam確認');
+  console.log(params_exam);
+
+  if (params_exam) { //params_examがある場合にのみ過去問を取得
+    const { uploaderId } = params_exam;
+    exams = await getYourExamByUploaderId(id)
+  }
+
   return (
-    <Card sx={{ maxWidth: 600, margin: "auto", mt: 5}}>
+    <Card sx={{ maxWidth: 600, margin: "auto", mt: 5 }}>
       <Card sx={{ maxWidth: 600, margin: "auto" }}>
         <CardContent>
           <Typography variant="h4" gutterBottom>
@@ -92,11 +102,22 @@ const UserProfile = async ({ params }: UserProfileProps) => {
           <Typography variant="h5" gutterBottom>
             あなたが投稿した過去問
           </Typography>
-          {/* {currentUserId === user.id && (
+          {currentUserId === user.id && (
             <List>
-
+              {exams.length > 0 ?
+                (exams.map((exam) => (
+                  <ListItem key={exam.lecture}>
+                    <ListItemText primary={exam.department} />
+                    <ListItemText primary={exam.professor} />
+                  </ListItem>
+                ))
+              ) : (
+                  <ListItem>
+                    <ListItemText primary="過去問はまだありません。" />
+                  </ListItem>
+              )}
             </List>
-          )} */}
+          )}
         </CardContent>
       </Card>
     </Card>
