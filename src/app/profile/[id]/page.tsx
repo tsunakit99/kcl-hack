@@ -17,7 +17,6 @@ const UserProfile = async ({ params }: UserProfileProps) => {
   if (!user) {
     return <Typography>ユーザーが見つかりません。</Typography>;
   }
-}
 
   return (
     <Card sx={{ maxWidth: 600, margin: "auto", mt: 5}}>
@@ -93,11 +92,11 @@ const UserProfile = async ({ params }: UserProfileProps) => {
           <Typography variant="h5" gutterBottom>
             あなたが投稿した過去問
           </Typography>
-            {/* {currentUserId === user.id && (
+          {/* {currentUserId === user.id && (
             <List>
-              {/* ここに過去問のリストを載せる */}
+
             </List>
-            )} */}
+          )} */}
         </CardContent>
       </Card>
     </Card>
