@@ -96,6 +96,7 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
                 overflow: "hidden",
                 marginTop: "20px",
                 marginLeft: "23px",
+                marginBottom: "20px",
                 border: "2px solid #000",
               }}
             >
@@ -128,7 +129,6 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
             )}
           />
           {errors.image && (<FormHelperText error> {errors.image.message}</FormHelperText>)}
-
         </Stack>
         <Stack>
           <CardContent>
@@ -164,26 +164,19 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
               label="自己紹介"
               fullWidth
               multiline
-              minRows={3}
+              minRows={4}
               {...register("introduction")}
               error={!!errors.introduction}
               helperText={errors.introduction?.message as React.ReactNode}
             />
-            {/* <TextField
-              label="アイコン"
-              fullWidth
-              {...register("introduction")}
-              error={!!errors.introduction}
-              helperText={errors.introduction?.message as React.ReactNode}
-            /> */}
-
-            {/* 将来的にフィールドを追加する場合は、以下のようにStack内にコンポーネントを追加 */}
           </CardContent>
         </Stack>
       </Stack>
-      <Button type="submit" variant="contained" color="primary" fullWidth>
-        保存
-      </Button>
+      <Box>
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          保存
+        </Button>
+      </Box>
     </Box>
   );
 };
