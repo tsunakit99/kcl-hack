@@ -28,8 +28,8 @@ const MenuSidebar: React.FC = () => {
         top: 0,
         left: 0,
         position: "fixed",
+        alignItems: "center",
         flexDirection: "column",
-        justifyContent: "center",
         backgroundColor: "#444f7c",
         padding: "10px",
         borderRadius: 0,
@@ -104,7 +104,7 @@ const MenuSidebar: React.FC = () => {
             src="/icon/person.png"
             alt="Person"
             text="profile"
-            linkUrl="/profile"
+            linkUrl="/sample"
           />
         </Box>
       )}

@@ -15,10 +15,13 @@ import {
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { getExams } from "./actions";
+import { useEffect, useState, useRef } from "react";
 import CircleIcon from "./components/CircleIcon";
+import ScrollButton from "./components/ScrollButton";
+import PdfViewer from "./components/PdfViewer";
 import { getLectureNames } from "./exam/upload/actions";
+import { getExams } from "./actions"; // デフォルトの過去問データを取得する関数
+// import { searchExams } from "./actions"; // 検索クエリに基づいたデータを取得する関数
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -96,10 +99,27 @@ export default function Home() {
       department: { name: string };
       year: number;
       professor: string;
+      pdfUrl: string;
     }[]
   >([]);
 
-  const [searchedExams, setSearchedExams] = useState<typeof exams>([]);
+  const [isToggled, setIsToggled] = useState(true);
+
+  // ボタンを押したときにレイアウトを切り替える関数
+  const toggleLayout = () => {
+    setIsToggled(!isToggled);
+  };
+
+  const scrollRef = useRef(null);
+
+  // スクロール関数（割合を受け取り、画面幅に応じてスクロール）
+  const scroll = (scrollPercentage) => {
+    const scrollOffset = window.innerWidth * scrollPercentage;
+    scrollRef.current.scrollBy({
+      left: scrollOffset,
+      behavior: "smooth",
+    });
+  };
 
   const handleSubjectChange = (event: SelectChangeEvent) => {
     setSubject(event.target.value as string);
@@ -109,35 +129,11 @@ export default function Home() {
     setYear(event.target.value as string);
   };
 
-  const handleSearch = async () => {
-    // ここでAPIコールを行い、検索結果を取得する
-    // 例: const result = await fetch('/api/search', { method: 'POST', body: JSON.stringify({ subject, year, lectureName }) });
-    // const data = await result.json();
-    // setSearchedExams(data);
-    // 今はモックデータで代用
-    const mockData = exams.filter(
-      (exam) =>
-        (!subject || exam.department.name.includes(subject)) &&
-        (!year || exam.year.toString() === year) &&
-        (!lectureName || exam.lecture.name.includes(lectureName))
-    );
-    console.log(mockData);
-    setSearchedExams(mockData);
-  };
-
   useEffect(() => {
     document.body.style.overflow = "hidden"; // スクロール無効化
     return () => {
       document.body.style.overflow = "auto"; // クリーンアップで元に戻す
     };
-  }, []);
-
-  useEffect(() => {
-    const loadExams = async () => {
-      const data = await getExams();
-      setExams(data);
-    };
-    loadExams();
   }, []);
 
   useEffect(() => {
@@ -150,6 +146,14 @@ export default function Home() {
     fetchLectureNames();
   }, [lectureName]);
 
+  useEffect(() => {
+    const loadExams = async () => {
+      const data = await getExams();
+      setExams(data);
+    };
+    loadExams();
+  }, []);
+
   return (
     <>
       <div
@@ -160,42 +164,41 @@ export default function Home() {
         }}
       >
         <div style={{ display: "flex", height: "95%" }}>
-          <Box
-            sx={{
-              width: "50%",
-              height: "100vh",
-              marginLeft: "6%",
-              overflowY: "auto",
-              padding: 2,
-              borderRadius: 2,
-              zIndex: 999,
-              // スクロールバーを非表示にするためのCSS
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-              scrollbarWidth: "none", // Firefox対応
-            }}
-          >
-            <Divider
-              textAlign="center"
-              sx={{
-                marginBottom: "20px",
-                marginTop: "-15px",
-              }}
-            >
-              {searchedExams.length > 0
-                ? "検索結果"
-                : "直近に投稿された過去問一覧"}
-            </Divider>
+          {isToggled ? (
             <Box
               sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 2,
+                width: "50%",
+                height: "95%",
+                marginLeft: "6%",
+                overflowY: "auto",
+                padding: 2,
+                borderRadius: 2,
+                flexDirection: "column",
+                zIndex: 999,
+                // スクロールバーを非表示にするためのCSS
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+                scrollbarWidth: "none", // Firefox対応
               }}
             >
-              {(searchedExams.length > 0 ? searchedExams : exams).map(
-                (exam) => (
+              <Divider
+                textAlign="center"
+                sx={{
+                  marginBottom: "20px",
+                  marginTop: "-15px",
+                }}
+              >
+                直近に投稿された過去問一覧
+              </Divider>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 2,
+                }}
+              >
+                {exams.map((exam) => (
                   <Box
                     key={exam.id}
                     sx={{
@@ -239,10 +242,133 @@ export default function Home() {
                     </Card>
                     {/* </Link> */}
                   </Box>
-                )
-              )}
+                ))}
+              </Box>
             </Box>
-          </Box>
+          ) : (
+            <Box
+              sx={{
+                width: "50%",
+                height: "95%",
+                marginLeft: "6%",
+                overflowY: "auto",
+                padding: 2,
+                borderRadius: 2,
+                flexDirection: "column",
+                zIndex: 999,
+                // スクロールバーを非表示にするためのCSS
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+                scrollbarWidth: "none", // Firefox対応
+              }}
+            >
+              <Divider
+                textAlign="center"
+                sx={{
+                  marginBottom: "20px",
+                  marginTop: "-15px",
+                }}
+              >
+                検索結果　{exams.length}件
+              </Divider>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {/* 左スクロールボタン */}
+                <ScrollButton
+                  text="←"
+                  scroll={() => scroll(-0.22)}
+                  color="#444f7c"
+                  hoverColor="#5a6aa1"
+                />
+
+                {/* 横スクロール可能なコンテナ */}
+                <Box
+                  ref={scrollRef}
+                  sx={{
+                    display: "flex",
+                    overflowX: "auto",
+                    scrollBehavior: "smooth",
+                    width: "100%", // 2枚分のカードが表示される幅に設定
+                    "&::-webkit-scrollbar": { display: "none" }, // スクロールバーを非表示
+                  }}
+                >
+                  {/* カードリスト */}
+                  {exams.map((exam) => (
+                    <Box
+                      key={exam.id}
+                      sx={{
+                        marginRight: "2%", // カード間のスペース
+                        flexGrow: 1, // カードの幅をコンテンツに応じて拡大
+                      }}
+                    >
+                      {/* リンクを追加するときはこのコメントを外す */}
+                      {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */}
+                      <Card
+                        sx={{
+                          width: "19vw",
+                          height: "25vh",
+                          marginBottom: "2vh",
+                          backgroundColor: "#ffffff",
+                          boxShadow: 3,
+                          display: "flex",
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src="/icon/book.png"
+                          alt="book"
+                          sx={{
+                            position: "relative",
+                            top: "15%", // カード内で位置調整
+                            width: "30%", // 相対的にサイズを設定
+                            height: "auto", // アスペクト比を保つ
+                            objectFit: "contain", // 画像がコンテナに収まるようにする
+                          }}
+                        />
+                        <CardContent>
+                          <Typography variant="h5" component="div">
+                            {exam.lecture.name} ({exam.year})
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            学科: {exam.department.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            教授名: {exam.professor || "不明"}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                      {/* </Link> */}
+                    </Box>
+                  ))}
+                </Box>
+
+                {/* 右スクロールボタン */}
+                <ScrollButton
+                  text="→"
+                  scroll={() => scroll(0.22)}
+                  color="#444f7c"
+                  hoverColor="#5a6aa1"
+                />
+              </Box>
+              <Divider
+                textAlign="center"
+                sx={{
+                  marginBottom: "20px",
+                  marginTop: "10px",
+                }}
+              ></Divider>
+              <div>
+                <h1>PDF Viewer</h1>
+                {/* examsリストのマッピング */}
+                {exams.map((exam) => (
+                  <div key={exam.id} style={{ marginBottom: "20px" }}>
+                    {/* PdfViewerComponentを使用してPDFを表示 */}
+                    <PdfViewer fileUrl={exam.pdfUrl} />
+                  </div>
+                ))}
+              </div>
+            </Box>
+          )}
 
           <div
             style={{
@@ -344,7 +470,7 @@ export default function Home() {
                     placeholder=""
                     inputProps={{ "aria-label": "search" }}
                   />
-                  <SearchButton variant="contained" onClick={handleSearch}>
+                  <SearchButton variant="contained" onClick={toggleLayout}>
                     検索
                   </SearchButton>
                 </Search>
