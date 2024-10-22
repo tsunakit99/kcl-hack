@@ -4,28 +4,37 @@ import Link from "next/link";
 import { getUserById, getYourExamByUploaderId } from "./actions";
 
 interface UserProfileProps {
-  params: { id: string };
-  params_exam?: { uploaderId: string }; //paramsオブジェクトを受け取り、その中にparams_examオブジェクトを含める形にする(TypeScriptでは複数のオブジェクトの受け取りは直接できない)
+  params: { id: string, uploaderId: string };
 }
 
-const UserProfile = async ({ params, params_exam }: UserProfileProps) => {
+const UserProfile = async ({ params }: UserProfileProps ) => {
+  console.log('params確認');
+  console.log(params);
   const { id } = params;
+  console.log('id確認');
+  console.log(id);
+  // console.log('uploaderId確認');
+  // console.log(uploaderId);
   const user = await getUserById(id);
+  console.log('user確認');
+  console.log(user);
   const currentUserId = await getCurrentUserId();
+  const exams = await getYourExamByUploaderId(id)
   // const exams = await getYourExamByUploaderId(uploaderId);
-  let exams = []; //params_examに何も入っていないときのためにデフォルト定義する
+  // let exams = {}; //paramsに何も入っていないときのためにデフォルト定義する
+  console.log('exams確認');
+  console.log(exams);
 
   if (!user) {
     return <Typography>ユーザーが見つかりません。</Typography>;
   }
 
-  //デバッグ用
-  console.log('params_exam確認');
-  console.log(params_exam);
-
-  if (params_exam) { //params_examがある場合にのみ過去問を取得
-    const { uploaderId } = params_exam;
-    exams = await getYourExamByUploaderId(id)
+  if (exams) { //paramsがある場合にのみ過去問を取得
+    const { uploaderId } = params;
+    console.log('exams存在時のuser確認');
+    console.log(user);
+    console.log('exams存在時のexams確認');
+    console.log(exams);
   }
 
   return (
@@ -104,11 +113,13 @@ const UserProfile = async ({ params, params_exam }: UserProfileProps) => {
           </Typography>
           {currentUserId === user.id && (
             <List>
-              {exams.length > 0 ?
+              {exams?
                 (exams.map((exam) => (
-                  <ListItem key={exam.lecture}>
-                    <ListItemText primary={exam.department} />
+                  <ListItem key={exam.lectureName}>
+                    <ListItemText primary={exam.lectureName} />
+                    <ListItemText primary={exam.departmentName} />
                     <ListItemText primary={exam.professor} />
+                    <ListItemText primary={exam.year} />
                   </ListItem>
                 ))
               ) : (
