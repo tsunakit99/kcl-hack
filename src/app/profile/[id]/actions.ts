@@ -18,7 +18,7 @@ export const getUserById = async (id: string) => {
 };
 
 export const getYourExamByUploaderId = async (uploaderId: string) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/exams/uploaders/${uploaderId}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/exams/${uploaderId}`, {
         method: 'GET',
         cache: 'no-store',
         headers: {
@@ -26,11 +26,11 @@ export const getYourExamByUploaderId = async (uploaderId: string) => {
         },
     });
 
-    //デバッグ用
-    console.log('getYourExamByUploaderIdの確認')
-    const text = await res.text();
-    console.log(text); //レスポンスの確認
-    console.log(res.status); // ステータスコードを出力
+    // //デバッグ用
+    // console.log('getYourExamByUploaderIdの確認')
+    // const text = await res.text();
+    // console.log(text); //レスポンスの確認
+    // console.log(res.status); // ステータスコードを出力
 
     if (res.ok) {
         const data = await res.json(); // JSONデータを取得
