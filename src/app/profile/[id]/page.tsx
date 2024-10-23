@@ -1,4 +1,5 @@
 import { getCurrentUserId } from "@/app/lib/auth";
+import { ExamByIdData } from "@/app/types";
 import { Box, Button, Card, CardContent, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { getUserById, getYourExamByUploaderId } from "./actions";
@@ -98,7 +99,7 @@ const UserProfile = async ({ params }: UserProfileProps ) => {
           {currentUserId === user.id && (
             <List>
               {exams?
-                (exams.map((exam) => (
+                (exams.map((exam: ExamByIdData) => (
                   <ListItem key={exam.lectureName}>
                     <ListItemText primary={exam.lectureName} />
                     <ListItemText primary={exam.departmentName} />

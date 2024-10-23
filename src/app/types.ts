@@ -28,3 +28,11 @@ export interface UploadExamFormData {
   professor?: string;
   file: File[];
 }
+
+// 自身が投稿した過去問の表示の型定義
+export interface ExamByIdData{
+  lectureName: string;
+  departmentName: string;
+  year: number;
+  professor?: string;
+}
