@@ -42,8 +42,10 @@ const MenuSidebar: React.FC = () => {
       <Button
         onClick={toggleMenu}
         sx={{
-          width: "100%",
+          display: "flex",
           textAlign: "center",
+          justifyContent: "center",
+          alignItems: "center",
           color: "#fff",
           marginBottom: 3,
           zIndex: 1001,
@@ -53,14 +55,13 @@ const MenuSidebar: React.FC = () => {
           sx={{
             width: "4vw",
             height: "4vw",
-            borderRadius: "20%",
+            borderRadius: 2,
             overflow: "hidden",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "#c0d7d2",
             boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
-            margin: "0 auto",
             transition: "background-color 0.3s ease",
             "&:hover": {
               backgroundColor: "#5a6aa1",
@@ -104,7 +105,7 @@ const MenuSidebar: React.FC = () => {
             src="/icon/person.png"
             alt="Person"
             text="profile"
-            linkUrl="/sample"
+            linkUrl="/signup"
           />
         </Box>
       )}

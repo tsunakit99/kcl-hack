@@ -3,7 +3,14 @@
 import { validationLoginSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import { Alert, Button, Divider, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Divider,
+  TextField,
+  Typography,
+  Box,
+} from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -41,12 +48,12 @@ const SigninPage = () => {
   return (
     <>
       <AuthLayout
-        title="ようこそ！"
+        title=""
         children1={
           <>
             <Typography
               component="h1"
-              variant="h4"
+              variant="h5"
               sx={{
                 position: "relative",
                 top: "-20px",
@@ -94,15 +101,41 @@ const SigninPage = () => {
               />
 
               {/* ログインボタン */}
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                ログイン
-              </Button>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    position: "relative",
+                    width: "15vw",
+                    height: "6vh", // ボタンの高さを調整
+                    borderRadius: 5,
+                    mt: 3,
+                    mb: 2,
+                    backgroundColor: "#444f7c",
+                    "&:hover": {
+                      backgroundColor: "#383f6a", // ホバー時の背景色
+                    },
+                  }}
+                >
+                  <div
+                    className="button-content"
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src="/icon/door.png"
+                      alt="icon"
+                      style={{ width: "24px", height: "24px" }}
+                    />
+                    <span>ログイン</span>
+                  </div>
+                </Button>
+              </Box>
             </form>
             <Divider sx={{ width: "100%", my: 2 }} />
             {/* GitHubログインボタン */}
@@ -115,6 +148,11 @@ const SigninPage = () => {
               }}
               sx={{
                 textTransform: "none",
+                color: "#444f7c",
+                borderColor: "#444f7c",
+                "&:hover": {
+                  color: "#fff",
+                },
               }}
             >
               Githubでログイン

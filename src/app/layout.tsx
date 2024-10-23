@@ -31,6 +31,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>
           <MenuSidebar />
+          {/* <Header /> */}
           {children}
         </Providers>
       </body>

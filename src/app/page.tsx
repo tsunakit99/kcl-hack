@@ -70,6 +70,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         width: "20ch",
       },
     },
+    "@media(max-width: 1000px)": {
+      fontSize: "15px",
+      padding: "10px 0",
+      paddingLeft: `calc(1em + ${theme.spacing(2)})`,
+    },
   },
 }));
 
@@ -129,12 +134,12 @@ export default function Home() {
     setYear(event.target.value as string);
   };
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden"; // スクロール無効化
-    return () => {
-      document.body.style.overflow = "auto"; // クリーンアップで元に戻す
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.body.style.overflow = "hidden"; // スクロール無効化
+  //   return () => {
+  //     document.body.style.overflow = "auto"; // クリーンアップで元に戻す
+  //   };
+  // }, []);
 
   useEffect(() => {
     const fetchLectureNames = async () => {
@@ -156,25 +161,35 @@ export default function Home() {
 
   return (
     <>
-      <div
-        style={{
-          margin: "30px",
+      <Box
+        sx={{
           overflow: "hidden",
           height: "100vh",
+          background: "linear-gradient(to right, #c0d7d2 57%, #fff 57%)",
+          gap: "4vw", // 間隔を調整
+          flexDirection: "row",
+          transition: "all 0.3s ease", // スムーズにサイズが変わるように
+          "@media (max-width: 1600px)": {
+            background: "linear-gradient(to right, #c0d7d2 54%, #fff 54%)",
+          },
         }}
       >
-        <div style={{ display: "flex", height: "95%" }}>
+        <div
+          style={{
+            display: "flex",
+            height: "95%",
+            margin: "2% 0 2% 2%",
+            gap: "4vw", // 間隔を調整
+          }}
+        >
           {isToggled ? (
             <Box
               sx={{
-                width: "50%",
-                height: "95%",
-                marginLeft: "6%",
-                overflowY: "auto",
-                padding: 2,
-                borderRadius: 2,
+                width: "45vw",
+                marginLeft: "10vw",
                 flexDirection: "column",
                 zIndex: 999,
+                overflowY: "auto",
                 // スクロールバーを非表示にするためのCSS
                 "&::-webkit-scrollbar": {
                   display: "none",
@@ -187,6 +202,7 @@ export default function Home() {
                 sx={{
                   marginBottom: "20px",
                   marginTop: "-15px",
+                  padding: "12px 0",
                 }}
               >
                 直近に投稿された過去問一覧
@@ -195,14 +211,15 @@ export default function Home() {
                 sx={{
                   display: "flex",
                   flexWrap: "wrap",
-                  gap: 2,
+                  gap: 4,
                 }}
               >
                 {exams.map((exam) => (
                   <Box
                     key={exam.id}
                     sx={{
-                      width: "calc(50% - 16px)", // 2列レイアウト
+                      flexBasis: "calc(40% - 4px)", // 2列レイアウト
+                      minWidth: "300px", // カードの最小幅を設定
                     }}
                   >
                     {/* リンクを追加するときはこのコメントを外す */}
@@ -210,7 +227,6 @@ export default function Home() {
                     <Card
                       sx={{
                         height: "25vh",
-                        marginBottom: "2vh",
                         backgroundColor: "#ffffff",
                         boxShadow: 3,
                         display: "flex",
@@ -248,9 +264,8 @@ export default function Home() {
           ) : (
             <Box
               sx={{
-                width: "50%",
-                height: "95%",
-                marginLeft: "6%",
+                width: "50vw",
+                marginLeft: "10vw",
                 overflowY: "auto",
                 padding: 2,
                 borderRadius: 2,
@@ -272,7 +287,7 @@ export default function Home() {
               >
                 検索結果　{exams.length}件
               </Divider>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: "2vw" }}>
                 {/* 左スクロールボタン */}
                 <ScrollButton
                   text="←"
@@ -357,45 +372,39 @@ export default function Home() {
                   marginTop: "10px",
                 }}
               ></Divider>
-              <div>
-                <h1>PDF Viewer</h1>
-                {/* examsリストのマッピング */}
-                {exams.map((exam) => (
-                  <div key={exam.id} style={{ marginBottom: "20px" }}>
-                    {/* PdfViewerComponentを使用してPDFを表示 */}
-                    <PdfViewer fileUrl={exam.pdfUrl} />
-                  </div>
-                ))}
-              </div>
+              {/* <div> */}
+              {/* <h1>PDF Viewer</h1> */}
+              {/* examsリストのマッピング */}
+              {/* {exams.map((exam) => ( */}
+              {/* <div key={exam.id} style={{ marginBottom: "20px" }}> */}
+              {/* PdfViewerComponentを使用してPDFを表示 */}
+              {/* <PdfViewer fileUrl={exam.pdfUrl} /> */}
+              {/* </div> */}
+              {/* ))} */}
+              {/* </div> */}
             </Box>
           )}
 
-          <div
-            style={{
-              width: "2px", // 線の幅
-              backgroundColor: "#ccc", // 線の色
-              margin: "0 20px", // 両Boxとの間隔
-              alignSelf: "stretch",
-            }}
-          ></div>
           <Box
             sx={{
-              width: "40%",
-              marginLeft: "12px",
+              width: "40vw",
+              marginTop: "-2vw",
               flexDirection: "column",
               justifyContent: "center",
-              backgroundColor: "#c0d7d2",
-              padding: "30px",
+              padding: "2vw",
               borderRadius: 2,
+              transition: "all 0.3s ease", // スムーズにサイズが変わるように
             }}
           >
             <Card
               sx={{
                 position: "relative",
                 height: "100%",
-                boxShadow: "0px 2px 10px 4px rgba(0, 0, 0, 0.2)",
+                backgroundColor: "rgba(255, 255, 255, 0)",
+                boxShadow: "none", // 影を消す
+                border: "none",
+                // boxShadow: "0px 2px 10px 4px rgba(0, 0, 0, 0.2)",
                 padding: "10px",
-                marginTop: "-7px",
                 overflowY: "auto", // スクロール可能にする
                 "&::-webkit-scrollbar": {
                   display: "none",
@@ -411,6 +420,7 @@ export default function Home() {
                   position: "relative",
                   top: "90px",
                   margin: "0 auto",
+                  transition: "all 0.3s ease", // スムーズにサイズが変わるように
                 }}
               ></div>
               <Box
@@ -436,6 +446,7 @@ export default function Home() {
                     color: "#444f7c",
                     fontWeight: 550,
                     fontSize: "30px",
+                    transition: "all 0.3s ease",
                   }}
                 >
                   講義名検索
@@ -450,6 +461,7 @@ export default function Home() {
                   color: "#444f7c",
                   fontWeight: 550,
                   fontSize: "16px",
+                  transition: "all 0.3s ease",
                 }}
               >
                 検索したい講義名を入力してください。
@@ -539,6 +551,10 @@ export default function Home() {
                   minWidth: 120,
                   display: "flex",
                   padding: "10px 50px",
+                  "@media(max-width: 1000px)": {
+                    flexDirection: "column", // 縦並びにする
+                    gap: "2vh",
+                  },
                 }}
               >
                 <Card
@@ -550,8 +566,8 @@ export default function Home() {
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 1,
-                    marginLeft: "30px",
-                    marginRight: 2,
+                    marginLeft: "4vw",
+                    marginRight: "4vw",
                   }}
                 >
                   <Typography
@@ -569,7 +585,7 @@ export default function Home() {
                     flexGrow: 2, // 横幅に応じて伸縮する
                     flexBasis: "60%",
                     backgroundColor: alpha("#000000", 0.05),
-                    marginRight: "30px",
+                    marginRight: "2vw",
                     "& fieldset": {
                       borderColor: "#444f7c", // 初期状態の枠線の色
                     },
@@ -578,6 +594,12 @@ export default function Home() {
                     },
                     "&.Mui-focused fieldset": {
                       borderColor: "#444f7c", // フォーカス時の枠線の色
+                    },
+                    "@media(max-width: 1000px)": {
+                      flexGrow: 1,
+                      flexBasis: "40%",
+                      marginLeft: "2vw",
+                      marginRight: "2vw",
                     },
                   }}
                 >
@@ -609,6 +631,10 @@ export default function Home() {
                   minWidth: 120,
                   display: "flex",
                   padding: "10px 50px",
+                  "@media(max-width: 1000px)": {
+                    flexDirection: "column", // 縦並びにする
+                    gap: "2vh",
+                  },
                 }}
               >
                 <Card
@@ -620,8 +646,8 @@ export default function Home() {
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 1,
-                    marginLeft: "30px",
-                    marginRight: 2,
+                    marginLeft: "4vw",
+                    marginRight: "4vw",
                   }}
                 >
                   <Typography
@@ -639,7 +665,7 @@ export default function Home() {
                     flexGrow: 2, // 横幅に応じて伸縮する
                     flexBasis: "60%",
                     backgroundColor: alpha("#000000", 0.05),
-                    marginRight: "30px",
+                    marginRight: "2vw",
                     "& fieldset": {
                       borderColor: "#444f7c", // 初期状態の枠線の色
                     },
@@ -648,6 +674,12 @@ export default function Home() {
                     },
                     "&.Mui-focused fieldset": {
                       borderColor: "#444f7c", // フォーカス時の枠線の色
+                    },
+                    "@media(max-width: 1000px)": {
+                      flexGrow: 1,
+                      flexBasis: "40%",
+                      marginLeft: "2vw",
+                      marginRight: "2vw",
                     },
                   }}
                 >
@@ -673,6 +705,10 @@ export default function Home() {
                   minWidth: 120,
                   display: "flex",
                   padding: "10px 50px",
+                  "@media(max-width: 1000px)": {
+                    flexDirection: "column", // 縦並びにする
+                    gap: "2vh",
+                  },
                 }}
               >
                 <Card
@@ -684,8 +720,8 @@ export default function Home() {
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 1,
-                    marginLeft: "30px",
-                    marginRight: 1,
+                    marginLeft: "4vw",
+                    marginRight: "4vw",
                   }}
                 >
                   <Typography
@@ -698,14 +734,21 @@ export default function Home() {
                     教授名
                   </Typography>
                 </Card>
-                <FormControl
-                  sx={{
-                    flexGrow: 2, // 横幅に応じて伸縮する
-                    flexBasis: "60%",
-                    marginRight: "30px",
-                  }}
-                >
-                  <Search sx={{ margin: 0 }}>
+                <FormControl>
+                  <Search
+                    sx={{
+                      margin: 0,
+                      flexGrow: 2, // 横幅に応じて伸縮する
+                      flexBasis: "60%",
+                      marginRight: "2vw",
+                      "@media(max-width: 1000px)": {
+                        flexGrow: 1,
+                        flexBasis: "40%",
+                        marginLeft: "2vw",
+                        marginRight: "2vw",
+                      },
+                    }}
+                  >
                     <StyledInputBase
                       placeholder=""
                       inputProps={{ "aria-label": "search" }}
@@ -740,7 +783,7 @@ export default function Home() {
             </Card>
           </Box>
         </div>
-      </div>
+      </Box>
     </>
   );
 }
