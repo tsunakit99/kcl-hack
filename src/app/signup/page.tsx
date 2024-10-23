@@ -56,7 +56,7 @@ const SignupPage = () => {
     <Box
       sx={{
         background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
-        minHeight: "100vh",
+        minHeight: "95vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
