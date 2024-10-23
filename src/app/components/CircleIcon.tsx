@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 interface CircleIconProps {
   src: string; // 画像のパス
   alt?: string; // 画像の代替テキスト
-  size?: number; // アイコンのサイズ (デフォルトは100)
   text?: string; // 表示するテキスト
   linkUrl?: string; // 遷移先のURL
 }
@@ -15,7 +14,6 @@ interface CircleIconProps {
 const CircleIcon: React.FC<CircleIconProps> = ({
   src,
   alt = "icon",
-  size = 100,
   text = "",
   linkUrl = "", // URLのデフォルトを空文字に設定
 }) => {
@@ -43,8 +41,8 @@ const CircleIcon: React.FC<CircleIconProps> = ({
     >
       <Box
         sx={{
-          width: `${size}px`, // アイコンの幅
-          height: `${size}px`, // アイコンの高さ
+          width: "4vw", // アイコンの幅
+          height: "4vw", // アイコンの高さ
           borderRadius: "50%", // 円形にするためのスタイル
           overflow: "hidden", // 円形の枠から画像がはみ出ないようにする
           display: "flex", // 中央揃えに必要
@@ -75,8 +73,8 @@ const CircleIcon: React.FC<CircleIconProps> = ({
           sx={{
             textAlign: "center", // テキストを中央揃え
             marginTop: 1, // テキストとアイコンの間にマージンを設定
-            marginBottom: 3,
-            color: "#444f7c",
+            marginBottom: 2,
+            color: "#c0d7d2",
             fontWeight: 550,
             fontSize: "15px",
           }}

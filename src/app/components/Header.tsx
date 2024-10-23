@@ -1,7 +1,5 @@
 "use client";
-import {
-  AccountCircle
-} from "@mui/icons-material";
+import { AccountCircle } from "@mui/icons-material";
 import {
   AppBar,
   Box,
@@ -9,7 +7,7 @@ import {
   Menu,
   MenuItem,
   Toolbar,
-  Typography
+  Typography,
 } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -17,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import HoverLink from "./HoverLink";
 
-import PostAddIcon from '@mui/icons-material/PostAdd';
+import PostAddIcon from "@mui/icons-material/PostAdd";
 import HoverIconLink from "./HoverIconLink";
 
 export default function Header() {
@@ -47,7 +45,7 @@ export default function Header() {
   const handleLogOut = () => {
     signOut();
     handleMenuClose();
-  }
+  };
 
   const menuId = "primary-search-account-menu";
   const renderMenu = (
@@ -90,15 +88,15 @@ export default function Header() {
       <AppBar position="static" sx={{ height: "90px" }}>
         <Toolbar style={{ backgroundColor: "#444f7c" }}>
           {/* <IconButton
-            edge="start"
-            sx={{
-              marginRight: 2,
-              marginLeft: 2,
-            }}
-            color="inherit"
-          >
-            <MenuIcon />
-          </IconButton> */}
+              edge="start"
+              sx={{
+                marginRight: 2,
+                marginLeft: 2,
+              }}
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton> */}
           <Link
             href="/"
             passHref
@@ -118,7 +116,11 @@ export default function Header() {
             </Typography>
           </Link>
           <HoverLink href="/" text="検索" underlineColor="#ffffff" />
-          <HoverIconLink href="/exam/upload" icon={PostAddIcon} underlineColor="#ffffff"></HoverIconLink>
+          <HoverIconLink
+            href="/exam/upload"
+            icon={PostAddIcon}
+            underlineColor="#ffffff"
+          ></HoverIconLink>
           <HoverLink href="/" text="修正・削除" underlineColor="#ffffff" />
 
           <Box sx={{ flexGrow: 1 }} />
