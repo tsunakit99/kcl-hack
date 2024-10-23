@@ -1,18 +1,44 @@
-import { getCurrentUserId } from "@/app/lib/auth";
+"use client";
 import { ExamByIdData } from "@/app/types";
 import { Box, Button, Card, CardContent, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { getUserById, getYourExamByUploaderId } from "./actions";
 
 interface UserProfileProps {
   params: { id: string, uploaderId: string };
 }
 
-const UserProfile = async ({ params }: UserProfileProps ) => {
+const UserProfile = ({ params }: UserProfileProps ) => {
   const { id } = params;
-  const user = await getUserById(id);
-  const currentUserId = await getCurrentUserId();
-  const exams = await getYourExamByUploaderId(id)
+  const { data: session, status } = useSession();
+  const router = useRouter();
+   const [user, setUser] = useState<any>(null);
+  const [exams, setExams] = useState<ExamByIdData[]>([]);
+
+  if (!session) {
+    router.push("/");
+  }
+
+  useEffect(() => {
+    // 認証状態を確認
+    if (status === "unauthenticated") {
+      router.push("/"); // 未認証の場合はリダイレクト
+    }
+  }, [status]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userResult = await getUserById(id);
+      const examResult = await getYourExamByUploaderId(id);
+      setUser(userResult);
+      setExams(examResult);
+    };
+    fetchUserData();
+  }, []);
+  
 
   if (!user) {
     return <Typography>ユーザーが見つかりません。</Typography>;
@@ -81,7 +107,7 @@ const UserProfile = async ({ params }: UserProfileProps ) => {
             </Stack>
           </Box>
           <Box sx={{ maxWidth: "80%", margin: "auto" }}>
-            {currentUserId === user.id && (
+            {session?.user.id === user.id && (
               <Link href={`/profile/${id}/edit`} passHref>
                 <Button variant="contained" color="primary" fullWidth>
                   プロフィール編集
@@ -96,7 +122,7 @@ const UserProfile = async ({ params }: UserProfileProps ) => {
           <Typography variant="h5" gutterBottom>
             あなたが投稿した過去問
           </Typography>
-          {currentUserId === user.id && (
+          {session?.user.id === user.id && (
             <List>
               {exams?
                 (exams.map((exam: ExamByIdData) => (
