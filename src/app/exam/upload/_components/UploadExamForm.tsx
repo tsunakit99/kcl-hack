@@ -17,6 +17,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -28,9 +29,14 @@ const UploadExamForm = () => {
   const router = useRouter();
   const [departments, setDepartments] = useState<
     { id: string; name: string }[]
-  >([]);
+    >([]);
+  const { data: session } = useSession();
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+
+  if (!session) {
+    router.push("/");
+  }
 
   const {
     control,
