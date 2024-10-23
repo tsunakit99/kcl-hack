@@ -17,9 +17,8 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // 認証状態を確認
     if (status === "unauthenticated") {
-      router.push("/"); // 未認証の場合はリダイレクト
+      router.push("/");
     }
   }, [status]);
 

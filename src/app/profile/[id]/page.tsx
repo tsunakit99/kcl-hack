@@ -18,14 +18,9 @@ const UserProfile = ({ params }: UserProfileProps ) => {
    const [user, setUser] = useState<any>(null);
   const [exams, setExams] = useState<ExamByIdData[]>([]);
 
-  if (!session) {
-    router.push("/");
-  }
-
   useEffect(() => {
-    // 認証状態を確認
     if (status === "unauthenticated") {
-      router.push("/"); // 未認証の場合はリダイレクト
+      router.push("/"); 
     }
   }, [status]);
 
@@ -55,7 +50,7 @@ const UserProfile = ({ params }: UserProfileProps ) => {
           <Typography variant="h4" gutterBottom>
             プロフィール
           </Typography>
-          <Box sx={{ maxWidth: "80%", margin: "auto", mt: 10 }}>
+          <Box sx={{ maxWidth: "100%", margin: "auto", mt: 10 }}>
             <Stack direction="row" spacing={2}>
               <Stack>
                 <Box
@@ -88,7 +83,7 @@ const UserProfile = ({ params }: UserProfileProps ) => {
                     学科
                   </Typography>
                   <Typography variant="h6" gutterBottom>
-                    {user.department}
+                    {user.departmentName}
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
                     自己紹介

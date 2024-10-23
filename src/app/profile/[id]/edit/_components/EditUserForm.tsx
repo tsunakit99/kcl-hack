@@ -22,12 +22,14 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
   const [resError, setResError] = useState<string | null>(null);
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [imagePreview, setImagePreview] = useState<string>(currentIcon || "");
 
-  if (!session) {
-    router.push("/");
-  }
+    useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/"); 
+    }
+  }, [status]);
 
   const {
     control,
