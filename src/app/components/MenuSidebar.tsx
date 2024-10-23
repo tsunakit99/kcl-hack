@@ -1,10 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
 import { Box, Button } from "@mui/material";
+import { signOut, useSession } from "next-auth/react";
+import React, { useEffect, useState } from "react";
 import CircleIcon from "./CircleIcon"; // CircleIconコンポーネントのインポート
 
 const MenuSidebar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const {data: session } = useSession();
 
   // 初回レンダー時にローカルストレージからメニュー状態を読み取る
   useEffect(() => {
@@ -21,6 +23,18 @@ const MenuSidebar: React.FC = () => {
     localStorage.setItem("menuOpenState", newMenuState.toString()); // ローカルストレージに状態を保存
   };
 
+   const handleProfileClick = () => {
+    const userId = session?.user?.id;
+    if (userId) {
+      return `/profile/${userId}`;
+    }
+   };
+  
+  const handleLogOut = () => {
+    signOut();
+  }
+
+  if (!session) return null;
   return (
     <Box
       sx={{
@@ -95,18 +109,27 @@ const MenuSidebar: React.FC = () => {
             text="投稿"
             linkUrl="/exam/upload"
           />
-          <CircleIcon
+          {/* <CircleIcon
             src="/icon/note.png"
             alt="Note"
             text="Moodle"
             linkUrl="https://ict-i.el.kyutech.ac.jp/login/index.php"
-          />
-          <CircleIcon
-            src="/icon/person.png"
-            alt="Person"
-            text="profile"
-            linkUrl="/signup"
-          />
+          /> */}
+          <Box sx={{ cursor: "pointer" }}>
+            <CircleIcon
+              src="/icon/person.png"
+              alt="Person"
+              text="profile"
+              linkUrl={handleProfileClick()}
+            />
+          </Box>
+          <Box onClick={handleLogOut} sx={{ cursor: "pointer" }}>
+            <CircleIcon
+              src="/icon/logout.png"
+              alt="Logout"
+              text="logout"
+            />
+          </Box>
         </Box>
       )}
     </Box>

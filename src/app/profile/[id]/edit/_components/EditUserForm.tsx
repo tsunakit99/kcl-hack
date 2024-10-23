@@ -4,6 +4,7 @@ import { EditUserFormData } from "@/app/types";
 import { validationEditSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, CardContent, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -21,7 +22,14 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
   const [resError, setResError] = useState<string | null>(null);
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [imagePreview, setImagePreview] = useState<string>(currentIcon || "");
+
+    useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/"); 
+    }
+  }, [status]);
 
   const {
     control,

@@ -1,5 +1,8 @@
-import { getCurrentUserId } from "@/app/lib/auth";
+"use client";
 import { Card, CardContent, Typography } from "@mui/material";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { getUserById } from "../actions";
 import EditUserForm from "./_components/EditUserForm";
 
@@ -7,16 +10,31 @@ interface EditUserPageProps {
   params: { id: string };
 }
 
-const EditUserPage = async ({ params }: EditUserPageProps) => {
+const EditUserPage = ({ params }: EditUserPageProps) => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const { id } = params;
-  const user = await getUserById(id);
-  const currentUserId = await getCurrentUserId();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const result = await getUserById(id);
+      setUser(result);
+    };
+    fetchUserData();
+  }, []);
 
   if (!user) {
     return <Typography>ユーザーが見つかりません。</Typography>;
   }
 
-  if (user.id !== currentUserId) {
+  if (user.id !== session?.user.id) {
     return <Typography>このページにアクセスする権限がありません。</Typography>;
   }
 

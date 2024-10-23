@@ -1,26 +1,26 @@
 "use client";
 
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
   CardContent,
-  Container,
   Divider,
   FormControl,
   InputBase,
+  InputLabel,
   MenuItem,
-  Typography,
+  Typography
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useRef } from "react";
-import CircleIcon from "./components/CircleIcon";
-import ScrollButton from "./components/ScrollButton";
-import PdfViewer from "./components/PdfViewer";
-import { getLectureNames } from "./exam/upload/actions";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { getExams } from "./actions"; // デフォルトの過去問データを取得する関数
+import ScrollButton from "./components/ScrollButton";
+import { getDepartments, getLectureNames } from "./exam/upload/actions";
 // import { searchExams } from "./actions"; // 検索クエリに基づいたデータを取得する関数
 
 const Search = styled("div")(({ theme }) => ({
@@ -92,7 +92,9 @@ const SearchButton = styled(Button)(({ theme }) => ({
 export default function Home() {
   const { data: session, status } = useSession();
 
-  const [subject, setSubject] = useState("");
+   const [departments, setDepartments] = useState<
+    { id: string; name: string }[]
+    >([]);
   const [year, setYear] = useState("");
   const [lectureName, setLectureName] = useState("");
 
@@ -106,7 +108,8 @@ export default function Home() {
       professor: string;
       pdfUrl: string;
     }[]
-  >([]);
+    >([]);
+  const { control } = useForm();
 
   const [isToggled, setIsToggled] = useState(true);
 
@@ -115,19 +118,17 @@ export default function Home() {
     setIsToggled(!isToggled);
   };
 
-  const scrollRef = useRef(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   // スクロール関数（割合を受け取り、画面幅に応じてスクロール）
-  const scroll = (scrollPercentage) => {
-    const scrollOffset = window.innerWidth * scrollPercentage;
-    scrollRef.current.scrollBy({
-      left: scrollOffset,
-      behavior: "smooth",
-    });
-  };
-
-  const handleSubjectChange = (event: SelectChangeEvent) => {
-    setSubject(event.target.value as string);
+  const scroll = (scrollPercentage: number) => {
+    if (scrollRef.current) {
+      const scrollOffset = window.innerWidth * scrollPercentage;
+      scrollRef.current.scrollBy({
+        left: scrollOffset,
+        behavior: "smooth",
+      });
+    }
   };
 
   const handleYearChange = (event: SelectChangeEvent) => {
@@ -140,6 +141,14 @@ export default function Home() {
   //     document.body.style.overflow = "auto"; // クリーンアップで元に戻す
   //   };
   // }, []);
+
+  useEffect(() => {
+    const loadDepartments = async () => {
+      const data = await getDepartments();
+      setDepartments(data);
+    };
+    loadDepartments();
+  }, []);
 
   useEffect(() => {
     const fetchLectureNames = async () => {
@@ -470,17 +479,17 @@ export default function Home() {
               </Typography>
               <CardContent sx={{ paddingTop: "20px" }}>
                 <Search>
-                  {/* <Autocomplete
+                  <Autocomplete
                     freeSolo
                     options={lectureOptions}
                     onInputChange={(event, newValue) => setLectureName(newValue)}
                     renderInput={(params) => (
-                      <TextField {...params} label="講義名" variant="outlined" />
+                      <StyledInputBase
+                        ref={params.InputProps.ref}
+                        inputProps={params.inputProps}
+                        placeholder="講義名を入力"
+                      />
                     )}
-                  /> */}
-                  <StyledInputBase
-                    placeholder=""
-                    inputProps={{ "aria-label": "search" }}
                   />
                   <SearchButton variant="contained" onClick={toggleLayout}>
                     検索
@@ -603,27 +612,26 @@ export default function Home() {
                     },
                   }}
                 >
-                  <Select
-                    value={subject}
-                    label=""
-                    onChange={handleSubjectChange}
-                    sx={{ fontSize: "20px" }}
-                  >
-                    <MenuItem value={"知能情報工学科"}>知能情報工学科</MenuItem>
-                    <MenuItem value={"情報・通信工学科"}>
-                      情報・通信工学科
-                    </MenuItem>
-                    <MenuItem value={"知的システム工学科"}>
-                      知的システム工学科
-                    </MenuItem>
-                    <MenuItem value={"物理情報工学科"}>物理情報工学科</MenuItem>
-                    <MenuItem value={"生命化学情報工学科"}>
-                      生命化学情報工学科
-                    </MenuItem>
-                    <MenuItem value={"情工１類"}>情工１類</MenuItem>
-                    <MenuItem value={"情工２類"}>情工２類</MenuItem>
-                    <MenuItem value={"情工３類"}>情工３類</MenuItem>
-                  </Select>
+                  <InputLabel id="department-label">学科</InputLabel>
+                  <Controller
+                    name="departmentId"
+                    control={control}
+                    defaultValue={departments[0]?.id || ""}
+                    render={({ field }) => (
+                      <Select
+                        labelId="department-label"
+                        label="学科"
+                        {...field}
+                        value={field.value || ""}
+                      >
+                        {departments.map((dept) => (
+                          <MenuItem key={dept.id} value={dept.id}>
+                            {dept.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
                 </FormControl>
               </Box>
               <Box
