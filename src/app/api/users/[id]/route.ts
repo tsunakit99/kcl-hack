@@ -21,9 +21,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             image: true,
         },
     });
-  
-    console.log('ルートからのuserの確認');
-    console.log(user);
 
     if (!user) {
         return new NextResponse(JSON.stringify({ message: 'ユーザが見つかりません' }), { status: 404 });
