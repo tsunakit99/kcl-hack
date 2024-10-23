@@ -83,13 +83,13 @@ const UserProfile = ({ params }: UserProfileProps ) => {
                     学科
                   </Typography>
                   <Typography variant="h6" gutterBottom>
-                    {user.departmentName}
+                    {user.department.name}
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
                     自己紹介
                   </Typography>
                   <Typography variant="h6" gutterBottom>
-                    {user.introduction}
+                    {user.introduction || "なし"}
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
                     メールアドレス
