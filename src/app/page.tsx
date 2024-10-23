@@ -1,26 +1,24 @@
 "use client";
 
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
   CardContent,
-  Container,
   Divider,
   FormControl,
   InputBase,
   MenuItem,
-  Typography,
+  Typography
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useRef } from "react";
-import CircleIcon from "./components/CircleIcon";
-import ScrollButton from "./components/ScrollButton";
-import PdfViewer from "./components/PdfViewer";
-import { getLectureNames } from "./exam/upload/actions";
+import { useEffect, useRef, useState } from "react";
 import { getExams } from "./actions"; // デフォルトの過去問データを取得する関数
+import ScrollButton from "./components/ScrollButton";
+import { getLectureNames } from "./exam/upload/actions";
 // import { searchExams } from "./actions"; // 検索クエリに基づいたデータを取得する関数
 
 const Search = styled("div")(({ theme }) => ({
@@ -470,17 +468,17 @@ export default function Home() {
               </Typography>
               <CardContent sx={{ paddingTop: "20px" }}>
                 <Search>
-                  {/* <Autocomplete
+                  <Autocomplete
                     freeSolo
                     options={lectureOptions}
                     onInputChange={(event, newValue) => setLectureName(newValue)}
                     renderInput={(params) => (
-                      <TextField {...params} label="講義名" variant="outlined" />
+                      <StyledInputBase
+                        ref={params.InputProps.ref}
+                        inputProps={params.inputProps}
+                        placeholder="講義名を入力"
+                  />
                     )}
-                  /> */}
-                  <StyledInputBase
-                    placeholder=""
-                    inputProps={{ "aria-label": "search" }}
                   />
                   <SearchButton variant="contained" onClick={toggleLayout}>
                     検索
