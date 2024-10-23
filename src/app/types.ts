@@ -14,7 +14,10 @@ export interface SigninFormData {
 
 // ユーザ情報編集の型定義
 export interface EditUserFormData {
-    name: string;
+  name: string;
+  departmentId: string;
+  introduction: string;
+  image: File;
 }
 
 // 過去問登録フォームの型定義
