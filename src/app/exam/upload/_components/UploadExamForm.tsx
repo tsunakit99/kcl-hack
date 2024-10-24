@@ -18,6 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -30,7 +31,7 @@ const UploadExamForm = () => {
   const [departments, setDepartments] = useState<
     { id: string; name: string }[]
     >([]);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   
@@ -182,10 +183,12 @@ const UploadExamForm = () => {
             {files.length > 0 ? (
               <>
                 <Typography variant="h4" align="center" color="blue">
-                  <img
+                  <Image
                     src="/icon/pdf.png"
                     alt="PDF Icon"
-                    style={{ width: 30, height: 30, marginRight: 8 }}
+                    width={30}
+                    height={30}
+                    style={{ marginRight: 8 }}
                   />
                   {files[0].name}
                 </Typography>
@@ -225,10 +228,11 @@ const UploadExamForm = () => {
                 alignItems: "center",
               }}
             >
-              <img
+              <Image
                 src="/icon/paper-plane.png"
                 alt="icon"
-                style={{ width: "24px", height: "24px" }}
+                width={24}
+                height={24}
               />
               <span>投稿</span>
             </div>
