@@ -1,4 +1,5 @@
 "use client";
+import { UserData } from "@/app/types";
 import { Card, CardContent, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -14,7 +15,7 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { id } = params;
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserData>();
 
   useEffect(() => {
     if (status === "unauthenticated") {
