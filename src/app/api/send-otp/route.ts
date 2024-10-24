@@ -31,28 +31,32 @@ async function sendOTPEmail(email:string, otp:string) {
 
 export async function POST(req: NextRequest) {
     const data = await req.json();
-    const { email } = data;
+    const { email, name } = data;
 
-    // メールアドレス重複確認とバリテーションを同時に行う
-    const [user, validationResult] = await Promise.all([
-        prisma.user.findFirst({ where: { email } }),
-        validationRegistSchema.safeParseAsync(data)
+    // メールアドレスおよび名前の重複確認とバリデーションを同時に行う
+    const [userByEmail, userByName, validationResult] = await Promise.all([
+        prisma.user.findFirst({ where: { email } }),    // email 重複確認
+        prisma.user.findFirst({ where: { name } }),     // name 重複確認
+        validationRegistSchema.safeParseAsync(data)     // バリデーション
     ]);
 
-    console.log(data);
-
+    // バリデーションエラー処理
     let errors = validationResult.success ? {} : validationResult.error.flatten().fieldErrors;
-    // スプレッド構文で広げてから代入
-    if (user) {
+
+    // 名前の重複エラー
+    if (userByName) {
+        errors.name = [...(errors.name || []), "この名前は既に使用されています"];
+    }
+
+    // メールアドレスの重複エラー
+    if (userByEmail) {
         errors.email = [...(errors.email || []), "このメールアドレスは既に使用されています"];
     }
     
     if (Object.keys(errors).length > 0) {
-         console.log("Validation Errors:", errors); 
+         console.log("バリテーションエラー:", errors); 
         return new NextResponse(JSON.stringify({ errors }), { status: 400 });
     }
-
-    console.log("a");
 
     // OTP生成
     const otp = generateOTP();
@@ -80,6 +84,6 @@ export async function POST(req: NextRequest) {
         });
     }
 
-    return new NextResponse(JSON.stringify({ message: "OTP sent to your email" }), { status: 200 });
+    return new NextResponse(JSON.stringify({ message: "メールにワンタイムパスワードを送信しました" }), { status: 200 });
     
 }

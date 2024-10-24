@@ -49,9 +49,13 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
+  department    Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  departmentId  String?
+  introduction  String?
   image         String?
   accounts      Account[]
   sessions      Session[]
+  exams     Exam[]  // User がアップロードした Exam のリスト
 
   @@map("users")
 }
@@ -74,3 +78,36 @@ model Otp {
   @@map("otps")
 }
 
+model Exam {
+  id           String    @id @default(cuid())
+  year         Int
+  professor    String?
+  fileUrl      String
+  uploader     User      @relation(fields: [uploaderId], references: [id])
+  uploaderId   String
+  department   Department  @relation(fields: [departmentId], references: [id])
+  departmentId String
+  lecture      Lecture   @relation(fields: [lectureId], references: [id])
+  lectureId    String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("exams")
+}
+
+model Department {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+  exams Exam[]
+
+  @@map("departments")
+}
+
+model Lecture {
+  id     String @id @default(cuid())
+  name   String @unique
+  exams  Exam[]
+
+  @@map("lectures")
+}
