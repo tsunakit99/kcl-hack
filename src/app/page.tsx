@@ -10,6 +10,7 @@ import {
   FormControl,
   InputBase,
   InputLabel,
+  Link,
   MenuItem,
   Typography
 } from "@mui/material";
@@ -231,8 +232,7 @@ export default function Home() {
                       minWidth: "300px", // カードの最小幅を設定
                     }}
                   >
-                    {/* リンクを追加するときはこのコメントを外す */}
-                    {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */}
+                     <Link href={`/exam/${exam.id}`}　style={{textDecoration: "none"}}>
                     <Card
                       sx={{
                         height: "25vh",
@@ -265,7 +265,7 @@ export default function Home() {
                         </Typography>
                       </CardContent>
                     </Card>
-                    {/* </Link> */}
+                    </Link>
                   </Box>
                 ))}
               </Box>
