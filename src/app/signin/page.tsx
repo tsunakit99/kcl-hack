@@ -5,11 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import {
   Alert,
+  Box,
   Button,
   Divider,
   TextField,
   Typography,
-  Box,
 } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";

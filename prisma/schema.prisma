@@ -111,4 +111,3 @@ model Lecture {
 
   @@map("lectures")
 }
-
