@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     ]);
 
     // バリデーションエラー処理
-    let errors = validationResult.success ? {} : validationResult.error.flatten().fieldErrors;
+    const errors = validationResult.success ? {} : validationResult.error.flatten().fieldErrors;
 
     // 名前の重複エラー
     if (userByName) {

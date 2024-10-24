@@ -1,6 +1,7 @@
 "use client";
 import { Box, Button } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import CircleIcon from "./CircleIcon"; // CircleIconコンポーネントのインポート
 
@@ -82,9 +83,11 @@ const MenuSidebar: React.FC = () => {
             },
           }}
         >
-          <img
+          <Image
             src="/icon/menu.png"
             alt="menu"
+            width={500}
+            height={500}
             style={{
               width: "50%",
               height: "50%",

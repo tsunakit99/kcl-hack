@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
-import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getExams } from "./actions"; // デフォルトの過去問データを取得する関数
@@ -38,19 +38,6 @@ const Search = styled("div")(({ theme }) => ({
   [theme.breakpoints.up("sm")]: {
     marginLeft: theme.spacing(1),
     width: "auto",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  "& svg": {
-    fontSize: "30px",
   },
 }));
 
@@ -79,7 +66,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const SearchButton = styled(Button)(({ theme }) => ({
+const SearchButton = styled(Button)(({ }) => ({
   position: "absolute",
   right: "2%",
   top: "50%",
@@ -91,7 +78,6 @@ const SearchButton = styled(Button)(({ theme }) => ({
 }));
 
 export default function Home() {
-  const { data: session, status } = useSession();
 
    const [departments, setDepartments] = useState<
     { id: string; name: string }[]
@@ -439,13 +425,12 @@ export default function Home() {
                   justifyContent: "center",
                 }}
               >
-                <img
+                <Image
                   src="/icon/search-icon.png"
                   alt="search"
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                  }}
+                  width={30}
+                  height={30}
+                
                 />
                 <Typography
                   variant="h6"
@@ -524,13 +509,11 @@ export default function Home() {
                   marginTop: "40px",
                 }}
               >
-                <img
+                <Image
                   src="/icon/search-icon.png"
                   alt="search"
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                  }}
+                  width={30}
+                  height={30}
                 />
                 <Typography
                   variant="h6"

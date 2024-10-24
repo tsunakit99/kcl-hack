@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
                     user = await prisma.user.findUnique({
                         where: { email: credentials?.email },
                     });
-                } catch (error) {
+                } catch {
                     return null;
                 }
                 return user;
@@ -39,13 +39,13 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
     },
     callbacks: {
-        async session({ session, user, token }) {
+        async session({ session, token }) {
             if (session.user && token.sub) {
                 session.user.id = token.sub;
             }
             return session;
         },
-        async redirect({ url, baseUrl }) {
+        async redirect() {
             return '/';
         },
     },

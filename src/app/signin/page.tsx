@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
@@ -22,12 +23,11 @@ import { SigninFormData } from "../types";
 import { logIn } from "./actions";
 
 const SigninPage = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [resError, setResError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm<SigninFormData>({
     mode: "onBlur",
@@ -127,10 +127,11 @@ const SigninPage = () => {
                       alignItems: "center",
                     }}
                   >
-                    <img
+                    <Image
                       src="/icon/door.png"
                       alt="icon"
-                      style={{ width: "24px", height: "24px" }}
+                      width={24}
+                      height={24}
                     />
                     <span>ログイン</span>
                   </div>

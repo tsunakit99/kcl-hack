@@ -36,3 +36,24 @@ export interface ExamByIdData{
   year: number;
   professor?: string;
 }
+
+export interface Department {
+  name: string;
+}
+
+export interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  departmentId: string;
+  introduction: string;
+  image: string;
+  department: Department;
+}
+
+export interface UploadedFile {
+  name: string;
+  size: number;
+  type: string;
+  arrayBuffer: () => Promise<ArrayBuffer>;
+}

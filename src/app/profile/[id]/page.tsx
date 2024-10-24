@@ -1,5 +1,5 @@
 "use client";
-import { ExamByIdData } from "@/app/types";
+import { ExamByIdData, UserData } from "@/app/types";
 import { Box, Button, Card, CardContent, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -15,7 +15,7 @@ const UserProfile = ({ params }: UserProfileProps ) => {
   const { id } = params;
   const { data: session, status } = useSession();
   const router = useRouter();
-   const [user, setUser] = useState<any>(null);
+   const [user, setUser] = useState<UserData>();
   const [exams, setExams] = useState<ExamByIdData[]>([]);
 
   useEffect(() => {
@@ -38,11 +38,6 @@ const UserProfile = ({ params }: UserProfileProps ) => {
   if (!user) {
     return <Typography>ユーザーが見つかりません。</Typography>;
   }
-
-  if (exams) { //paramsがある場合にのみ過去問を取得
-    const { uploaderId } = params;
-  }
-
   return (
     <Card sx={{ maxWidth: 600, margin: "auto", mt: 5 }}>
       <Card sx={{ maxWidth: 600, margin: "auto" }}>

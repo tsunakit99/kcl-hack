@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
@@ -20,7 +21,7 @@ import OtpModal from "./_components/OtpModal";
 import { sendOtp } from "./actions";
 
 const SignupPage = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [resError, setResError] = useState<string | null>(null);
   const [openOtpModal, setOpenOtpModal] = useState(false);
   const [name, setName] = useState("");
@@ -30,7 +31,6 @@ const SignupPage = () => {
   const {
     register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm<SignupFormData>({
     mode: "onBlur",
@@ -180,10 +180,11 @@ const SignupPage = () => {
                     alignItems: "center",
                   }}
                 >
-                  <img
+                  <Image
                     src="/icon/entry.png"
                     alt="icon"
-                    style={{ width: "24px", height: "24px" }}
+                    width={24}
+                    height={24}
                   />
                   <span>登録</span>
                 </div>

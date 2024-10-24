@@ -1,7 +1,8 @@
 "use client";
 
 import { Box, Container, Divider, Typography } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import UploadExamForm from "./_components/UploadExamForm";
 
 const UploadExam = () => {
@@ -44,10 +45,12 @@ const UploadExam = () => {
             justifyContent: "center",
           }}
         >
-          <img
+          <Image
             className="post-icon"
             src="/icon/post2.png"
             alt="search"
+            width={500}
+            height={500}
             style={{
               transition: "opacity 2s ease",
               opacity: isVisible ? 1 : 0, // フェードインアニメーション
