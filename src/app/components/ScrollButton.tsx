@@ -1,5 +1,11 @@
-import React from "react";
 import { Button } from "@mui/material";
+
+interface ScrollButtonProps {
+  text: string;
+  scroll: () => void;
+  color?: string;
+  hoverColor?: string;
+}
 
 // ScrollButton コンポーネント
 const ScrollButton = ({
@@ -7,7 +13,7 @@ const ScrollButton = ({
   scroll,
   color = "#444f7c",
   hoverColor = "#5a6aa1",
-}) => {
+} : ScrollButtonProps) => {
   return (
     <Button
       onClick={scroll}
