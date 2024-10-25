@@ -50,7 +50,7 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
           currentName={user.name || ""}
           currentDepartmentId={user.departmentId || ""}
           currentIntroduction={user.introduction || ""}
-          currentIcon={user.image || ""}
+          currentIcon={user.imageUrl || ""}
         />
       </CardContent>
     </Card>

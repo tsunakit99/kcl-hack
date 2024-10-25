@@ -2,6 +2,7 @@
 import { ExamByIdData, UserData } from "@/app/types";
 import { Box, Button, Card, CardContent, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -39,8 +40,8 @@ const UserProfile = ({ params }: UserProfileProps ) => {
     return <Typography>ユーザーが見つかりません。</Typography>;
   }
   return (
-    <Card sx={{ maxWidth: 600, margin: "auto", mt: 5 }}>
-      <Card sx={{ maxWidth: 600, margin: "auto" }}>
+    <Card sx={{ width: "50%", margin: "auto", mt: 5 }}>
+      <Card sx={{ width: "100%", margin: "auto" }}>
         <CardContent>
           <Typography variant="h4" gutterBottom>
             プロフィール
@@ -59,9 +60,11 @@ const UserProfile = ({ params }: UserProfileProps ) => {
                     border: "2px solid #000",
                   }}
                 >
-                  <img
-                    src={user.image || '/default-profile.png'} // デフォルト画像を設定
+                  <Image
+                    src={user.imageUrl || '/icon/default-profile.png'} // デフォルト画像を設定
                     alt="プロフィール画像"
+                    width={500}
+                    height={500}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 </Box>
@@ -78,7 +81,7 @@ const UserProfile = ({ params }: UserProfileProps ) => {
                     学科
                   </Typography>
                   <Typography variant="h6" gutterBottom>
-                    {user.department.name}
+                    {user.department?.name}
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
                     自己紹介
