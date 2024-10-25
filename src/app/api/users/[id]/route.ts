@@ -133,7 +133,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
           if (deleteError) {
             console.error('古い画像の削除に失敗しました：', deleteError);
           }
-        } catch (err) {
+        } catch (err: unknown) {
           console.error('古い画像の削除中にエラーが発生しました：', err);
         }
       }
