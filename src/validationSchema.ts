@@ -74,7 +74,7 @@ export const validationUploadExamSchema = z.object({
         .min(1900, '年度が不正です')
         .max(new Date().getFullYear(), '年度が不正です'),
     professor: z.string().optional(),
-    file: z.custom<File[] | null>((file) => {
+    file: z.custom<File | null>((file) => {
         // ファイルが null または空かどうかをチェック
         if (!file || file.length === 0) {
             return false;
