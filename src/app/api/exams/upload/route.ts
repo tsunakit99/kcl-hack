@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         });
       
         return new NextResponse(JSON.stringify(exam), { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error);
     let errorMessage = 'サーバーエラーが発生しました。';
     if (error instanceof Error) {
