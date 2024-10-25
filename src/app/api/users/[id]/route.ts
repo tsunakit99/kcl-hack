@@ -1,37 +1,60 @@
 import { getCurrentUserId } from "@/app/lib/auth";
 import prisma from "@/app/lib/prisma";
+import { supabaseServer } from "@/app/lib/supabaseServerClient";
 import { validationEditSchema } from '@/validationSchema';
-import { promises as fs } from 'fs';
-import f from 'fs/promises';
 import { NextRequest, NextResponse } from "next/server";
-import path from 'path';
+import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const { id } = params;
+  const { id } = params;
 
-    const user = await prisma.user.findUnique({
-        where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        departmentId: true,
-        introduction: true,
-        image: true,
-        department: { 
-          select: {
-            name: true,
-          },
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      departmentId: true,
+      introduction: true,
+      image: true,
+      department: { 
+        select: {
+          name: true,
         },
       },
-    });
+    },
+  });
 
-    if (!user) {
-        return new NextResponse(JSON.stringify({ message: 'ユーザが見つかりません' }), { status: 404 });
+  if (!user) {
+    return new NextResponse(JSON.stringify({ message: 'ユーザが見つかりません' }), { status: 404 });
+  }
+
+  // 画像の公開URLを取得
+  let imageUrl: string | null = null;
+  if (user.image) {
+    const { data } = await supabaseServer.storage
+      .from('usericons')
+      .getPublicUrl(user.image);
+    
+    if (!data) {
+      console.log('画像のURL取得に失敗しました');
+    } else {
+      imageUrl = data.publicUrl;
     }
+  }
 
-    return new NextResponse(JSON.stringify(user), {status: 200});
+  const responseData = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    departmentId: user.departmentId,
+    introduction: user.introduction,
+    department: user.department,
+    imageUrl, // 画像の公開 URL を追加
+  };
+
+  return new NextResponse(JSON.stringify(responseData), { status: 200 });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
@@ -49,7 +72,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const name = formData.get('name')?.toString();
     const departmentId = formData.get('departmentId')?.toString();
     const introduction = formData.get('introduction')?.toString();
-    const image = formData.get('image');
+    const image = formData.get('image') as File | null;
 
     // バリデーション
     const validationResult = await validationEditSchema.safeParseAsync({
@@ -65,15 +88,15 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       return new NextResponse(JSON.stringify({ message: '入力値が不正です', errors }), { status: 400 });
     }
 
-      const { name: validName, departmentId: validDepartmentId, introduction: validIntroduction, image: validImage } = validationResult.data;
-      
-      const existingUser = await prisma.user.findUnique({
-          where: { id },
-      });
+    const { name: validName, departmentId: validDepartmentId, introduction: validIntroduction, image: validImage } = validationResult.data;
 
-      if (!existingUser) {
-          return new NextResponse(JSON.stringify({ message: 'ユーザが存在しません' }), { status: 400 });
-      }
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingUser) {
+      return new NextResponse(JSON.stringify({ message: 'ユーザが存在しません' }), { status: 400 });
+    }
 
     // 名前の重複チェック
     const nameConflictUser = await prisma.user.findFirst({
@@ -92,32 +115,38 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     // ファイルのバリデーションと保存
     let imageUrl = existingUser.image;
     if (validImage) {
-      if (typeof validImage === 'object' && 'arrayBuffer' in validImage) {
-        const fileExtension = path.extname(validImage.name || '').toLowerCase();
-        const allowedExtensions = ['.jpg', '.jpeg'];
+      const fileExtension = path.extname(validImage.name || '').toLowerCase();
+      const allowedExtensions = ['.jpg', '.jpeg'];
 
-        if (!allowedExtensions.includes(fileExtension)) {
-          return new NextResponse(JSON.stringify({ message: 'JPEG画像ファイルをアップロードしてください。' }), { status: 400 });
-        }
-          
-          if (existingUser.image) {
-              const oldImagePath = path.join(process.cwd(), 'public', existingUser.image);
-              try {
-                  await f.unlink(oldImagePath);
-              } catch (err) {
-                  console.error('古い画像の削除に失敗しました:', err);
-              }
+      if (!allowedExtensions.includes(fileExtension)) {
+        return new NextResponse(JSON.stringify({ message: 'JPEG画像ファイルをアップロードしてください。' }), { status: 400 });
+      }
+
+      // 古い画像を削除
+      if (existingUser.image) {
+        const oldImagePath = existingUser.image; // e.g., 'profiles/userId/oldFileName.jpg'
+        try {
+          const { error: deleteError } = await supabaseServer.storage
+            .from('usericons')
+            .remove([oldImagePath]);
+
+          if (deleteError) {
+            console.error('古い画像の削除に失敗しました：', deleteError);
           }
-
-        // ファイルを保存
-        imageUrl = await saveFileToLocal(validImage);
-      } else {
-        return new NextResponse(JSON.stringify({ message: '画像ファイルが正しくアップロードされていません。' }), { status: 400 });
+        } catch (err) {
+          console.error('古い画像の削除中にエラーが発生しました：', err);
         }
-      };
+      }
+
+      // 新しいファイルを保存
+      const fileName = uuidv4() + fileExtension;
+      const filePath = `profiles/${id}/${fileName}`; // ユーザーIDでフォルダ分け
+
+      imageUrl = await uploadFileToSupabase(validImage, filePath);
+    }
 
     // ユーザー情報の更新
-    const updateUser = await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id },
       data: {
         name: validName,
@@ -127,24 +156,31 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       },
     });
 
-    return new NextResponse(JSON.stringify(updateUser), { status: 200 });
+    return new NextResponse(JSON.stringify(updatedUser), { status: 200 });
   } catch (error) {
     console.error(error);
-    return new NextResponse(JSON.stringify({ message: 'ユーザの更新に失敗しました' }), { status: 500 });
+    let errorMessage = 'ユーザの更新に失敗しました';
+    if (error instanceof Error) {
+      errorMessage = error.message;
     }
+    return new NextResponse(JSON.stringify({ message: errorMessage }), { status: 500 });
+  }
 }
 
-// ローカルファイルに保存する関数
-async function saveFileToLocal(file: any): Promise<string> {
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
+// Supabase Storageにファイルを保存する関数
+async function uploadFileToSupabase(file: File, path: string): Promise<string> {
+  const { data, error } = await supabaseServer.storage
+    .from('usericons') // バケット名
+    .upload(path, file, {
+      cacheControl: '3600',
+      upsert: true, // 上書きする場合はtrue
+    });
 
-  const fileName = uuidv4() + path.extname(file.name || '');
-  const uploadDir = path.join(process.cwd(), 'public', 'images');
-  await fs.mkdir(uploadDir, { recursive: true });
-  const filePath = path.join(uploadDir, fileName);
+  if (error) {
+    console.error('ファイルのアップロードに失敗しました：', error);
+    throw new Error('ファイルのアップロードに失敗しました');
+  }
 
-  await fs.writeFile(filePath, buffer);
-
-  return `/images/${fileName}`;
+  // data.path がアップロードされたファイルのパス
+  return data.path;
 }

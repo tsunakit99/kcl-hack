@@ -1,4 +1,5 @@
 import { Box, Card, CardContent, Stack, Typography } from '@mui/material';
+import Link from 'next/link';
 import { getExamById } from './actions';
 
 interface ExamPageProps {
@@ -54,6 +55,11 @@ const ExamPage = async ({ params }: ExamPageProps) => {
                   <Typography variant="h6" gutterBottom>
                     {exam.professor || "不明"}
                   </Typography>
+                  <Link href={exam.fileUrl}>
+                  <Typography variant="h6" gutterBottom>
+                    ファイル
+                    </Typography>
+                  </Link>
                 </CardContent>   
               </Stack>
             </Box>
