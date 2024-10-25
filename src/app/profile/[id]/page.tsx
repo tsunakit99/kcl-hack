@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getUserById, getYourExamByUploaderId } from "./actions";
+import { getUserById, getYourExamByUploaderId, getExams } from "./actions";
 
 interface UserProfileProps {
   params: { id: string, uploaderId: string };
@@ -29,7 +29,7 @@ const UserProfile = ({ params }: UserProfileProps ) => {
       const userResult = await getUserById(id);
       const examResult = await getYourExamByUploaderId(id);
       setUser(userResult);
-      setExams(examResult);
+      setExams(examResult); //examsを更新
     };
     fetchUserData();
   }, []);
@@ -116,12 +116,16 @@ const UserProfile = ({ params }: UserProfileProps ) => {
             <List>
               {exams?
                 (exams.map((exam: ExamByIdData) => (
-                  <ListItem key={exam.lectureName}>
-                    <ListItemText primary={exam.lectureName} />
-                    <ListItemText primary={exam.departmentName} />
-                    <ListItemText primary={exam.professor} />
-                    <ListItemText primary={exam.year} />
-                  </ListItem>
+                  <Box key={exam.id}>
+                    <Link href={`/exam/${exam.id}`} style={{textDecoration: "none"}}>
+                      <ListItem>
+                        <ListItemText primary={exam.lectureName} />
+                        <ListItemText primary={exam.departmentName} />
+                        <ListItemText primary={exam.professor} />
+                        <ListItemText primary={exam.year} />
+                      </ListItem>
+                    </Link>
+                  </Box>
                 ))
               ) : (
                   <ListItem>
