@@ -17,12 +17,14 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import AuthLayout from "../components/AuthLayout";
 import LeftLineText from "../components/LeftLineText";
+import LoadingIndicator from "../components/LoadingIndicator";
 import { SigninFormData } from "../types";
 import { logIn } from "./actions";
 
 const SigninPage = () => {
   const { data: session } = useSession();
   const [resError, setResError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -36,10 +38,13 @@ const SigninPage = () => {
   if (session) redirect("/");
 
   const handleLogin = async (data: SigninFormData) => {
+    setIsLoading(true);
     const result = await logIn(data);
     if (result.success) {
+      setIsLoading(false);
       signIn("credentials", { email: data.email, password: data.password });
     } else {
+      setIsLoading(false);
       setResError(result.error);
     }
   };
@@ -104,6 +109,7 @@ const SigninPage = () => {
                   type="submit"
                   variant="contained"
                   color="primary"
+                  disabled={isLoading}
                   sx={{
                     position: "relative",
                     width: "15vw",
@@ -117,6 +123,9 @@ const SigninPage = () => {
                     },
                   }}
                 >
+                  {isLoading ? (
+                    <LoadingIndicator />
+                  ) : (
                     <div
                       className="button-content"
                       style={{
@@ -133,6 +142,7 @@ const SigninPage = () => {
                       />
                       <span>ログイン</span>
                     </div>
+                  )}
                 </Button>
               </Box>
             </form>
