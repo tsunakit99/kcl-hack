@@ -16,7 +16,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import LoadingIndicator from "../components/LoadingIndicator";
 import { SignupFormData } from "../types";
 import OtpModal from "./_components/OtpModal";
 import { sendOtp } from "./actions";
@@ -25,7 +24,6 @@ const SignupPage = () => {
   const { data: session } = useSession();
   const [resError, setResError] = useState<string | null>(null);
   const [openOtpModal, setOpenOtpModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,16 +41,13 @@ const SignupPage = () => {
 
   // 登録処理
   const handleRegist = async (data: SignupFormData) => {
-    setIsLoading(true);
     const result = await sendOtp(data);
     if (result.success) {
       setName(data.name);
       setEmail(data.email); // emailを状態に保存
       setPassword(data.password); // 
-      setIsLoading(false);
       setOpenOtpModal(true); // OTPモーダルを開く
     } else {
-      setIsLoading(false);
       setResError(result.error);
     };
   };
@@ -164,7 +159,6 @@ const SignupPage = () => {
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={isLoading}
                 sx={{
                   position: "relative",
                   width: "15vw",
@@ -178,9 +172,6 @@ const SignupPage = () => {
                   },
                 }}
               >
-                {isLoading ? (
-                  <LoadingIndicator />
-                ) : (
                   <div
                     className="button-content"
                     style={{
@@ -197,7 +188,6 @@ const SignupPage = () => {
                     />
                     <span>登録</span>
                   </div>
-                )}
               </Button>
             </Box>
           </form>
