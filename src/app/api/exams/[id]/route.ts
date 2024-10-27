@@ -40,7 +40,7 @@ export async function GET(
     fileUrl, // 画像の公開 URL を追加
   };
 
-    return NextResponse.json(responseData, { status: 200 });
+    return new NextResponse(JSON.stringify(responseData), { status: 200 });
   } catch (error) {
     console.error('試験の取得に失敗しました：', error);
     return new NextResponse(JSON.stringify({ message: '試験の取得に失敗しました。' }), { status: 500 });

@@ -39,6 +39,7 @@ export interface ExamByIdData{
 }
 
 export interface Department {
+  id: string;
   name: string;
 }
 
@@ -49,5 +50,15 @@ export interface UserData {
   departmentId: string;
   introduction: string;
   imageUrl: string;
-  department: Department;
+  department: { name: string };
+}
+
+// Examデータの型定義
+export interface ExamData {
+  id: string;
+  lecture: { name: string };
+  department: { name: string };
+  year: number;
+  professor?: string;
+  pdfUrl: string;
 }
