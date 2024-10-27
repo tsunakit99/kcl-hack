@@ -108,7 +108,6 @@ const SignupPage = () => {
               id="name"
               label="名前"
               autoComplete="name"
-              autoFocus
               {...register("name")}
               error={!!errors.name}
               helperText={errors.name?.message as React.ReactNode}
@@ -121,7 +120,6 @@ const SignupPage = () => {
               id="email"
               label="メールアドレス"
               autoComplete="email"
-              autoFocus
               {...register("email")}
               error={!!errors.email}
               helperText={errors.email?.message as React.ReactNode}

@@ -80,7 +80,6 @@ const SigninPage = () => {
                 id="email"
                 label="メールアドレス"
                 autoComplete="email"
-                autoFocus
                 {...register("email")}
                 error={!!errors.email}
                 helperText={errors.email?.message as React.ReactNode}
