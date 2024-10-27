@@ -7,4 +7,4 @@ export default withAuth({
   }
 })
 
-export const config = { matcher: ["/"] }
+export const config = { matcher: ['/((?!sign*).*)'], }

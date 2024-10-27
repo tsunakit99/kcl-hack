@@ -1,6 +1,6 @@
 "use client";
 
-import { EditUserFormData } from "@/app/types";
+import { Department, EditUserFormData } from "@/app/types";
 import { validationEditSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, CardContent, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
@@ -21,7 +21,7 @@ interface EditUserFormProps {
 
 const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroduction, currentIcon}: EditUserFormProps) => {
   const [resError, setResError] = useState<string | null>(null);
-  const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const router = useRouter();
   const { status } = useSession();
   const [imagePreview, setImagePreview] = useState<string>(currentIcon || "");

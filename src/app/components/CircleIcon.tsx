@@ -36,7 +36,7 @@ const CircleIcon: React.FC<CircleIconProps> = ({
         gap: 1, // アイコンとテキストの間の隙間
         width: "100%", // Boxの幅を100%に設定
         marginTop: 2,
-        cursor: linkUrl ? "pointer" : "default", // URLが指定されている場合はカーソルをポインターに
+        cursor: "pointer"
       }}
       onClick={handleClick} // クリックイベントを追加
     >

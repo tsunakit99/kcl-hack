@@ -1,6 +1,7 @@
 "use client";
 
-import { UploadExamFormData } from "@/app/types";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
+import { Department, UploadExamFormData } from "@/app/types";
 import { validationUploadExamSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -17,7 +18,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -28,18 +28,10 @@ import { getDepartments, getLectureNames, submitExam } from "../actions";
 const UploadExamForm = () => {
   const [resError, setResError] = useState("");
   const router = useRouter();
-  const [departments, setDepartments] = useState<
-    { id: string; name: string }[]
-    >([]);
-  const { status } = useSession();
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  
-    useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/"); 
-    }
-  }, [status]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -85,12 +77,15 @@ const UploadExamForm = () => {
   });
 
   const onSubmit = async (data: UploadExamFormData) => {
+    setIsLoading(true);
     const result = await submitExam(data);
     if (result.success) {
+      setIsLoading(false);
       router.push("/");
     } else {
+      setIsLoading(false);
       setResError(result.error);
-    }
+    };
   };
 
   return (
@@ -209,6 +204,7 @@ const UploadExamForm = () => {
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isLoading}
             sx={{
               position: "relative",
               width: "15vw",
@@ -220,22 +216,26 @@ const UploadExamForm = () => {
               },
             }}
           >
-            <div
-              className="button-content"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Image
-                src="/icon/paper-plane.png"
-                alt="icon"
-                width={24}
-                height={24}
-              />
-              <span>投稿</span>
-            </div>
+            {isLoading ? (
+              <LoadingIndicator />
+            ) : (
+              <div
+                className="button-content"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  src="/icon/paper-plane.png"
+                  alt="icon"
+                  width={24}
+                  height={24}
+                />
+                <span>投稿</span>
+              </div>
+            )}
           </Button>
         </Box>
       </Stack>

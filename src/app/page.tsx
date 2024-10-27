@@ -1,5 +1,6 @@
 "use client";
 
+import { supabase } from "@/app/lib/supabaseClient";
 import {
   Autocomplete,
   Box,
@@ -22,6 +23,7 @@ import { Controller, useForm } from "react-hook-form";
 import { getExams } from "./actions"; // デフォルトの過去問データを取得する関数
 import ScrollButton from "./components/ScrollButton";
 import { getDepartments, getLectureNames } from "./exam/upload/actions";
+import { Department, ExamData } from "./types";
 // import { searchExams } from "./actions"; // 検索クエリに基づいたデータを取得する関数
 
 const Search = styled("div")(({ theme }) => ({
@@ -79,23 +81,12 @@ const SearchButton = styled(Button)(({ }) => ({
 
 export default function Home() {
 
-   const [departments, setDepartments] = useState<
-    { id: string; name: string }[]
-    >([]);
+   const [departments, setDepartments] = useState<Department[]>([]);
   const [year, setYear] = useState("");
   const [lectureName, setLectureName] = useState("");
 
   const [lectureOptions, setLectureOptions] = useState<string[]>([]);
-  const [exams, setExams] = useState<
-    {
-      id: string;
-      lecture: { name: string };
-      department: { name: string };
-      year: number;
-      professor: string;
-      pdfUrl: string;
-    }[]
-    >([]);
+  const [exams, setExams] = useState<ExamData[]>([]);
   const { control } = useForm();
 
   const [isToggled, setIsToggled] = useState(true);
@@ -147,13 +138,28 @@ export default function Home() {
     fetchLectureNames();
   }, [lectureName]);
 
+  const fetchExams = async () => {
+    const data = await getExams();
+    setExams(data);
+  };
+
   useEffect(() => {
-    const loadExams = async () => {
-      const data = await getExams();
-      setExams(data);
+    // 初回レンダリング時のデータ取得
+    fetchExams();
+
+    const channel = supabase
+      .channel('exams')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'exams' }, (payload) => {
+        console.log("新しいExamが追加されました:", payload);
+        fetchExams();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
     };
-    loadExams();
   }, []);
+
 
   return (
     <>
