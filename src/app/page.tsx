@@ -144,21 +144,24 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // 初回レンダリング時のデータ取得
-    fetchExams();
+  const fetchData = async () => {
+    await fetchExams();
+  };
 
-    const channel = supabase
-      .channel('exams')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'exams' }, (payload) => {
-        console.log("新しいExamが追加されました:", payload);
-        fetchExams();
-      })
-      .subscribe();
+  fetchData();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  const channel = supabase
+    .channel('public:exams')  // ここで Supabase のチャンネル名とスキーマを正確に指定する
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'exams' }, (payload) => {
+      console.log("新しいExamが追加されました:", payload);
+      fetchData(); // リアルタイムで更新されたデータを再取得
+    })
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
 
 
   return (
