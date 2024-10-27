@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "if [ \"$VERCEL\" = \"true\" ]; then prisma generate; fi"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -47,5 +47,8 @@
     "eslint-config-next": "14.2.13",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
   }
 }
