@@ -1,10 +1,9 @@
 "use client";
 import { ExamByIdData, UserData } from "@/app/types";
-import { Box, Button, Card, CardContent, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, CircularProgress, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getUserById, getYourExamByUploaderId } from "./actions";
 
@@ -14,16 +13,10 @@ interface UserProfileProps {
 
 const UserProfile = ({ params }: UserProfileProps ) => {
   const { id } = params;
-  const { data: session, status } = useSession();
-  const router = useRouter();
-   const [user, setUser] = useState<UserData>();
+  const { data: session } = useSession();
+  const [user, setUser] = useState<UserData>();
   const [exams, setExams] = useState<ExamByIdData[]>([]);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/"); 
-    }
-  }, [status]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -31,14 +24,20 @@ const UserProfile = ({ params }: UserProfileProps ) => {
       const examResult = await getYourExamByUploaderId(id);
       setUser(userResult);
       setExams(examResult);
+       setIsLoading(false);
     };
     fetchUserData();
   }, []);
-  
 
-  if (!user) {
-    return <Typography>ユーザーが見つかりません。</Typography>;
+
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
+    );
   }
+  
   return (
     <Card sx={{ width: "50%", margin: "auto", mt: 5 }}>
       <Card sx={{ width: "100%", margin: "auto" }}>
@@ -61,7 +60,7 @@ const UserProfile = ({ params }: UserProfileProps ) => {
                   }}
                 >
                   <Image
-                    src={user.imageUrl || '/icon/default-profile.png'} // デフォルト画像を設定
+                    src={user?.imageUrl || '/icon/default-profile.png'} // デフォルト画像を設定
                     alt="プロフィール画像"
                     width={500}
                     height={500}
@@ -75,32 +74,32 @@ const UserProfile = ({ params }: UserProfileProps ) => {
                     名前
                   </Typography>
                   <Typography variant="h6" gutterBottom>
-                    {user.name}
+                    {user?.name}
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
                     学科
                   </Typography>
                   <Typography variant="h6" gutterBottom>
-                    {user.department?.name}
+                    {user?.department?.name}
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
                     自己紹介
                   </Typography>
                   <Typography variant="h6" gutterBottom>
-                    {user.introduction || "なし"}
+                    {user?.introduction || "なし"}
                   </Typography>
                   <Typography variant="subtitle1" color="textSecondary">
                     メールアドレス
                   </Typography>
                   <Typography variant="h6" gutterBottom>
-                    {user.email}
+                    {user?.email}
                   </Typography>
                 </CardContent>
               </Stack>
             </Stack>
           </Box>
           <Box sx={{ maxWidth: "80%", margin: "auto" }}>
-            {session?.user.id === user.id && (
+            {session?.user.id === user?.id && (
               <Link href={`/profile/${id}/edit`} passHref>
                 <Button variant="contained" color="primary" fullWidth>
                   プロフィール編集
@@ -115,7 +114,7 @@ const UserProfile = ({ params }: UserProfileProps ) => {
           <Typography variant="h5" gutterBottom>
             あなたが投稿した過去問
           </Typography>
-          {session?.user.id === user.id && (
+          {session?.user.id === user?.id && (
             <List>
               {exams?
                 (exams.map((exam: ExamByIdData) => (
