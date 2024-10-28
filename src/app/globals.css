@@ -53,6 +53,26 @@ body {
   }
 }
 
+.profile-item-name {
+  font-size: 16px;
+}
+
+@media (max-width: 1000px) {
+  .profile-item-name {
+    font-size: 12px;
+  }
+}
+
+.profile-item {
+  font-size: 15px;
+}
+
+@media (max-width: 1000px) {
+  .profile-item {
+    font-size: 12px;
+  }
+}
+
 /* アイコンとテキストの初期スタイル */
 .button-content img {
   position: absolute;
