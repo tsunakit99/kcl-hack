@@ -3,6 +3,7 @@
 import { Box, Container, Divider, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import UploadExamForm from "./_components/UploadExamForm";
+import Image from "next/image";
 
 const UploadExam = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -44,10 +45,12 @@ const UploadExam = () => {
             justifyContent: "center",
           }}
         >
-          <img
+          <Image
             className="post-icon"
             src="/icon/post2.png"
             alt="search"
+            width={500}
+            height={500}
             style={{
               transition: "opacity 2s ease",
               opacity: isVisible ? 1 : 0, // フェードインアニメーション
@@ -55,15 +58,15 @@ const UploadExam = () => {
             }}
           />
           <Typography
-            variant="h2"
             sx={{
               marginTop: "60vh",
               color: "#444f7c",
+              fontSize: "50px",
               fontWeight: 550,
               transition: "opacity 2s ease",
               opacity: isVisible ? 1 : 0, // フェードインアニメーション
               "@media(max-width: 1000px)": {
-                fontSize: "50px",
+                fontSize: "35px",
               },
             }}
           >

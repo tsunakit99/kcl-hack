@@ -29,14 +29,14 @@ const UploadExamForm = () => {
   const router = useRouter();
   const [departments, setDepartments] = useState<
     { id: string; name: string }[]
-    >([]);
+  >([]);
   const { data: session, status } = useSession();
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  
-    useEffect(() => {
+
+  useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/"); 
+      router.push("/");
     }
   }, [status]);
 
