@@ -58,7 +58,6 @@ const SigninPage = () => {
       }}
     >
       <AuthLayout
-        title=""
         children1={
           <>
             <Typography
