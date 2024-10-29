@@ -41,8 +41,8 @@ const SigninPage = () => {
     setIsLoading(true);
     const result = await logIn(data);
     if (result.success) {
-      setIsLoading(false);
       signIn("credentials", { email: data.email, password: data.password });
+      setIsLoading(false);
     } else {
       setIsLoading(false);
       setResError(result.error);
