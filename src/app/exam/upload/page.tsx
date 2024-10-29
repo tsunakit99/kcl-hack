@@ -32,6 +32,54 @@ const UploadExam = () => {
     >
       <div
         style={{
+          width: "35%",
+          height: "3vw",
+          backgroundColor: "#c0d7d2",
+          position: "absolute",
+          top: 0,
+          left: "8vw",
+          zIndex: 999,
+          transform: "rotate(-45deg)",
+        }}
+      />
+      <div
+        style={{
+          width: "40%",
+          height: "4vw",
+          backgroundColor: "#c0d7d2",
+          position: "absolute",
+          top: "10vw",
+          left: "8vw",
+          zIndex: 999,
+          transform: "rotate(-65deg)",
+        }}
+      />
+      <div
+        style={{
+          width: "4vw",
+          height: "4vw",
+          backgroundColor: "#444f7c",
+          borderRadius: "50%",
+          position: "absolute",
+          top: 5,
+          left: "36vw",
+          zIndex: 1000,
+        }}
+      />
+      <div
+        style={{
+          width: "5vw",
+          height: "5vw",
+          backgroundColor: "#444f7c",
+          borderRadius: "50%",
+          position: "absolute",
+          top: "6vw",
+          left: "26vw",
+          zIndex: 1000,
+        }}
+      />
+      <div
+        style={{
           display: "flex",
           height: "95%",
           margin: "0 0 2% 4%",

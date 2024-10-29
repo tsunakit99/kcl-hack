@@ -10,6 +10,7 @@ import {
   ListItemText,
   Stack,
   Typography,
+  Fade,
 } from "@mui/material";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -34,6 +35,17 @@ const UserProfile = ({ params }: UserProfileProps) => {
       router.push("/");
     }
   }, [status]);
+
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // 画面遷移後にフェードインを開始
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 300); // 遅延を少し入れる場合
+
+    return () => clearTimeout(timer); // クリーンアップ
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -70,10 +82,51 @@ const UserProfile = ({ params }: UserProfileProps) => {
         },
       }}
     >
-      <Box sx={{ display: "block", marginLeft: "8vw", mt: "20vh" }}>
+      <div
+        style={{
+          width: "4vw",
+          height: "4vw",
+          backgroundColor: "#444f7c",
+          borderRadius: "50%",
+          position: "absolute",
+          top: 5,
+          left: "8vw",
+          zIndex: 1000,
+        }}
+      />
+      <div
+        style={{
+          width: "7vw",
+          height: "7vw",
+          backgroundColor: "#fff",
+          borderRadius: "50%",
+          position: "absolute",
+          top: 6,
+          left: "8vw",
+          zIndex: 999,
+        }}
+      />
+      <div
+        style={{
+          background: "#fff",
+          position: "absolute",
+          top: "2vw",
+          left: "9vw",
+          margin: 0,
+          width: "38%",
+          height: "2vw",
+          borderRadius: 5,
+        }}
+      />
+      <Box sx={{ display: "block", marginLeft: "8vw", mt: "12vh" }}>
         <Typography
           variant="h3"
-          sx={{ color: "#444f7c", fontWeight: 550, mt: "-15vh" }}
+          sx={{
+            color: "#444f7c",
+            fontWeight: 550,
+            transition: "opacity 2s ease",
+            opacity: isVisible ? 1 : 0,
+          }}
         >
           Profile
         </Typography>
@@ -184,7 +237,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
               sx={{
                 display: "flex",
                 justifyContent: "center",
-                marginTop: "20px",
+                marginTop: "1vh",
               }}
             >
               {session?.user.id === user.id && (
@@ -229,7 +282,9 @@ const UserProfile = ({ params }: UserProfileProps) => {
       <Box
         sx={{
           width: "50vw",
-          height: "90%",
+          height: "80%",
+          position: "relative",
+          top: "-6vh",
           overflowY: "auto", // スクロール可能にする
           "&::-webkit-scrollbar": {
             display: "none",
@@ -308,54 +363,61 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 }}
               ></div>
               {exams ? (
-                exams.map((exam: ExamByIdData) => (
-                  <ListItem
+                exams.map((exam: ExamByIdData, index) => (
+                  <Fade
+                    in={true}
+                    timeout={500} // アニメーションの速度
+                    style={{ transitionDelay: `${index * 200}ms` }} // 各行に遅延を追加
                     key={exam.lectureName}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
                   >
-                    <ListItemText
-                      primary={exam.lectureName}
+                    <ListItem
+                      key={exam.lectureName}
                       sx={{
-                        flexBasis: "6vw",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                       }}
-                      primaryTypographyProps={{
-                        sx: {
-                          "@media(max-width: 1000px)": { fontSize: "12px" },
-                        },
-                      }}
-                    />
-                    <ListItemText
-                      primary={exam.departmentName}
-                      sx={{ flexBasis: "8vw" }}
-                      primaryTypographyProps={{
-                        sx: {
-                          "@media(max-width: 1000px)": { fontSize: "12px" },
-                        },
-                      }}
-                    />
-                    <ListItemText
-                      primary={exam.professor}
-                      sx={{ flexBasis: "6vw" }}
-                      primaryTypographyProps={{
-                        sx: {
-                          "@media(max-width: 1000px)": { fontSize: "12px" },
-                        },
-                      }}
-                    />
-                    <ListItemText
-                      primary={exam.year}
-                      sx={{ flexBasis: "6vw" }}
-                      primaryTypographyProps={{
-                        sx: {
-                          "@media(max-width: 1000px)": { fontSize: "12px" },
-                        },
-                      }}
-                    />
-                  </ListItem>
+                    >
+                      <ListItemText
+                        primary={exam.lectureName}
+                        sx={{
+                          flexBasis: "6vw",
+                        }}
+                        primaryTypographyProps={{
+                          sx: {
+                            "@media(max-width: 1000px)": { fontSize: "12px" },
+                          },
+                        }}
+                      />
+                      <ListItemText
+                        primary={exam.departmentName}
+                        sx={{ flexBasis: "8vw" }}
+                        primaryTypographyProps={{
+                          sx: {
+                            "@media(max-width: 1000px)": { fontSize: "12px" },
+                          },
+                        }}
+                      />
+                      <ListItemText
+                        primary={exam.professor}
+                        sx={{ flexBasis: "6vw" }}
+                        primaryTypographyProps={{
+                          sx: {
+                            "@media(max-width: 1000px)": { fontSize: "12px" },
+                          },
+                        }}
+                      />
+                      <ListItemText
+                        primary={exam.year}
+                        sx={{ flexBasis: "6vw" }}
+                        primaryTypographyProps={{
+                          sx: {
+                            "@media(max-width: 1000px)": { fontSize: "12px" },
+                          },
+                        }}
+                      />
+                    </ListItem>
+                  </Fade>
                 ))
               ) : (
                 <ListItem>
@@ -366,6 +428,30 @@ const UserProfile = ({ params }: UserProfileProps) => {
           )}
         </CardContent>
       </Box>
+      <div
+        style={{
+          width: "4vw",
+          height: "4vw",
+          backgroundColor: "#444f7c",
+          borderRadius: "50%",
+          position: "absolute",
+          bottom: 5,
+          right: 5,
+          zIndex: 1000,
+        }}
+      />
+      <div
+        style={{
+          width: "7vw",
+          height: "7vw",
+          backgroundColor: "#c0d7d2",
+          borderRadius: "50%",
+          position: "absolute",
+          bottom: 6,
+          right: 6,
+          zIndex: 999,
+        }}
+      />
     </Box>
   );
 };
