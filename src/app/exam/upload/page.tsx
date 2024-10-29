@@ -1,7 +1,8 @@
 "use client";
 
 import { Box, Container, Divider, Typography } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import UploadExamForm from "./_components/UploadExamForm";
 import Image from "next/image";
 import { Rotate90DegreesCcw, RotateLeft } from "@mui/icons-material";

@@ -1,7 +1,8 @@
 // src/components/CircleIcon.tsx
-import React from "react";
 import { Box, Typography } from "@mui/material";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import React from "react";
 
 // コンポーネントのプロパティの型定義
 interface CircleIconProps {
@@ -35,7 +36,7 @@ const CircleIcon: React.FC<CircleIconProps> = ({
         gap: 1, // アイコンとテキストの間の隙間
         width: "100%", // Boxの幅を100%に設定
         marginTop: 2,
-        cursor: linkUrl ? "pointer" : "default", // URLが指定されている場合はカーソルをポインターに
+        cursor: "pointer"
       }}
       onClick={handleClick} // クリックイベントを追加
     >
@@ -57,12 +58,14 @@ const CircleIcon: React.FC<CircleIconProps> = ({
           },
         }}
       >
-        <img
+        <Image
           src={src}
           alt={alt}
+          width={500}  // 必須のwidthを指定 (任意の値)
+          height={500} // 必須のheightを指定 (任意の値)
           style={{
-            width: "50%",
-            height: "50%",
+            width: "50%",    // スタイルとして幅を50%に
+            height: "50%",   // スタイルとして高さを50%に
             objectFit: "cover",
           }}
         />

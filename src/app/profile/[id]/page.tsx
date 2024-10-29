@@ -1,23 +1,11 @@
 "use client";
-import { ExamByIdData } from "@/app/types";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  List,
-  ListItem,
-  ListItemText,
-  Stack,
-  Typography,
-  Fade,
-} from "@mui/material";
+import { ExamByIdData, UserData } from "@/app/types";
+import { Box, Button, Card, CardContent, CircularProgress, Fade, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getUserById, getYourExamByUploaderId } from "./actions";
-import Image from "next/image";
 
 interface UserProfileProps {
   params: { id: string; uploaderId: string };
@@ -25,16 +13,10 @@ interface UserProfileProps {
 
 const UserProfile = ({ params }: UserProfileProps) => {
   const { id } = params;
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const { data: session } = useSession();
+  const [user, setUser] = useState<UserData>();
   const [exams, setExams] = useState<ExamByIdData[]>([]);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -53,19 +35,19 @@ const UserProfile = ({ params }: UserProfileProps) => {
       const examResult = await getYourExamByUploaderId(id);
       setUser(userResult);
       setExams(examResult);
+       setIsLoading(false);
     };
     fetchUserData();
   }, []);
 
-  if (!user) {
-    return <Typography>ユーザーが見つかりません。</Typography>;
-  }
-
-  if (exams) {
-    //paramsがある場合にのみ過去問を取得
-    const { uploaderId } = params;
-  }
-
+    if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
+    );
+    }
+  
   return (
     <Box
       sx={{
@@ -176,7 +158,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 }}
               >
                 <Image
-                  src={user.image || "/default-profile.png"} // デフォルト画像を設定
+                  src={user?.imageUrl || "/default-profile.png"} // デフォルト画像を設定
                   alt="プロフィール画像"
                   width={500}
                   height={500}
@@ -201,7 +183,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     名前
                   </Typography>
                   <Typography className="profile-item" gutterBottom>
-                    {user.name}
+                    {user?.name}
                   </Typography>
                   <Typography
                     className="profile-item-name"
@@ -210,7 +192,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     学科
                   </Typography>
                   <Typography className="profile-item" gutterBottom>
-                    {user.department.name}
+                    {user?.department.name}
                   </Typography>
                   <Typography
                     className="profile-item-name"
@@ -219,7 +201,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     自己紹介
                   </Typography>
                   <Typography className="profile-item" gutterBottom>
-                    {user.introduction || "なし"}
+                    {user?.introduction || "なし"}
                   </Typography>
                   <Typography
                     className="profile-item-name"
@@ -228,7 +210,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     メールアドレス
                   </Typography>
                   <Typography className="profile-item" gutterBottom>
-                    {user.email}
+                    {user?.email}
                   </Typography>
                 </CardContent>
               </Stack>
@@ -240,7 +222,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 marginTop: "1vh",
               }}
             >
-              {session?.user.id === user.id && (
+              {session?.user.id === user?.id && (
                 <Link href={`/profile/${id}/edit`} passHref>
                   <Button
                     type="submit"
@@ -306,8 +288,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
           >
             あなたが投稿した過去問
           </Typography>
-          {/* カラム名を表示する */}
-          {session?.user.id === user.id && (
+          {session?.user.id === user?.id && (
             <List>
               <ListItem
                 sx={{

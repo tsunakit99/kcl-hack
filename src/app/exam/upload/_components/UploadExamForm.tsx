@@ -1,6 +1,7 @@
 "use client";
 
-import { UploadExamFormData } from "@/app/types";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
+import { Department, UploadExamFormData } from "@/app/types";
 import { validationUploadExamSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -17,7 +18,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -27,18 +28,10 @@ import { getDepartments, getLectureNames, submitExam } from "../actions";
 const UploadExamForm = () => {
   const [resError, setResError] = useState("");
   const router = useRouter();
-  const [departments, setDepartments] = useState<
-    { id: string; name: string }[]
-  >([]);
-  const { data: session, status } = useSession();
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -84,12 +77,15 @@ const UploadExamForm = () => {
   });
 
   const onSubmit = async (data: UploadExamFormData) => {
+    setIsLoading(true);
     const result = await submitExam(data);
     if (result.success) {
+      setIsLoading(false);
       router.push("/");
     } else {
+      setIsLoading(false);
       setResError(result.error);
-    }
+    };
   };
 
   return (
@@ -182,10 +178,12 @@ const UploadExamForm = () => {
             {files.length > 0 ? (
               <>
                 <Typography variant="h4" align="center" color="blue">
-                  <img
+                  <Image
                     src="/icon/pdf.png"
                     alt="PDF Icon"
-                    style={{ width: 30, height: 30, marginRight: 8 }}
+                    width={30}
+                    height={30}
+                    style={{ marginRight: 8 }}
                   />
                   {files[0].name}
                 </Typography>
@@ -206,6 +204,7 @@ const UploadExamForm = () => {
             type="submit"
             variant="contained"
             color="primary"
+            disabled={isLoading}
             sx={{
               position: "relative",
               width: "15vw",
@@ -217,21 +216,26 @@ const UploadExamForm = () => {
               },
             }}
           >
-            <div
-              className="button-content"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <img
-                src="/icon/paper-plane.png"
-                alt="icon"
-                style={{ width: "24px", height: "24px" }}
-              />
-              <span>投稿</span>
-            </div>
+            {isLoading ? (
+              <LoadingIndicator />
+            ) : (
+              <div
+                className="button-content"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  src="/icon/paper-plane.png"
+                  alt="icon"
+                  width={24}
+                  height={24}
+                />
+                <span>投稿</span>
+              </div>
+            )}
           </Button>
         </Box>
       </Stack>

@@ -11,26 +11,28 @@ import {
   Typography,
 } from "@mui/material";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import LoadingIndicator from "../components/LoadingIndicator";
 import { SignupFormData } from "../types";
 import OtpModal from "./_components/OtpModal";
 import { sendOtp } from "./actions";
 
 const SignupPage = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [resError, setResError] = useState<string | null>(null);
   const [openOtpModal, setOpenOtpModal] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm<SignupFormData>({
     mode: "onBlur",
@@ -41,15 +43,18 @@ const SignupPage = () => {
 
   // 登録処理
   const handleRegist = async (data: SignupFormData) => {
+    setIsLoading(true);
     const result = await sendOtp(data);
     if (result.success) {
       setName(data.name);
       setEmail(data.email); // emailを状態に保存
-      setPassword(data.password); // passwordを状態に保存
+      setPassword(data.password); // 
+      setIsLoading(false);
       setOpenOtpModal(true); // OTPモーダルを開く
     } else {
+      setIsLoading(false);
       setResError(result.error);
-    }
+    };
   };
 
   return (
@@ -118,7 +123,6 @@ const SignupPage = () => {
                 id="name"
                 label="名前"
                 autoComplete="name"
-                autoFocus
                 {...register("name")}
                 error={!!errors.name}
                 helperText={errors.name?.message as React.ReactNode}
@@ -131,7 +135,6 @@ const SignupPage = () => {
                 id="email"
                 label="メールアドレス"
                 autoComplete="email"
-                autoFocus
                 {...register("email")}
                 error={!!errors.email}
                 helperText={errors.email?.message as React.ReactNode}
@@ -182,21 +185,26 @@ const SignupPage = () => {
                     },
                   }}
                 >
-                  <div
-                    className="button-content"
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <img
-                      src="/icon/entry.png"
-                      alt="icon"
-                      style={{ width: "24px", height: "24px" }}
-                    />
-                    <span>登録</span>
-                  </div>
+                  {isLoading ? (
+                    <LoadingIndicator />
+                  ) : (
+                    <div
+                      className="button-content"
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Image
+                        src="/icon/entry.png"
+                        alt="icon"
+                        width={24}
+                        height={24}
+                      />
+                      <span>登録</span>
+                    </div>
+                  )}
                 </Button>
               </Box>
             </form>

@@ -1,6 +1,7 @@
 "use client";
 import { Box, Button } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import CircleIcon from "./CircleIcon"; // CircleIconコンポーネントのインポート
 
@@ -82,9 +83,11 @@ const MenuSidebar: React.FC = () => {
             },
           }}
         >
-          <img
+          <Image
             src="/icon/menu.png"
             alt="menu"
+            width={500}
+            height={500}
             style={{
               width: "50%",
               height: "50%",
@@ -115,19 +118,17 @@ const MenuSidebar: React.FC = () => {
             text="Moodle"
             linkUrl="https://ict-i.el.kyutech.ac.jp/login/index.php"
           /> */}
-          <Box sx={{ cursor: "pointer" }}>
             <CircleIcon
               src="/icon/person.png"
               alt="Person"
-              text="profile"
+              text="プロフィール"
               linkUrl={handleProfileClick()}
             />
-          </Box>
-          <Box onClick={handleLogOut} sx={{ cursor: "pointer" }}>
+          <Box onClick={handleLogOut}>
             <CircleIcon
               src="/icon/logout.png"
               alt="Logout"
-              text="logout"
+              text="ログアウト"
             />
           </Box>
         </Box>

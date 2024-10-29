@@ -1,10 +1,11 @@
 "use client";
 
-import { EditUserFormData } from "@/app/types";
+import { Department, EditUserFormData } from "@/app/types";
 import { validationEditSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, CardContent, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -20,9 +21,9 @@ interface EditUserFormProps {
 
 const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroduction, currentIcon}: EditUserFormProps) => {
   const [resError, setResError] = useState<string | null>(null);
-  const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [imagePreview, setImagePreview] = useState<string>(currentIcon || "");
 
     useEffect(() => {
@@ -108,9 +109,11 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
                 border: "2px solid #000",
               }}
             >
-              <img
+              <Image
                 src={imagePreview}
                 alt="プロフィール画像プレビュー"
+                width={500}
+                height={500}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </Box>

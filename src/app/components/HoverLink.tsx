@@ -1,4 +1,4 @@
-import { Typography, Link } from "@mui/material";
+import { Link, Typography } from "@mui/material";
 import React from "react";
 
 // 型定義 (必要に応じて修正)
@@ -10,7 +10,6 @@ interface HoverLinkProps {
 }
 
 const HoverLink: React.FC<HoverLinkProps> = ({
-  href,
   text,
   underlineColor = "#ffffff", // デフォルトの下線色
   fontSize = "20px", // デフォルトのフォントサイズ
