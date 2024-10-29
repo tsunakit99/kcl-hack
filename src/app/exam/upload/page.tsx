@@ -4,6 +4,7 @@ import { Box, Container, Divider, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import UploadExamForm from "./_components/UploadExamForm";
 import Image from "next/image";
+import { Rotate90DegreesCcw, RotateLeft } from "@mui/icons-material";
 
 const UploadExam = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,7 +27,7 @@ const UploadExam = () => {
         height: "100vh",
         width: "100vw",
         margin: 0,
-        background: "linear-gradient(to right, #c0d7d2 47%, #fff 47%)",
+        background: "linear-gradient(80deg, #c0d7d2 27%, #fff 27%)",
       }}
     >
       <div
@@ -34,7 +35,7 @@ const UploadExam = () => {
           display: "flex",
           height: "95%",
           margin: "0 0 2% 4%",
-          gap: "8vw", // 間隔を調整
+          gap: 0, // 間隔を調整
         }}
       >
         <Box
@@ -52,6 +53,7 @@ const UploadExam = () => {
             width={500}
             height={500}
             style={{
+              transform: "rotate(-5deg)",
               transition: "opacity 2s ease",
               opacity: isVisible ? 1 : 0, // フェードインアニメーション
               marginTop: "40vh",
@@ -75,8 +77,8 @@ const UploadExam = () => {
         </Box>
         <Container
           sx={{
-            width: "40vw",
-            height: "90%",
+            width: "50vw",
+            height: "100%",
             borderRadius: "16px",
             boxShadow: 0,
             backgroundColor: "rgba(0,0,0,0)",
@@ -90,10 +92,11 @@ const UploadExam = () => {
           <Divider
             textAlign="center"
             sx={{
-              margin: "2vw",
+              margin: "1vw 0 2vw 0",
               color: "#444f7c",
               "@media(max-width: 1000px)": {
                 fontSize: "12px",
+                margin: "1vw",
               },
             }}
           >

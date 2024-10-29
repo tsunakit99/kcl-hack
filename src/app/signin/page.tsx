@@ -46,7 +46,13 @@ const SigninPage = () => {
   };
 
   return (
-    <>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
+      }}
+    >
       <AuthLayout
         title=""
         children1={
@@ -165,7 +171,7 @@ const SigninPage = () => {
           </Link>
         }
       />
-    </>
+    </div>
 
     //                 {/* <button onClick={() => {
     //                     signIn("google");

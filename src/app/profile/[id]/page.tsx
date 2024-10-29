@@ -63,7 +63,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
         height: "100vh",
         width: "100vw",
         margin: 0,
-        background: "linear-gradient(45deg, #c0d7d2 47%, #fff 47%)",
+        background: "linear-gradient(to right,  #c0d7d2 48%, #fff 48%)",
         gap: "6vw",
         "@media(max-width: 1000px)": {
           gap: "2vw",
@@ -77,6 +77,15 @@ const UserProfile = ({ params }: UserProfileProps) => {
         >
           Profile
         </Typography>
+        <div
+          style={{
+            width: "60%",
+            height: "2px",
+            backgroundColor: "#444f7c",
+            position: "relative",
+            top: 0,
+          }}
+        ></div>
         <Card
           sx={{
             width: "40vw",
@@ -171,7 +180,13 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 </CardContent>
               </Stack>
             </Box>
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "20px",
+              }}
+            >
               {session?.user.id === user.id && (
                 <Link href={`/profile/${id}/edit`} passHref>
                   <Button
@@ -214,8 +229,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
       <Box
         sx={{
           width: "50vw",
-          height: "50vh",
-          marginTop: "-30vh",
+          height: "90%",
           overflowY: "auto", // スクロール可能にする
           "&::-webkit-scrollbar": {
             display: "none",

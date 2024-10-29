@@ -94,7 +94,7 @@ const UploadExamForm = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-      <Stack spacing={6}>
+      <Stack spacing={4}>
         {resError && <Alert severity="error">{resError}</Alert>}
 
         <Controller
