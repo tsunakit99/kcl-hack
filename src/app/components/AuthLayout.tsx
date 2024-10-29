@@ -5,7 +5,6 @@ const AuthLayout = ({
   children1,
   children2,
 }: {
-  title: string;
   children1: React.ReactNode;
   children2: React.ReactNode;
 }) => {
