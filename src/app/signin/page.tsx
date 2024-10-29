@@ -41,8 +41,8 @@ const SigninPage = () => {
     setIsLoading(true);
     const result = await logIn(data);
     if (result.success) {
-      setIsLoading(false);
       signIn("credentials", { email: data.email, password: data.password });
+      setIsLoading(false);
     } else {
       setIsLoading(false);
       setResError(result.error);
@@ -50,9 +50,14 @@ const SigninPage = () => {
   };
 
   return (
-    <>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
+      }}
+    >
       <AuthLayout
-        title=""
         children1={
           <>
             <Typography
@@ -174,7 +179,7 @@ const SigninPage = () => {
           </Link>
         }
       />
-    </>
+    </div>
 
     //                 {/* <button onClick={() => {
     //                     signIn("google");
