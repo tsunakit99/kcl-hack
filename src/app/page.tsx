@@ -1,19 +1,21 @@
 "use client";
 
-import { supabase } from "@/app/lib/supabaseClient";
 import {
   Autocomplete,
   Box,
   Button,
   Card,
   CardContent,
+  CircularProgress,
   Divider,
   FormControl,
   InputBase,
   InputLabel,
   Link,
   MenuItem,
-  Typography
+  Snackbar,
+  Typography,
+  useMediaQuery
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
@@ -72,7 +74,7 @@ const SearchButton = styled(Button)(({ }) => ({
   position: "absolute",
   right: "2%",
   top: "50%",
-  width: "14%",
+  width: "30px",
   transform: "translateY(-50%)",
   height: "50px",
   backgroundColor: "#444f7c",
@@ -81,15 +83,17 @@ const SearchButton = styled(Button)(({ }) => ({
 
 export default function Home() {
 
-   const [departments, setDepartments] = useState<Department[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [year, setYear] = useState("");
   const [lectureName, setLectureName] = useState("");
-
+  // 画面幅が1000px以下の場合はtrueになる
+  const isSmallScreen = useMediaQuery("(max-width: 1000px)");
   const [lectureOptions, setLectureOptions] = useState<string[]>([]);
   const [exams, setExams] = useState<ExamData[]>([]);
   const { control } = useForm();
-
   const [isToggled, setIsToggled] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   // ボタンを押したときにレイアウトを切り替える関数
   const toggleLayout = () => {
@@ -139,29 +143,25 @@ export default function Home() {
   }, [lectureName]);
 
   const fetchExams = async () => {
+  setIsLoading(true);
+  try {
     const data = await getExams();
     setExams(data);
-  };
+    setOpenSnackbar(true);
+  } catch (error) {
+    console.error("データの取得に失敗しました:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   useEffect(() => {
-  const fetchData = async () => {
-    await fetchExams();
-  };
-
-  fetchData();
-
-  const channel = supabase
-    .channel('public:exams')  // ここで Supabase のチャンネル名とスキーマを正確に指定する
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'exams' }, (payload) => {
-      console.log("新しいExamが追加されました:", payload);
-      fetchData(); // リアルタイムで更新されたデータを再取得
-    })
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, []);
+    const loadExams = async () => {
+      const data = await getExams();
+      setExams(data);
+    };
+    loadExams();
+  }, []);
 
 
   return (
@@ -179,6 +179,13 @@ export default function Home() {
           },
         }}
       >
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          message="直近の過去問一覧を更新しました"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
         <div
           style={{
             display: "flex",
@@ -202,6 +209,26 @@ export default function Home() {
                 scrollbarWidth: "none", // Firefox対応
               }}
             >
+              {/* 更新ボタン */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={fetchExams}
+          disabled={isLoading}
+          sx={{
+            position: "relative",
+            top: "0px",
+            left: "0px",
+            backgroundColor: "#444f7c",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#383f6a",
+            },
+          }}
+        >
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : "↺"}
+          
+        </Button>
               <Divider
                 textAlign="center"
                 sx={{
@@ -224,7 +251,7 @@ export default function Home() {
                     key={exam.id}
                     sx={{
                       flexBasis: "calc(40% - 4px)", // 2列レイアウト
-                      minWidth: "300px", // カードの最小幅を設定
+                      minWidth: "220px", // カードの最小幅を設定
                     }}
                   >
                      <Link href={`/exam/${exam.id}`}　style={{textDecoration: "none"}}>
@@ -249,7 +276,7 @@ export default function Home() {
                         }}
                       />
                       <CardContent>
-                        <Typography variant="h5" component="div">
+                        <Typography variant="h6" component="div">
                           {exam.lecture.name} ({exam.year})
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -416,17 +443,6 @@ export default function Home() {
                 scrollbarWidth: "none", // Firefox対応
               }}
             >
-              <div
-                style={{
-                  width: "90%",
-                  height: "2px",
-                  backgroundColor: "#c0d7d2",
-                  position: "relative",
-                  top: "90px",
-                  margin: "0 auto",
-                  transition: "all 0.3s ease", // スムーズにサイズが変わるように
-                }}
-              ></div>
               <Box
                 sx={{
                   display: "flex",
@@ -435,28 +451,40 @@ export default function Home() {
                 }}
               >
                 <Image
+                  className="search-icon"
                   src="/icon/search-icon.png"
                   alt="search"
-                  width={30}
-                  height={30}
-                
+                  width={50}
+                  height={50}
                 />
                 <Typography
-                  variant="h6"
                   sx={{
                     textAlign: "center",
                     padding: "30px",
                     color: "#444f7c",
                     fontWeight: 550,
-                    fontSize: "30px",
+                    fontSize: "28px",
                     transition: "all 0.3s ease",
+                    "@media(max-width: 1000px)": {
+                      fontSize: "20px",
+                    },
                   }}
                 >
                   講義名検索
                 </Typography>
               </Box>
+              <div
+                style={{
+                  width: "90%",
+                  height: "2px",
+                  backgroundColor: "#c0d7d2",
+                  position: "relative",
+                  top: "-10px",
+                  margin: "0 auto",
+                  transition: "all 0.3s ease", // スムーズにサイズが変わるように
+                }}
+              ></div>
               <Typography
-                variant="h6"
                 sx={{
                   textAlign: "center",
                   marginTop: "5px",
@@ -465,6 +493,9 @@ export default function Home() {
                   fontWeight: 550,
                   fontSize: "16px",
                   transition: "all 0.3s ease",
+                  "@media(max-width: 1000px)": {
+                    fontSize: "12px",
+                  },
                 }}
               >
                 検索したい講義名を入力してください。
@@ -472,23 +503,68 @@ export default function Home() {
                 条件で絞り込みたい場合は詳細検索をご利用ください。
               </Typography>
               <CardContent sx={{ paddingTop: "20px" }}>
-                <Search>
-                  <Autocomplete
-                    freeSolo
-                    options={lectureOptions}
-                    onInputChange={(event, newValue) => setLectureName(newValue)}
-                    renderInput={(params) => (
-                      <StyledInputBase
-                        ref={params.InputProps.ref}
-                        inputProps={params.inputProps}
-                        placeholder="講義名を入力"
+                {isSmallScreen ? (
+                  // 1000px以下の場合、SearchButtonをSearchの外に表示
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Search>
+                      <Autocomplete
+                        freeSolo
+                        options={lectureOptions}
+                        onInputChange={(event, newValue) =>
+                          setLectureName(newValue)
+                        }
+                        renderInput={(params) => (
+                          <StyledInputBase
+                            ref={params.InputProps.ref}
+                            inputProps={params.inputProps}
+                            placeholder="講義名を入力"
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  <SearchButton variant="contained" onClick={toggleLayout}>
-                    検索
-                  </SearchButton>
-                </Search>
+                    </Search>
+                    <Button
+                      variant="contained"
+                      onClick={toggleLayout}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        backgroundColor: "#444f7c",
+                        color: "#fff",
+                        marginTop: "20px",
+                      }}
+                    >
+                      検索
+                    </Button>
+                  </div>
+                ) : (
+                  // 600pxより大きい場合、SearchButtonをSearchの中に表示
+                  <Search>
+                    <Autocomplete
+                      freeSolo
+                      options={lectureOptions}
+                      onInputChange={(event, newValue) =>
+                        setLectureName(newValue)
+                      }
+                      renderInput={(params) => (
+                        <StyledInputBase
+                          ref={params.InputProps.ref}
+                          inputProps={params.inputProps}
+                          placeholder="講義名を入力"
+                        />
+                      )}
+                    />
+                    <SearchButton variant="contained" onClick={toggleLayout}>
+                      検索
+                    </SearchButton>
+                  </Search>
+                )}
               </CardContent>
               <div
                 style={{
@@ -525,13 +601,15 @@ export default function Home() {
                   height={30}
                 />
                 <Typography
-                  variant="h6"
                   sx={{
                     textAlign: "center",
                     padding: "30px",
                     color: "#444f7c",
                     fontWeight: 550,
-                    fontSize: "30px",
+                    fontSize: "28px",
+                    "@media(max-width: 1000px)": {
+                      fontSize: "20px",
+                    },
                   }}
                 >
                   詳細検索
@@ -549,10 +627,10 @@ export default function Home() {
               ></div>
               <Box
                 sx={{
-                  minWidth: 120,
+                  minWidth: 140,
                   display: "flex",
                   padding: "10px 50px",
-                  "@media(max-width: 1000px)": {
+                  "@media(max-width: 1200px)": {
                     flexDirection: "column", // 縦並びにする
                     gap: "2vh",
                   },
@@ -567,15 +645,22 @@ export default function Home() {
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 1,
-                    marginLeft: "4vw",
-                    marginRight: "4vw",
+                    marginLeft: "3vw",
+                    marginRight: "3vw",
+                    "@media(max-width: 1200px)": {
+                      marginLeft: "2vw",
+                      marginRight: "2vw",
+                    },
                   }}
                 >
                   <Typography
                     sx={{
                       color: "#ffffff",
                       fontWeight: 450,
-                      fontSize: "23px",
+                      fontSize: "20px",
+                      "@media(max-width: 1200px)": {
+                        fontSize: "16px",
+                      },
                     }}
                   >
                     開講学科
@@ -596,7 +681,7 @@ export default function Home() {
                     "&.Mui-focused fieldset": {
                       borderColor: "#444f7c", // フォーカス時の枠線の色
                     },
-                    "@media(max-width: 1000px)": {
+                    "@media(max-width: 1200px)": {
                       flexGrow: 1,
                       flexBasis: "40%",
                       marginLeft: "2vw",
@@ -631,7 +716,7 @@ export default function Home() {
                   minWidth: 120,
                   display: "flex",
                   padding: "10px 50px",
-                  "@media(max-width: 1000px)": {
+                  "@media(max-width: 1200px)": {
                     flexDirection: "column", // 縦並びにする
                     gap: "2vh",
                   },
@@ -646,15 +731,22 @@ export default function Home() {
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 1,
-                    marginLeft: "4vw",
-                    marginRight: "4vw",
+                    marginLeft: "3vw",
+                    marginRight: "3vw",
+                    "@media(max-width: 1200px)": {
+                      marginLeft: "2vw",
+                      marginRight: "2vw",
+                    },
                   }}
                 >
                   <Typography
                     sx={{
                       color: "#ffffff",
                       fontWeight: 450,
-                      fontSize: "23px",
+                      fontSize: "20px",
+                      "@media(max-width: 1200px)": {
+                        fontSize: "16px",
+                      },
                     }}
                   >
                     開講年度
@@ -675,7 +767,7 @@ export default function Home() {
                     "&.Mui-focused fieldset": {
                       borderColor: "#444f7c", // フォーカス時の枠線の色
                     },
-                    "@media(max-width: 1000px)": {
+                    "@media(max-width: 1200px)": {
                       flexGrow: 1,
                       flexBasis: "40%",
                       marginLeft: "2vw",
@@ -705,7 +797,7 @@ export default function Home() {
                   minWidth: 120,
                   display: "flex",
                   padding: "10px 50px",
-                  "@media(max-width: 1000px)": {
+                  "@media(max-width: 1200px)": {
                     flexDirection: "column", // 縦並びにする
                     gap: "2vh",
                   },
@@ -720,15 +812,22 @@ export default function Home() {
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 1,
-                    marginLeft: "4vw",
-                    marginRight: "4vw",
+                    marginLeft: "3vw",
+                    marginRight: "3vw",
+                    "@media(max-width: 1200px)": {
+                      marginLeft: "2vw",
+                      marginRight: "2vw",
+                    },
                   }}
                 >
                   <Typography
                     sx={{
                       color: "#ffffff",
                       fontWeight: 450,
-                      fontSize: "23px",
+                      fontSize: "20px",
+                      "@media(max-width: 1200px)": {
+                        fontSize: "16px",
+                      },
                     }}
                   >
                     教授名
@@ -741,7 +840,7 @@ export default function Home() {
                       flexGrow: 2, // 横幅に応じて伸縮する
                       flexBasis: "60%",
                       marginRight: "2vw",
-                      "@media(max-width: 1000px)": {
+                      "@media(max-width: 1200px)": {
                         flexGrow: 1,
                         flexBasis: "40%",
                         marginLeft: "2vw",
@@ -769,13 +868,17 @@ export default function Home() {
               <Button
                 sx={{
                   position: "relative",
-                  left: "80.5%",
-                  top: "1%",
-                  width: "13%",
+                  left: "30vw",
+                  width: "30px",
                   height: "50px",
                   backgroundColor: "#444f7c",
                   color: "#fff",
-                  marginTop: "20px",
+                  marginTop: "25px",
+                  "@media(max-width: 1000px)": {
+                    width: "20px",
+                    height: "30px",
+                    left: "26vw",
+                  },
                 }}
               >
                 検索

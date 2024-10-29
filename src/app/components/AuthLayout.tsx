@@ -1,20 +1,17 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import React from "react";
 
 const AuthLayout = ({
-  title,
   children1,
   children2,
 }: {
-  title: string;
   children1: React.ReactNode;
   children2: React.ReactNode;
 }) => {
   return (
     <Box
       sx={{
-        background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
-        minHeight: "100vh",
+        minHeight: "85vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -22,35 +19,6 @@ const AuthLayout = ({
         padding: "30px",
       }}
     >
-      <Typography
-        variant="h1"
-        color="white"
-        sx={{
-          position: "relative",
-          top: 0,
-          fontFamily: "Monospace",
-          paddingBottom: "5px",
-          "&::before": {
-            background: "#fff",
-            content: '""',
-            width: "100%",
-            height: "5px",
-            position: "absolute",
-            left: 0,
-            bottom: 0,
-            margin: "auto",
-            transformOrigin: "right top",
-            transform: "scale(0, 1)",
-            transition: "transform .3s",
-          },
-          "&:hover::before": {
-            transformOrigin: "center top",
-            transform: "scale(1, 1)",
-          },
-        }}
-      >
-        {title}
-      </Typography>
       <Container
         maxWidth="xs"
         sx={{
