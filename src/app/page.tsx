@@ -1,20 +1,21 @@
 "use client";
 
-import { supabase } from "@/app/lib/supabaseClient";
 import {
   Autocomplete,
   Box,
   Button,
   Card,
   CardContent,
+  CircularProgress,
   Divider,
   FormControl,
   InputBase,
   InputLabel,
   Link,
   MenuItem,
+  Snackbar,
   Typography,
-  useMediaQuery,
+  useMediaQuery
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
@@ -82,18 +83,17 @@ const SearchButton = styled(Button)(({ }) => ({
 
 export default function Home() {
 
-   const [departments, setDepartments] = useState<Department[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [year, setYear] = useState("");
   const [lectureName, setLectureName] = useState("");
-
   // 画面幅が1000px以下の場合はtrueになる
   const isSmallScreen = useMediaQuery("(max-width: 1000px)");
-
   const [lectureOptions, setLectureOptions] = useState<string[]>([]);
   const [exams, setExams] = useState<ExamData[]>([]);
   const { control } = useForm();
-
   const [isToggled, setIsToggled] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   // ボタンを押したときにレイアウトを切り替える関数
   const toggleLayout = () => {
@@ -143,29 +143,25 @@ export default function Home() {
   }, [lectureName]);
 
   const fetchExams = async () => {
+  setIsLoading(true);
+  try {
     const data = await getExams();
     setExams(data);
-  };
+    setOpenSnackbar(true);
+  } catch (error) {
+    console.error("データの取得に失敗しました:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   useEffect(() => {
-  const fetchData = async () => {
-    await fetchExams();
-  };
-
-  fetchData();
-
-  const channel = supabase
-    .channel('public:exams')  // ここで Supabase のチャンネル名とスキーマを正確に指定する
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'exams' }, (payload) => {
-      console.log("新しいExamが追加されました:", payload);
-      fetchData(); // リアルタイムで更新されたデータを再取得
-    })
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, []);
+    const loadExams = async () => {
+      const data = await getExams();
+      setExams(data);
+    };
+    loadExams();
+  }, []);
 
 
   return (
@@ -183,6 +179,13 @@ export default function Home() {
           },
         }}
       >
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          message="直近の過去問一覧を更新しました"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
         <div
           style={{
             display: "flex",
@@ -206,6 +209,26 @@ export default function Home() {
                 scrollbarWidth: "none", // Firefox対応
               }}
             >
+              {/* 更新ボタン */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={fetchExams}
+          disabled={isLoading}
+          sx={{
+            position: "relative",
+            top: "0px",
+            left: "0px",
+            backgroundColor: "#444f7c",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#383f6a",
+            },
+          }}
+        >
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : "↺"}
+          
+        </Button>
               <Divider
                 textAlign="center"
                 sx={{
