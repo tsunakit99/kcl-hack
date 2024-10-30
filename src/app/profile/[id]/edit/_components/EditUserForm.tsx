@@ -3,13 +3,27 @@
 import { Department, EditUserFormData } from "@/app/types";
 import { validationEditSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Box, Button, CardContent, FormControl, FormHelperText, InputLabel, MenuItem, Select, Stack, TextField } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CardContent,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getDepartments, UpdateUserInfo } from "../actions";
+import { Directions } from "@mui/icons-material";
+import LoadingIndicator from "../../../../components/LoadingIndicator";
 
 interface EditUserFormProps {
   id: string;
@@ -19,16 +33,22 @@ interface EditUserFormProps {
   currentIcon?: string;
 }
 
-const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroduction, currentIcon}: EditUserFormProps) => {
+const EditUserForm = ({
+  id,
+  currentName,
+  currentDepartmentId,
+  currentIntroduction,
+  currentIcon,
+}: EditUserFormProps) => {
   const [resError, setResError] = useState<string | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const router = useRouter();
   const { status } = useSession();
   const [imagePreview, setImagePreview] = useState<string>(currentIcon || "");
 
-    useEffect(() => {
+  useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/"); 
+      router.push("/");
     }
   }, [status]);
 
@@ -49,43 +69,64 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
   });
 
   useEffect(() => {
-        const loadDepartments = async () => {
-            const data = await getDepartments();
-            setDepartments(data);
-        };
-        loadDepartments();
+    const loadDepartments = async () => {
+      const data = await getDepartments();
+      setDepartments(data);
+    };
+    loadDepartments();
   }, []);
-  
+
   const handleEdit = async (data: EditUserFormData) => {
-  const formData = new FormData();
-  formData.append("name", data.name);
-  formData.append("departmentId", data.departmentId);
-  formData.append("introduction", data.introduction);
-  if (data.image) {
-    formData.append("image", data.image);
-  }
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("departmentId", data.departmentId);
+    formData.append("introduction", data.introduction);
+    if (data.image) {
+      formData.append("image", data.image);
+    }
 
-  const result = await UpdateUserInfo(id, formData);
+    const result = await UpdateUserInfo(id, formData);
 
-  if (result.success) {
-    router.push(`/profile/${id}`);
-  } else {
-    setResError(result.error);
-  }
+    if (result.success) {
+      router.push(`/profile/${id}`);
+    } else {
+      setResError(result.error);
+    }
   };
 
   useEffect(() => {
-  // imagePreview が変更されるたびに前回のプレビューURLを解放
-  return () => {
-    if (imagePreview && imagePreview.startsWith("blob:")) {
-      URL.revokeObjectURL(imagePreview);
-    }
-  };
+    // imagePreview が変更されるたびに前回のプレビューURLを解放
+    return () => {
+      if (imagePreview && imagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
   }, [imagePreview]);
-  
+
+  const [isLoading, setIsLoading] = useState(false);
+
   return (
-    <Box component="form" onSubmit={handleSubmit(handleEdit)} sx={{ maxWidth: "80%", margin: "auto", mt: 10 }} noValidate>
-      <Stack direction="row" spacing={2}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit(handleEdit)}
+      sx={{
+        maxWidth: "90%",
+        margin: "auto",
+        mt: 5,
+      }}
+      noValidate
+    >
+      <Stack
+        spacing={2}
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 5,
+          "@media(max-width: 1000px)": {
+            flexDirection: "column",
+          },
+        }}
+      >
         {resError && (
           <Alert severity="error">
             {Object.values(resError)
@@ -103,10 +144,13 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
                 height: 150,
                 borderRadius: "50%",
                 overflow: "hidden",
-                marginTop: "20px",
-                marginLeft: "23px",
-                marginBottom: "20px",
+                mt: 5,
+                mb: 5,
                 border: "2px solid #000",
+                "@media(max-width: 1000px)": {
+                  margin: "0 auto",
+                  mb: 5,
+                },
               }}
             >
               <Image
@@ -139,7 +183,9 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
               />
             )}
           />
-          {errors.image && (<FormHelperText error> {errors.image.message}</FormHelperText>)}
+          {errors.image && (
+            <FormHelperText error> {errors.image.message}</FormHelperText>
+          )}
         </Stack>
         <Stack>
           <CardContent>
@@ -158,7 +204,12 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
                 control={control}
                 defaultValue={departments[0]?.id || ""}
                 render={({ field }) => (
-                  <Select labelId="department-label" label="学科" {...field} value={field.value || ""}>
+                  <Select
+                    labelId="department-label"
+                    label="学科"
+                    {...field}
+                    value={field.value || ""}
+                  >
                     {departments.map((dept) => (
                       <MenuItem key={dept.id} value={dept.id}>
                         {dept.name}
@@ -183,9 +234,39 @@ const EditUserForm = ({ id, currentName, currentDepartmentId, currentIntroductio
           </CardContent>
         </Stack>
       </Stack>
-      <Box>
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          保存
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          sx={{
+            position: "relative",
+            width: "15vw",
+            height: "6vh", // ボタンの高さを調整
+            borderRadius: 5,
+            mt: 5,
+            mb: 0,
+            backgroundColor: "#444f7c",
+            "&:hover": {
+              backgroundColor: "#383f6a", // ホバー時の背景色
+            },
+          }}
+        >
+          {isLoading ? (
+            <LoadingIndicator />
+          ) : (
+            <div
+              className="button-content"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image src="/icon/entry.png" alt="icon" width={24} height={24} />
+              <span>保存</span>
+            </div>
+          )}
         </Button>
       </Box>
     </Box>
