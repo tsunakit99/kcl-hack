@@ -1,5 +1,7 @@
 "use client";
 
+import { examSearchSchema } from "@/validationSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Autocomplete,
   Box,
@@ -14,18 +16,19 @@ import {
   Link,
   MenuItem,
   Snackbar,
+  TextField,
   Typography,
   useMediaQuery
 } from "@mui/material";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { getExams } from "./actions"; // デフォルトの過去問データを取得する関数
+import { getExams, searchExams } from "./actions"; // デフォルトの過去問データを取得する関数
 import ScrollButton from "./components/ScrollButton";
 import { getDepartments, getLectureNames } from "./exam/upload/actions";
-import { Department, ExamData } from "./types";
+import { Department, ExamData, ExamSearchData } from "./types";
 // import { searchExams } from "./actions"; // 検索クエリに基づいたデータを取得する関数
 
 const Search = styled("div")(({ theme }) => ({
@@ -81,31 +84,59 @@ const SearchButton = styled(Button)(({ }) => ({
   color: "#fff",
 }));
 
+// 配列をチャンクに分割する関数
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const results: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    results.push(array.slice(i, i + chunkSize));
+  }
+  return results;
+}
+
 export default function Home() {
 
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [year, setYear] = useState("");
   const [lectureName, setLectureName] = useState("");
   // 画面幅が1000px以下の場合はtrueになる
   const isSmallScreen = useMediaQuery("(max-width: 1000px)");
   const [lectureOptions, setLectureOptions] = useState<string[]>([]);
   const [exams, setExams] = useState<ExamData[]>([]);
-  const { control } = useForm();
   const [isToggled, setIsToggled] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [updateFlag, setUpdateFlag] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  
+  const { control,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<ExamSearchData>({
+    mode: 'onTouched',
+    resolver: zodResolver(examSearchSchema),
+  });
 
-  // ボタンを押したときにレイアウトを切り替える関数
-  const toggleLayout = () => {
-    setIsToggled(!isToggled);
-  };
+  const handleSearch = async (data: ExamSearchData) => {
+    try {
+      const examData = await searchExams(data);
+      setExams(examData);
+      setIsToggled(false); // 検索結果画面に切り替える
+  } catch (error: unknown) {
+    console.error('検索エラー:', error);
+  }
+};
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
-  // スクロール関数（割合を受け取り、画面幅に応じてスクロール）
-  const scroll = (scrollPercentage: number) => {
+  const totalPages = Math.ceil(exams.length / 6);
+
+  const scroll = (direction: number) => {
     if (scrollRef.current) {
-      const scrollOffset = window.innerWidth * scrollPercentage;
+      const scrollOffset = scrollRef.current.clientWidth * direction;
+      const newScrollLeft = scrollRef.current.scrollLeft + scrollOffset;
+      const pageWidth = scrollRef.current.clientWidth;
+      const newCurrentPage = Math.round(newScrollLeft / pageWidth) + 1;
+      setCurrentPage(newCurrentPage);
+
       scrollRef.current.scrollBy({
         left: scrollOffset,
         behavior: "smooth",
@@ -113,56 +144,63 @@ export default function Home() {
     }
   };
 
-  const handleYearChange = (event: SelectChangeEvent) => {
-    setYear(event.target.value as string);
-  };
-
-  // useEffect(() => {
-  //   document.body.style.overflow = "hidden"; // スクロール無効化
-  //   return () => {
-  //     document.body.style.overflow = "auto"; // クリーンアップで元に戻す
-  //   };
-  // }, []);
-
   useEffect(() => {
-    const loadDepartments = async () => {
-      const data = await getDepartments();
-      setDepartments(data);
-    };
-    loadDepartments();
-  }, []);
-
-  useEffect(() => {
-    const fetchLectureNames = async () => {
-      if (lectureName.length > 0) {
-        const data = await getLectureNames(lectureName);
-        setLectureOptions(data);
+    const handleScroll = () => {
+      if (scrollRef.current) {
+        const scrollLeft = scrollRef.current.scrollLeft;
+        const pageWidth = scrollRef.current.clientWidth;
+        const newCurrentPage = Math.round(scrollLeft / pageWidth) + 1;
+        setCurrentPage(newCurrentPage);
       }
     };
-    fetchLectureNames();
-  }, [lectureName]);
 
-  const fetchExams = async () => {
-  setIsLoading(true);
-  try {
-    const data = await getExams();
-    setExams(data);
-    setOpenSnackbar(true);
-  } catch (error) {
-    console.error("データの取得に失敗しました:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-  useEffect(() => {
-    const loadExams = async () => {
-      const data = await getExams();
-      setExams(data);
-    };
-    loadExams();
+    const scrollContainer = scrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll);
+      // クリーンアップ関数
+      return () => {
+        scrollContainer.removeEventListener("scroll", handleScroll);
+      };
+    }
   }, []);
 
+    useEffect(() => {
+      const loadDepartments = async () => {
+        const data = await getDepartments();
+        setDepartments(data);
+      };
+      loadDepartments();
+    }, []);
+
+    useEffect(() => {
+      const fetchLectureNames = async () => {
+        if (lectureName.length > 0) {
+          const data = await getLectureNames(lectureName);
+          setLectureOptions(data);
+        }
+      };
+      fetchLectureNames();
+    }, [lectureName]);
+
+    useEffect(() => {
+      const fetchExams = async () => {
+        setIsLoading(true);
+        try {
+          const examData = await getExams();
+          setExams(examData);
+          setOpenSnackbar(true);
+        } catch (error: unknown) {
+          console.error("データの取得に失敗しました:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchExams();
+    }, [updateFlag]);
+
+    const handleUpdate = () => {
+      setUpdateFlag((prevFlag) => !prevFlag); // フラグをトグル
+    };
 
   return (
     <>
@@ -210,25 +248,25 @@ export default function Home() {
               }}
             >
               {/* 更新ボタン */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={fetchExams}
-          disabled={isLoading}
-          sx={{
-            position: "relative",
-            top: "0px",
-            left: "0px",
-            backgroundColor: "#444f7c",
-            color: "#fff",
-            "&:hover": {
-              backgroundColor: "#383f6a",
-            },
-          }}
-        >
-          {isLoading ? <CircularProgress size={24} color="inherit" /> : "↺"}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleUpdate}
+                disabled={isLoading}
+                sx={{
+                  position: "relative",
+                  top: "0px",
+                  left: "0px",
+                  backgroundColor: "#444f7c",
+                  color: "#fff",
+                  "&:hover": {
+                    backgroundColor: "#383f6a",
+                  },
+                }}
+              >
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : "↺"}
           
-        </Button>
+              </Button>
               <Divider
                 textAlign="center"
                 sx={{
@@ -254,106 +292,10 @@ export default function Home() {
                       minWidth: "220px", // カードの最小幅を設定
                     }}
                   >
-                     <Link href={`/exam/${exam.id}`}　style={{textDecoration: "none"}}>
-                    <Card
-                      sx={{
-                        height: "25vh",
-                        backgroundColor: "#ffffff",
-                        boxShadow: 3,
-                        display: "flex",
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src="/icon/book.png"
-                        alt="book"
-                        sx={{
-                          position: "relative",
-                          top: "15%", // カード内で位置調整
-                          width: "30%", // 相対的にサイズを設定
-                          height: "auto", // アスペクト比を保つ
-                          objectFit: "contain", // 画像がコンテナに収まるようにする
-                        }}
-                      />
-                      <CardContent>
-                        <Typography variant="h6" component="div">
-                          {exam.lecture.name} ({exam.year})
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          学科: {exam.department.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          教授名: {exam.professor || "不明"}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                    </Link>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                width: "50vw",
-                marginLeft: "10vw",
-                overflowY: "auto",
-                padding: 2,
-                borderRadius: 2,
-                flexDirection: "column",
-                zIndex: 999,
-                // スクロールバーを非表示にするためのCSS
-                "&::-webkit-scrollbar": {
-                  display: "none",
-                },
-                scrollbarWidth: "none", // Firefox対応
-              }}
-            >
-              <Divider
-                textAlign="center"
-                sx={{
-                  marginBottom: "20px",
-                  marginTop: "-15px",
-                }}
-              >
-                検索結果　{exams.length}件
-              </Divider>
-              <Box sx={{ display: "flex", alignItems: "center", gap: "2vw" }}>
-                {/* 左スクロールボタン */}
-                <ScrollButton
-                  text="←"
-                  scroll={() => scroll(-0.22)}
-                  color="#444f7c"
-                  hoverColor="#5a6aa1"
-                />
-
-                {/* 横スクロール可能なコンテナ */}
-                <Box
-                  ref={scrollRef}
-                  sx={{
-                    display: "flex",
-                    overflowX: "auto",
-                    scrollBehavior: "smooth",
-                    width: "100%", // 2枚分のカードが表示される幅に設定
-                    "&::-webkit-scrollbar": { display: "none" }, // スクロールバーを非表示
-                  }}
-                >
-                  {/* カードリスト */}
-                  {exams.map((exam) => (
-                    <Box
-                      key={exam.id}
-                      sx={{
-                        marginRight: "2%", // カード間のスペース
-                        flexGrow: 1, // カードの幅をコンテンツに応じて拡大
-                      }}
-                    >
-                      {/* リンクを追加するときはこのコメントを外す */}
-                      {/* <Link href={`/exams/${exam.id}`} key={exam.id} style={{textDecoration: "none"}}> */}
+                    <Link href={`/exam/${exam.id}`} style={{ textDecoration: "none" }}>
                       <Card
                         sx={{
-                          width: "19vw",
                           height: "25vh",
-                          marginBottom: "2vh",
                           backgroundColor: "#ffffff",
                           boxShadow: 3,
                           display: "flex",
@@ -372,7 +314,7 @@ export default function Home() {
                           }}
                         />
                         <CardContent>
-                          <Typography variant="h5" component="div">
+                          <Typography variant="h6" component="div">
                             {exam.lecture.name} ({exam.year})
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -383,7 +325,113 @@ export default function Home() {
                           </Typography>
                         </CardContent>
                       </Card>
-                      {/* </Link> */}
+                    </Link>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                width: "50vw",
+                marginLeft: "5vw",
+                overflow: "hidden",
+                padding: 2,
+                borderRadius: 2,
+                flexDirection: "column",
+                zIndex: 999,
+              }}
+            >
+              <Divider
+                textAlign="center"
+                sx={{
+                  marginBottom: "20px",
+                  marginTop: "-15px",
+                }}
+              >
+                検索結果　{exams.length}件
+              </Divider>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: "2vw" }}>
+                {/* 左スクロールボタン */}
+                <ScrollButton
+                  text="←"
+                  scroll={() => scroll(-1)}
+                  color="#444f7c"
+                  hoverColor="#5a6aa1"
+                />
+
+                {/* 横スクロール可能なコンテナ */}
+                <Box
+                  ref={scrollRef}
+                  sx={{
+                    display: "flex",
+                    overflowX: "auto",
+                    scrollBehavior: "smooth",
+                    width: "100%",
+                    "&::-webkit-scrollbar": { display: "none" },
+                  }}
+                >
+                  {/* examsを6件ごとのチャンクに分割して表示 */}
+                  {chunkArray(exams, 6).map((examChunk, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        flex: "none",
+                        width: "100%",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(2, 1fr)",
+                          gridGap: 4,
+                        }}
+                      >
+                        {examChunk.map((exam) => (
+                          <Box
+                            key={exam.id}
+                            sx={{
+                              minWidth: "220px",
+                            }}
+                          >
+                            <Link href={`/exam/${exam.id}`} style={{ textDecoration: "none" }}>
+                              <Card
+                                sx={{
+                                  height: "25vh",
+                                  backgroundColor: "#ffffff",
+                                  boxShadow: 3,
+                                  display: "flex",
+                                }}
+                              >
+                                <Box
+                                  component="img"
+                                  src="/icon/book.png"
+                                  alt="book"
+                                  sx={{
+                                    position: "relative",
+                                    top: "15%",
+                                    width: "30%",
+                                    height: "auto",
+                                    objectFit: "contain",
+                                  }}
+                                />
+                                <CardContent>
+                                  <Typography variant="h6" component="div">
+                                    {exam.lecture.name} ({exam.year})
+                                  </Typography>
+                                  <Typography variant="body2" color="text.secondary">
+                                    学科: {exam.department.name}
+                                  </Typography>
+                                  <Typography variant="body2" color="text.secondary">
+                                    教授名: {exam.professor || "不明"}
+                                  </Typography>
+                                </CardContent>
+                              </Card>
+                            </Link>
+                          </Box>
+                        ))}
+                      </Box>
                     </Box>
                   ))}
                 </Box>
@@ -391,11 +439,17 @@ export default function Home() {
                 {/* 右スクロールボタン */}
                 <ScrollButton
                   text="→"
-                  scroll={() => scroll(0.22)}
+                  scroll={() => scroll(1)}
                   color="#444f7c"
                   hoverColor="#5a6aa1"
                 />
               </Box>
+
+              {/* ページ番号の表示 */}
+              <Typography textAlign="center" sx={{ marginTop: "10px" }}>
+                ページ {currentPage} / {totalPages}
+              </Typography>
+
               <Divider
                 textAlign="center"
                 sx={{
@@ -403,16 +457,6 @@ export default function Home() {
                   marginTop: "10px",
                 }}
               ></Divider>
-              {/* <div> */}
-              {/* <h1>PDF Viewer</h1> */}
-              {/* examsリストのマッピング */}
-              {/* {exams.map((exam) => ( */}
-              {/* <div key={exam.id} style={{ marginBottom: "20px" }}> */}
-              {/* PdfViewerComponentを使用してPDFを表示 */}
-              {/* <PdfViewer fileUrl={exam.pdfUrl} /> */}
-              {/* </div> */}
-              {/* ))} */}
-              {/* </div> */}
             </Box>
           )}
 
@@ -514,24 +558,34 @@ export default function Home() {
                     }}
                   >
                     <Search>
-                      <Autocomplete
-                        freeSolo
-                        options={lectureOptions}
-                        onInputChange={(event, newValue) =>
-                          setLectureName(newValue)
-                        }
-                        renderInput={(params) => (
-                          <StyledInputBase
-                            ref={params.InputProps.ref}
-                            inputProps={params.inputProps}
-                            placeholder="講義名を入力"
+                      <Controller
+                        name="lectureName"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <Autocomplete
+                            freeSolo
+                            options={lectureOptions}
+                            inputValue={field.value}
+                            onInputChange={(event, newValue) => {
+                              field.onChange(newValue);
+                              // オートコンプリートの候補を更新するための処理
+                              setLectureName(newValue);
+                            }}
+                            renderInput={(params) => (
+                              <StyledInputBase
+                                ref={params.InputProps.ref}
+                                inputProps={params.inputProps}
+                                placeholder="講義名を入力"
+                              />
+                            )}
                           />
                         )}
                       />
                     </Search>
                     <Button
                       variant="contained"
-                      onClick={toggleLayout}
+                      onClick={handleSubmit(handleSearch)}
                       style={{
                         width: "30px",
                         height: "30px",
@@ -546,21 +600,31 @@ export default function Home() {
                 ) : (
                   // 600pxより大きい場合、SearchButtonをSearchの中に表示
                   <Search>
-                    <Autocomplete
-                      freeSolo
-                      options={lectureOptions}
-                      onInputChange={(event, newValue) =>
-                        setLectureName(newValue)
-                      }
-                      renderInput={(params) => (
-                        <StyledInputBase
-                          ref={params.InputProps.ref}
-                          inputProps={params.inputProps}
-                          placeholder="講義名を入力"
+                    <Controller
+                      name="lectureName"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <Autocomplete
+                          freeSolo
+                          options={lectureOptions}
+                          inputValue={field.value}
+                          onInputChange={(event, newValue) => {
+                            field.onChange(newValue);
+                            // オートコンプリートの候補を更新するための処理
+                            setLectureName(newValue);
+                          }}
+                          renderInput={(params) => (
+                            <StyledInputBase
+                              ref={params.InputProps.ref}
+                              inputProps={params.inputProps}
+                              placeholder="講義名を入力"
+                            />
+                          )}
                         />
                       )}
                     />
-                    <SearchButton variant="contained" onClick={toggleLayout}>
+                    <SearchButton variant="contained" onClick={handleSubmit(handleSearch)}>
                       検索
                     </SearchButton>
                   </Search>
@@ -775,21 +839,21 @@ export default function Home() {
                     },
                   }}
                 >
-                  <Select
-                    value={year}
-                    label=""
-                    onChange={handleYearChange}
-                    sx={{ fontSize: "20px" }}
-                  >
-                    <MenuItem value={"2024"}>2024</MenuItem>
-                    <MenuItem value={"2023"}>2023</MenuItem>
-                    <MenuItem value={"2022"}>2022</MenuItem>
-                    <MenuItem value={"2021"}>2021</MenuItem>
-                    <MenuItem value={"2020"}>2020</MenuItem>
-                    <MenuItem value={"2019"}>2019</MenuItem>
-                    <MenuItem value={"2018"}>2018</MenuItem>
-                    <MenuItem value={"2017"}>2017</MenuItem>
-                  </Select>
+                  <Controller
+                    name="year"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        type="number"
+                        label="年度"
+                        variant="outlined"
+                        error={!!errors.year}
+                        helperText={errors.year ? errors.year.message : ""}
+                        sx={{ fontSize: "20px" }}
+                      />
+                    )}
+                  />
                 </FormControl>
               </Box>
               <Box
@@ -833,26 +897,41 @@ export default function Home() {
                     教授名
                   </Typography>
                 </Card>
-                <FormControl>
-                  <Search
-                    sx={{
-                      margin: 0,
-                      flexGrow: 2, // 横幅に応じて伸縮する
-                      flexBasis: "60%",
+                <FormControl
+                  sx={{
+                    flexGrow: 2, // 横幅に応じて伸縮する
+                    flexBasis: "60%",
+                    backgroundColor: alpha("#000000", 0.05),
+                    marginRight: "2vw",
+                    "& fieldset": {
+                      borderColor: "#444f7c", // 初期状態の枠線の色
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "red", // ホバー時の枠線の色
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#444f7c", // フォーカス時の枠線の色
+                    },
+                    "@media(max-width: 1200px)": {
+                      flexGrow: 1,
+                      flexBasis: "40%",
+                      marginLeft: "2vw",
                       marginRight: "2vw",
-                      "@media(max-width: 1200px)": {
-                        flexGrow: 1,
-                        flexBasis: "40%",
-                        marginLeft: "2vw",
-                        marginRight: "2vw",
-                      },
-                    }}
-                  >
-                    <StyledInputBase
-                      placeholder=""
-                      inputProps={{ "aria-label": "search" }}
-                    />
-                  </Search>
+                    },
+                  }}>
+                  <Controller
+                    name="professor"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="教授名"
+                        variant="outlined"
+                        sx={{ fontSize: "20px" }}
+                      />
+                    )}
+                  />
                 </FormControl>
               </Box>
               <div
@@ -866,6 +945,7 @@ export default function Home() {
                 }}
               ></div>
               <Button
+                onClick={handleSubmit(handleSearch)}
                 sx={{
                   position: "relative",
                   left: "30vw",
@@ -889,4 +969,4 @@ export default function Home() {
       </Box>
     </>
   );
-}
+};
