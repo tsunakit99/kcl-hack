@@ -84,3 +84,14 @@ export const validationUploadExamSchema = z.object({
         message: 'ファイルは必須です'
     })
 });
+
+export const examSearchSchema = z.object({
+    lectureName: z.string().optional(),
+    departmentId: z.string().optional(),
+    year: z
+        .coerce
+        .number({ invalid_type_error: '年度は数値で入力してください' })
+        .int('年度は整数で入力してください')
+        .optional(),
+    professor: z.string().optional(),
+});
