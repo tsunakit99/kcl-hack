@@ -62,3 +62,10 @@ export interface ExamData {
   professor?: string;
   pdfUrl: string;
 }
+
+export interface ExamSearchData {
+  lectureName?: string;
+  departmentId?: string;
+  year?: number;
+  professor?: string;
+}

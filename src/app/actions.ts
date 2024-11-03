@@ -1,3 +1,5 @@
+import { ExamSearchData } from "./types";
+
 export const getExams = async () => {
     const res = await fetch('/api/exams/list', {
         method: 'GET',
@@ -12,3 +14,25 @@ export const getExams = async () => {
         return resError.error;
     }
 }
+
+export const searchExams = async (data: ExamSearchData) => {
+    const res = await fetch('/api/exams/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            lectureName: data.lectureName || '',
+            departmentId: data.departmentId || '',
+            year: data.year || '',
+            professor: data.professor || '',
+        }),
+    });
+    
+    if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+        return data;
+    } else {
+        const resError = await res.json();
+        return resError.error;
+    }
+};
