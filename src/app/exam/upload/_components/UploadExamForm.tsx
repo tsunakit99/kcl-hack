@@ -14,6 +14,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -27,11 +28,12 @@ import { getDepartments, getLectureNames, submitExam } from "../actions";
 
 const UploadExamForm = () => {
   const [resError, setResError] = useState("");
-  const router = useRouter();
   const [departments, setDepartments] = useState<Department[]>([]);
+  const router = useRouter();
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const {
     control,
@@ -81,6 +83,7 @@ const UploadExamForm = () => {
     const result = await submitExam(data);
     if (result.success) {
       setIsLoading(false);
+      setOpenSnackbar(true);
       router.push("/");
     } else {
       setIsLoading(false);
@@ -90,6 +93,13 @@ const UploadExamForm = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          message="過去問投稿が完了しました"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
       <Stack spacing={4}>
         {resError && <Alert severity="error">{resError}</Alert>}
 
