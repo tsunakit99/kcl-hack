@@ -22,7 +22,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getDepartments, UpdateUserInfo } from "../actions";
-import { Directions } from "@mui/icons-material";
 import LoadingIndicator from "../../../../components/LoadingIndicator";
 
 interface EditUserFormProps {
@@ -45,6 +44,7 @@ const EditUserForm = ({
   const router = useRouter();
   const { status } = useSession();
   const [imagePreview, setImagePreview] = useState<string>(currentIcon || "");
+   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -77,6 +77,7 @@ const EditUserForm = ({
   }, []);
 
   const handleEdit = async (data: EditUserFormData) => {
+    setIsLoading(true);
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("departmentId", data.departmentId);
@@ -88,8 +89,10 @@ const EditUserForm = ({
     const result = await UpdateUserInfo(id, formData);
 
     if (result.success) {
+      setIsLoading(false);
       router.push(`/profile/${id}`);
     } else {
+      setIsLoading(false);
       setResError(result.error);
     }
   };
@@ -102,8 +105,6 @@ const EditUserForm = ({
       }
     };
   }, [imagePreview]);
-
-  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <Box
