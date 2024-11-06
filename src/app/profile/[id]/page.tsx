@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getUserById, getYourExamByUploaderId, getExams } from "./actions";
+import { getUserById, getYourExamByUploaderId } from "./actions";
 
 interface UserProfileProps {
   params: { id: string, uploaderId: string };
@@ -15,7 +15,7 @@ const UserProfile = ({ params }: UserProfileProps ) => {
   const { id } = params;
   const { data: session, status } = useSession();
   const router = useRouter();
-   const [user, setUser] = useState<UserData>();
+  const [user, setUser] = useState<UserData>();
   const [exams, setExams] = useState<ExamByIdData[]>([]);
 
   useEffect(() => {
