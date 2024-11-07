@@ -3,45 +3,30 @@
 import { Box, Container, Divider, Typography } from "@mui/material";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-// import { useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import EditExamForm from "./_components/EditExamForm";
-// import { ExamByIdData, UserData } from "@/app/types";
-// import { getUserById, getYourExamByUploaderId } from "./actions";
+import { ExamByIdData } from "@/app/types";
+import { getExamById } from "../actions";
+import { useForm } from "react-hook-form";
 
-// interface EditExamPageProps {
-//   params: { id: string };
-// }
+interface EditExamPageProps {
+  params: { id: string };
+}
 
-// const EditExam = ({ params }: EditExamPageProps) => {
-//   const [isVisible, setIsVisible] = useState(false);
-//   const { id } = params;
-//   const [exam, setExam] = useState<ExamByIdData>();
-
-//   useEffect(() => {
-//     // 画面遷移後にフェードインを開始
-//     const timer = setTimeout(() => {
-//       setIsVisible(true);
-//     }, 100); // 遅延を少し入れる場合
-
-//     return () => clearTimeout(timer); // クリーンアップ
-//   }, []);
-
-//   useEffect(() => {
-//     const fetchExamData = async () => {
-//       const result = await getYourExamByUploaderId(id);
-//       setExam(result);
-//     };
-//     fetchExamData();
-//   }, []);
-
-const EditExam = () => {
+const EditExamPage = ({ params }: EditExamPageProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  // const { data: session, status } = useSession();
-  // const router = useRouter();
-  // const { id } = params;
-  // const [user, setUser] = useState<UserData>();
-  //const [exams, setExams] = useState<ExamByIdData[]>([]);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { id } = params;
+  const [exam, setExam] = useState<ExamByIdData>();
+  const { setValue } = useForm();
+  const [formData, setFormData] = useState({
+    lectureName: "",
+    departmentName: "",
+    year: "",
+    professor: "",
+  });
 
   useEffect(() => {
     // 画面遷移後にフェードインを開始
@@ -52,30 +37,24 @@ const EditExam = () => {
     return () => clearTimeout(timer); // クリーンアップ
   }, []);
 
-  // useEffect(() => {
-  //   if (status === "unauthenticated") {
-  //     router.push("/"); 
-  //   }
-  // }, [status]);
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/"); 
+    }
+  }, [status]);
 
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     const userResult = await getUserById(id);
-  //     const examResult = await getYourExamByUploaderId(id);
-  //     setUser(userResult);
-  //     //setExams(examResult); //examsを更新
-  //   };
-  //   fetchUserData();
-  // }, []);
-    
-  // if (!user) {
-  //   return <Typography>ユーザーが見つかりません。</Typography>;
-  // }
+  useEffect(() => {
+    const fetchExamData = async () => {
+      const examResult = await getExamById(id);
+      setExam(examResult);
+    };
+    fetchExamData();
+  }, []);
 
-  // if (user.id !== session?.user.id) {
-  //   return <Typography>このページにアクセスする権限がありません。</Typography>;
-  // }
-
+  if (!exam) {
+    return <Typography>試験が見つかりません。</Typography>;
+  }
+  
   return (
     <Box
       sx={{
@@ -158,11 +137,18 @@ const EditExam = () => {
           >
             以下に過去問情報を入力してください
           </Divider>
-          <EditExamForm />
+          <EditExamForm
+            id={exam.id}
+            beforeLectureName={exam.lectureName || ""}
+            beforeDepartmentId={exam.departmentId || ""}
+            beforeYear={exam.year || ""}
+            beforeProfessor={exam.professor || ""}
+            beforeFile={exam.file || ""}
+          />
         </Container>
       </div>
     </Box>
   );
 };
 
-export default EditExam;
+export default EditExamPage;
