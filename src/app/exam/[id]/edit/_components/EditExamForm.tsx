@@ -23,25 +23,33 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
-import { getDepartments, getLectureNames, getExamById, submitExam } from "../actions";
+import { getDepartments, getLectureNames, EditExamInfo } from "../actions";
 
-const EditExamForm = () => {
+interface EditExamFormProps {
+  id: string;
+  beforeLectureName: string;
+  beforeDepartmentId: string;
+  beforeYear: number;
+  beforeProfessor?: string;
+  beforeFile: File[];
+}
+
+const EditExamForm = ({
+  id,
+  beforeLectureName,
+  beforeDepartmentId,
+  beforeYear,
+  beforeProfessor,
+  beforeFile
+}: EditExamFormProps) => {
   const [resError, setResError] = useState("");
-  //const { examData: session, status } = useSession();
   const router = useRouter();
-  //const { id } = params;
-  //const [examData, setUser] = useState<ExamByIdData>();
-  const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
+  const examId = id;
+  console.log("examId:", examId);
   const { status } = useSession();
+  const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
-  //const [formData, setFormData] = useState<EditExamFormData | null>(null);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status]);
 
   const {
     control,
@@ -53,7 +61,13 @@ const EditExamForm = () => {
   } = useForm<EditExamFormData>({
     mode: "onBlur",
     resolver: zodResolver(validationUploadExamSchema),
-    //defaultValues: formData || {}, // 取得したデータをデフォルト値として設定
+    defaultValues: { // 取得したデータをデフォルト値として設定
+      lectureName: beforeLectureName,
+      departmentId: beforeDepartmentId,
+      year: Number(beforeYear),
+      professor: beforeProfessor,
+      file: beforeFile
+    }
   });
 
   const watchLectureName = watch("lectureName", "");
@@ -76,30 +90,6 @@ const EditExamForm = () => {
     fetchLectureSuggestions();
   }, [watchLectureName]);
 
-  // // 過去問データを取得
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const exam = await getExamById(params.id);
-  //     setFormData({
-  //       lectureName: exam.lectureName,
-  //       departmentName: exam.departmentName,
-  //       year: exam.year,
-  //       professor: exam.professor || '',
-  //     });
-  //   };
-    
-  //   fetchData();
-  // }, [params.id]);
-
-  // useEffect(() => {
-  //   if (formData) {
-  //     setValue("lectureName", formData.lectureName);
-  //     setValue("year", formData.year);
-  //     setValue("professor", formData.professor);
-  //     // departmentIdも設定する場合は適宜追加
-  //   }
-  // }, [formData]);
-
   const onDrop = (acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
     setValue("file", acceptedFiles);
@@ -111,20 +101,41 @@ const EditExamForm = () => {
     multiple: false,
   });
 
-  const onSubmit = async (data: EditExamFormData) => {
-    const result = await submitExam(data);
+  const handleEdit = async (data: EditExamFormData) => {
+    if (errors.year) {
+      console.log("エラー:", errors.year);  // `year`のエラーメッセージを確認
+    }
+
+    const formData = new FormData();
+    formData.append("lectureName", data.lectureName);
+    formData.append("departmentId", data.departmentId);
+    formData.append("year", Number(data.year).toString());
+    formData.append("professor", data.professor || "");
+    if (data.file && data.file[0]) {
+      formData.append("file", data.file[0]);
+    }
+
+    const result = await EditExamInfo(examId, formData);
+
     if (result.success) {
-      router.push("/");
+      router.push(`/`);
     } else {
-      setResError(result.error);
+      setResError(result.error || '更新に失敗しました。');
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+    <Box component="form" onSubmit={handleSubmit(handleEdit)} noValidate>
       <Stack spacing={6}>
-        {resError && <Alert severity="error">{resError}</Alert>}
-
+        {resError && (
+          <Alert severity="error">
+            {Object.values(resError)
+              .flat()
+              .map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+          </Alert>
+        )}
         <Controller
           name="lectureName"
           control={control}
