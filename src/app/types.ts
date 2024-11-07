@@ -29,13 +29,23 @@ export interface UploadExamFormData {
   file: File[];
 }
 
+// 過去問編集フォームの型定義
+export interface EditExamFormData {
+  lectureName: string;
+  departmentId: string;
+  year: number;
+  professor?: string;
+  file: File[];
+}
+
 // 自身が投稿した過去問の表示の型定義
 export interface ExamByIdData{
   id: string;
   lectureName: string;
-  departmentName: string;
+  departmentId: string;
   year: number;
   professor?: string;
+  file: File[];
 }
 
 export interface Department {
