@@ -21,12 +21,6 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
   const { id } = params;
   const [exam, setExam] = useState<ExamByIdData>();
   const { setValue } = useForm();
-  const [formData, setFormData] = useState({
-    lectureName: "",
-    departmentName: "",
-    year: "",
-    professor: "",
-  });
 
   useEffect(() => {
     // 画面遷移後にフェードインを開始
@@ -47,6 +41,11 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
     const fetchExamData = async () => {
       const examResult = await getExamById(id);
       setExam(examResult);
+      // setValue("lectureId", examResult.lectureId);
+      // setValue("departmentId", examResult.departmentId);
+      // setValue("year", examResult.year);
+      // setValue("professor", examResult.professor || "");
+      // setValue("file", examResult.file);
     };
     fetchExamData();
   }, []);
@@ -139,11 +138,11 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
           </Divider>
           <EditExamForm
             id={exam.id}
-            beforeLectureName={exam.lectureName || ""}
-            beforeDepartmentId={exam.departmentId || ""}
-            beforeYear={exam.year || ""}
+            beforeLectureName={exam.lectureName}
+            beforeDepartmentId={exam.departmentId}
+            beforeYear={exam.year}
             beforeProfessor={exam.professor || ""}
-            beforeFile={exam.file || ""}
+            beforeFile={exam.file}
           />
         </Container>
       </div>
