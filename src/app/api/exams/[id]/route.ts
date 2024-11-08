@@ -33,7 +33,6 @@ export async function GET(
 
 export async function PUT( req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
-  console.log("更新対象のID:", id);
 
   if (!id) {
       return new NextResponse(JSON.stringify({ message: '試験が見つかりません' }), { status: 401 });
@@ -125,4 +124,35 @@ async function saveFileToLocal(file: any): Promise<string> {
   await fs.writeFile(filePath, buffer);
 
   return `/uploads/${fileName}`;
+}
+
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
+
+  try {
+    const exam = await prisma.exam.findUnique({
+      where: { id },
+      include: {
+        lecture: true,
+        department: true,
+      },
+    });
+
+    if (!exam) {
+      return new NextResponse(JSON.stringify({ message: '試験が見つかりませんでした。' }), { status: 404 });
+    }
+
+    await prisma.exam.delete({
+      where: { id }
+    })
+
+    return NextResponse.json(exam, { status: 200 });
+  } catch (error) {
+    console.error('試験の削除に失敗しました：', error);
+    return new NextResponse(JSON.stringify({ message: '試験の削除に失敗しました。' }), { status: 500 });
+  }
 }
