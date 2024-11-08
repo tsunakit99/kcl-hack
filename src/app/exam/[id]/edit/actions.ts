@@ -24,7 +24,6 @@ export const EditExamInfo = async (id: string, formData: FormData) => {
     method: 'PUT',
     body: formData,
   });
-  console.log("リクエストURL",`${process.env.NEXT_PUBLIC_API_URL}/api/exams/${id}`);
 
   if (res.ok) {
     const data = await res.json();
@@ -32,6 +31,19 @@ export const EditExamInfo = async (id: string, formData: FormData) => {
   } else {
     const resError = await res.json();
     return { success: false, error: resError.message || 'エラーが発生しました。' };
+  }
+};
+
+export const deleteExam = async (id: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/exams/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (res.ok) {
+    return { success: true };
+  } else {
+    const resError = await res.json();
+    return { success: false, error: resError.message || '削除に失敗しました。' };
   }
 };
 
