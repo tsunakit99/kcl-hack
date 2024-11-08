@@ -23,7 +23,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
-import { getDepartments, getLectureNames, EditExamInfo } from "../actions";
+import { getDepartments, getLectureNames, EditExamInfo, deleteExam } from "../actions";
+import { getExamById } from "../../actions";
 
 interface EditExamFormProps {
   id: string;
@@ -44,9 +45,8 @@ const EditExamForm = ({
 }: EditExamFormProps) => {
   const [resError, setResError] = useState("");
   const router = useRouter();
-  const examId = id;
-  console.log("examId:", examId);
   const { status } = useSession();
+  const [exam, setExam] = useState<ExamByIdData>();
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
@@ -69,6 +69,19 @@ const EditExamForm = ({
       file: beforeFile
     }
   });
+
+  // useEffect(() => {
+  //   const fetchExamData = async () => {
+  //     const examResult = await getExamById(id);
+  //     setExam(examResult);
+  //     setValue("lectureName", examResult.lectureName);
+  //     setValue("file", examResult.file);
+  //     setValue("departmentId", examResult.departmentId);
+  //     setValue("year", examResult.year);
+  //     setValue("professor", examResult.professor || "");
+  //   };
+  //   fetchExamData();
+  // }, [id, setValue]);
 
   const watchLectureName = watch("lectureName", "");
 
@@ -115,7 +128,7 @@ const EditExamForm = ({
       formData.append("file", data.file[0]);
     }
 
-    const result = await EditExamInfo(examId, formData);
+    const result = await EditExamInfo(id, formData);
 
     if (result.success) {
       router.push(`/`);
@@ -123,6 +136,18 @@ const EditExamForm = ({
       setResError(result.error || '更新に失敗しました。');
     }
   };
+
+  const handleDelete = async () => {
+    if (window.confirm('本当に削除しても良いですか？')) {
+      const result = await deleteExam(id);
+
+      if (result.success) {
+        router.push(`/`);
+      } else {
+        setResError(result.error || '削除に失敗しました。');
+      }
+    }
+  }
 
   return (
     <Box component="form" onSubmit={handleSubmit(handleEdit)} noValidate>
@@ -143,12 +168,14 @@ const EditExamForm = ({
             <Autocomplete
               freeSolo
               options={lectureNames}
+              // value={field.value}
               onInputChange={(e, value) => field.onChange(value)}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="講義名"
                   required
+                  // {...register("lectureName")}
                   error={!!errors.lectureName}
                   helperText={errors.lectureName?.message as React.ReactNode}
                 />
@@ -255,6 +282,29 @@ const EditExamForm = ({
             <div className="button-content" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
               <Image src="/icon/paper-plane.png" alt="icon" width={24} height={24} />
               <span>更新</span>
+            </div>
+          </Button>
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            type="button"
+            variant="contained"
+            color="primary"
+            sx={{
+              position: "relative",
+              width: "15vw",
+              height: "6vh",
+              borderRadius: 5,
+              backgroundColor: "#B22222",
+              "&:hover": {
+                backgroundColor: "#8B0000",
+              },
+            }}
+            onClick={handleSubmit(handleDelete)}
+          >
+            <div className="button-content" style={{ display: "flex", justifyContent: "center", alignItems: "center" , color: "white"}}>
+              <Image src="/icon/delete.png" alt="icon" width={24} height={24} />
+              <span>削除</span>
             </div>
           </Button>
         </Box>
