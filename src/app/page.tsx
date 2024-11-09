@@ -27,8 +27,8 @@ import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getExams, searchExams } from "./actions"; // デフォルトの過去問データを取得する関数
 import ScrollButton from "./components/ScrollButton";
-import { getDepartments, getLectureNames } from "./exam/upload/actions";
-import { Department, ExamData, ExamSearchData } from "./types";
+import { getDepartments, getLectureNames, getTags } from "./exam/upload/actions";
+import { Department, ExamData, ExamSearchData, Tag } from "./types";
 // import { searchExams } from "./actions"; // 検索クエリに基づいたデータを取得する関数
 
 const Search = styled("div")(({ theme }) => ({
@@ -96,6 +96,7 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 export default function Home() {
 
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [lectureName, setLectureName] = useState("");
   // 画面幅が1000px以下の場合はtrueになる
   const isSmallScreen = useMediaQuery("(max-width: 1000px)");
@@ -117,6 +118,7 @@ export default function Home() {
 
   const handleSearch = async (data: ExamSearchData) => {
     try {
+      console.log(data);
       const examData = await searchExams(data);
       setExams(examData);
       setIsToggled(false); // 検索結果画面に切り替える
@@ -170,6 +172,14 @@ export default function Home() {
         setDepartments(data);
       };
       loadDepartments();
+    }, []);
+  
+  useEffect(() => {
+      const loadTags = async () => {
+        const data = await getTags();
+        setTags(data);
+      };
+      loadTags();
     }, []);
 
     useEffect(() => {
@@ -323,6 +333,20 @@ export default function Home() {
                           <Typography variant="body2" color="text.secondary">
                             教授名: {exam.professor || "不明"}
                           </Typography>
+                          <Box sx={{
+                            padding: "3px",
+                            width: "50%",
+                          position: "relative",
+                          bottom: "-10px",
+                            right: "0px",
+                            border: "medium solid gray",
+                            borderRadius: "10px",
+                          background: "linear-gradient(45deg, #c0d7d2, #33d4e2)",
+                        }}>
+                          <Typography variant="body2" textAlign={"center"} color="text.primary">
+                          {exam.tag.name || "不明"}
+                          </Typography>
+                        </Box>
                         </CardContent>
                       </Card>
                     </Link>
@@ -426,6 +450,20 @@ export default function Home() {
                                   <Typography variant="body2" color="text.secondary">
                                     教授名: {exam.professor || "不明"}
                                   </Typography>
+                                  <Box sx={{
+                            padding: "3px",
+                            width: "50%",
+                          position: "relative",
+                          bottom: "-10px",
+                            right: "0px",
+                            border: "medium solid gray",
+                            borderRadius: "10px",
+                          background: "linear-gradient(45deg, #c0d7d2, #33d4e2)",
+                        }}>
+                          <Typography variant="body2" textAlign={"center"} color="text.primary">
+                          {exam.tag.name || "不明"}
+                          </Typography>
+                        </Box>
                                 </CardContent>
                               </Card>
                             </Link>
@@ -768,6 +806,92 @@ export default function Home() {
                         {departments.map((dept) => (
                           <MenuItem key={dept.id} value={dept.id}>
                             {dept.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+                </FormControl>
+              </Box>
+              <Box
+                sx={{
+                  minWidth: 140,
+                  display: "flex",
+                  padding: "10px 50px",
+                  "@media(max-width: 1200px)": {
+                    flexDirection: "column", // 縦並びにする
+                    gap: "2vh",
+                  },
+                }}
+              >
+                <Card
+                  sx={{
+                    backgroundColor: "#444f7c",
+                    flexGrow: 1, // 横幅に応じて伸縮する
+                    flexBasis: "40%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 1,
+                    marginLeft: "3vw",
+                    marginRight: "3vw",
+                    "@media(max-width: 1200px)": {
+                      marginLeft: "2vw",
+                      marginRight: "2vw",
+                    },
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: "#ffffff",
+                      fontWeight: 450,
+                      fontSize: "20px",
+                      "@media(max-width: 1200px)": {
+                        fontSize: "16px",
+                      },
+                    }}
+                  >
+                    過去問タグ
+                  </Typography>
+                </Card>
+                <FormControl
+                  sx={{
+                    flexGrow: 2, // 横幅に応じて伸縮する
+                    flexBasis: "60%",
+                    backgroundColor: alpha("#000000", 0.05),
+                    marginRight: "2vw",
+                    "& fieldset": {
+                      borderColor: "#444f7c", // 初期状態の枠線の色
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "red", // ホバー時の枠線の色
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#444f7c", // フォーカス時の枠線の色
+                    },
+                    "@media(max-width: 1200px)": {
+                      flexGrow: 1,
+                      flexBasis: "40%",
+                      marginLeft: "2vw",
+                      marginRight: "2vw",
+                    },
+                  }}
+                >
+                  <InputLabel id="tag-label">過去問タグ</InputLabel>
+                  <Controller
+                    name="tagId"
+                    control={control}
+                    defaultValue={tags[0]?.id || ""}
+                    render={({ field }) => (
+                      <Select
+                        labelId="tag-label"
+                        label="過去問タグ"
+                        {...field}
+                        value={field.value || ""}
+                      >
+                        {tags.map((tag) => (
+                          <MenuItem key={tag.id} value={tag.id}>
+                            {tag.name}
                           </MenuItem>
                         ))}
                       </Select>

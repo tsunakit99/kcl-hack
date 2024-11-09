@@ -22,6 +22,7 @@ export const searchExams = async (data: ExamSearchData) => {
         body: JSON.stringify({
             lectureName: data.lectureName || '',
             departmentId: data.departmentId || '',
+            tagId: data.tagId || '',
             year: data.year || '',
             professor: data.professor || '',
         }),
@@ -29,7 +30,6 @@ export const searchExams = async (data: ExamSearchData) => {
     
     if (res.ok) {
         const data = await res.json();
-        console.log(data);
         return data;
     } else {
         const resError = await res.json();
