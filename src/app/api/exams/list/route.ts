@@ -6,6 +6,7 @@ export async function GET() {
         include: {
             lecture: true,
             department: true,
+            tag: true,
         },
         orderBy: {
             createdAt: 'desc',
