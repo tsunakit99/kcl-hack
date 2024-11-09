@@ -1,6 +1,18 @@
 "use client";
 import { ExamByIdData, UserData } from "@/app/types";
-import { Box, Button, Card, CardContent, CircularProgress, Fade, List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Fade,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -35,19 +47,24 @@ const UserProfile = ({ params }: UserProfileProps) => {
       const examResult = await getYourExamByUploaderId(id);
       setUser(userResult);
       setExams(examResult);
-       setIsLoading(false);
+      setIsLoading(false);
     };
     fetchUserData();
   }, []);
 
-    if (isLoading) {
+  if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <CircularProgress />
       </Box>
     );
-    }
-  
+  }
+
   return (
     <Box
       sx={{
@@ -88,26 +105,30 @@ const UserProfile = ({ params }: UserProfileProps) => {
           zIndex: 999,
         }}
       />
-      <div
-        style={{
-          background: "#fff",
-          position: "absolute",
-          top: "2vw",
-          left: "9vw",
-          margin: 0,
-          width: "38%",
-          height: "2vw",
-          borderRadius: 5,
+      <Box
+        sx={{
+          display: "block",
+          marginLeft: "8vw",
+          mt: 0,
+          overflowY: "auto", // スクロール可能にする
+          overflowX: "hidden",
+          maxHeight: "70vh", // スクロールする高さの上限を設定
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          scrollbarWidth: "none", // Firefox対応
         }}
-      />
-      <Box sx={{ display: "block", marginLeft: "8vw", mt: "12vh" }}>
+      >
         <Typography
-          variant="h3"
           sx={{
+            fontSize: "60px",
             color: "#444f7c",
             fontWeight: 550,
             transition: "opacity 2s ease",
             opacity: isVisible ? 1 : 0,
+            "@media(max-width: 1000px)": {
+              fontSize: "40px",
+            },
           }}
         >
           Profile
@@ -118,7 +139,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
             height: "2px",
             backgroundColor: "#444f7c",
             position: "relative",
-            top: 0,
+            top: "-8px",
           }}
         ></div>
         <Card
@@ -142,37 +163,87 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 },
               }}
             >
-              <Box
-                sx={{
-                  width: "130px",
-                  height: "130px",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  marginTop: "20px",
-                  border: "2px solid #000",
-                  marginRight: "2vw",
-                  "@media(max-width: 1000px)": {
-                    width: "100px",
-                    height: "100px",
-                  },
-                }}
-              >
-                <Image
-                  src={user?.imageUrl || "/default-profile.png"} // デフォルト画像を設定
-                  alt="プロフィール画像"
-                  width={500}
-                  height={500}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
+              <Box>
+                <Box
+                  sx={{
+                    width: "130px",
+                    height: "130px",
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    marginTop: "20px",
+                    border: "2px solid #000",
+                    marginRight: "2vw",
+                    "@media(max-width: 1000px)": {
+                      width: "100px",
+                      height: "100px",
+                      marginTop: "10px",
+                    },
                   }}
-                />
+                >
+                  <Image
+                    src={user?.imageUrl || "/default-profile.png"} // デフォルト画像を設定
+                    alt="プロフィール画像"
+                    width={500}
+                    height={500}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    marginTop: "5vh",
+                  }}
+                >
+                  {session?.user.id === user?.id && (
+                    <Link href={`/profile/${id}/edit`} passHref>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          position: "relative",
+                          width: "10vw",
+                          height: "6vh", // ボタンの高さを調整
+                          borderRadius: 5,
+                          backgroundColor: "#444f7c",
+                          "&:hover": {
+                            backgroundColor: "#383f6a", // ホバー時の背景色
+                          },
+                          "@media(max-width: 1000px)": {
+                            width: "18vw",
+                          },
+                        }}
+                      >
+                        <div
+                          className="button-content"
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <img
+                            src="/icon/entry.png"
+                            alt="icon"
+                            style={{ width: "20px", height: "20px" }}
+                          />
+                          <span>プロフィール編集</span>
+                        </div>
+                      </Button>
+                    </Link>
+                  )}
+                </Box>
               </Box>
               <Stack
                 sx={{
-                  overflow: "visble",
-                  maxWidth: "100%",
+                  maxWidth: "65%",
+                  "@media(max-width: 1000px)": {
+                    maxWidth: "90%",
+                  },
                 }}
               >
                 <CardContent>
@@ -215,49 +286,6 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 </CardContent>
               </Stack>
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                marginTop: "1vh",
-              }}
-            >
-              {session?.user.id === user?.id && (
-                <Link href={`/profile/${id}/edit`} passHref>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    sx={{
-                      position: "relative",
-                      width: "15vw",
-                      height: "6vh", // ボタンの高さを調整
-                      borderRadius: 5,
-                      backgroundColor: "#444f7c",
-                      "&:hover": {
-                        backgroundColor: "#383f6a", // ホバー時の背景色
-                      },
-                    }}
-                  >
-                    <div
-                      className="button-content"
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <img
-                        src="/icon/entry.png"
-                        alt="icon"
-                        style={{ width: "24px", height: "24px" }}
-                      />
-                      <span>プロフィール編集</span>
-                    </div>
-                  </Button>
-                </Link>
-              )}
-            </Box>
           </CardContent>
         </Card>
       </Box>
@@ -276,64 +304,86 @@ const UserProfile = ({ params }: UserProfileProps) => {
       >
         <CardContent>
           <Typography
-            gutterBottom
             color="#444f7c"
             sx={{
               fontWeight: 550,
               fontSize: "30px",
+              textDecoration: "underline dotted",
               "@media(max-width: 1000px)": {
                 fontSize: "20px",
               },
             }}
           >
-            あなたが投稿した過去問
+            投稿した過去問
+          </Typography>
+          <Typography
+            gutterBottom
+            color="#444f7c"
+            sx={{
+              fontWeight: 550,
+              fontSize: "15px",
+              "@media(max-width: 1000px)": {
+                fontSize: "10px",
+              },
+            }}
+          >
+            　編集したい過去問をクリックしてください。
           </Typography>
           {session?.user.id === user?.id && (
             <List>
-              <ListItem
+              <Button
+                disabled
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  width: "90%",
                 }}
               >
-                <ListItemText
-                  primary="講義名"
-                  sx={{ flexBasis: "6vw" }}
-                  primaryTypographyProps={{
-                    sx: {
-                      "@media(max-width: 1000px)": { fontSize: "12px" },
-                    },
+                <ListItem
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 1,
+                    color: "black",
                   }}
-                />
-                <ListItemText
-                  primary="学科"
-                  sx={{ flexBasis: "8vw" }}
-                  primaryTypographyProps={{
-                    sx: {
-                      "@media(max-width: 1000px)": { fontSize: "12px" },
-                    },
-                  }}
-                />
-                <ListItemText
-                  primary="担当教授"
-                  sx={{ flexBasis: "6vw" }}
-                  primaryTypographyProps={{
-                    sx: {
-                      "@media(max-width: 1000px)": { fontSize: "12px" },
-                    },
-                  }}
-                />
-                <ListItemText
-                  primary="年数"
-                  sx={{ flexBasis: "6vw" }}
-                  primaryTypographyProps={{
-                    sx: {
-                      "@media(max-width: 1000px)": { fontSize: "12px" },
-                    },
-                  }}
-                />
-              </ListItem>
+                >
+                  <ListItemText
+                    primary="講義名"
+                    sx={{ flexBasis: "6vw" }}
+                    primaryTypographyProps={{
+                      sx: {
+                        "@media(max-width: 1000px)": { fontSize: "12px" },
+                      },
+                    }}
+                  />
+                  <ListItemText
+                    primary="学科"
+                    sx={{ flexBasis: "8vw" }}
+                    primaryTypographyProps={{
+                      sx: {
+                        "@media(max-width: 1000px)": { fontSize: "12px" },
+                      },
+                    }}
+                  />
+                  <ListItemText
+                    primary="担当教授"
+                    sx={{ flexBasis: "8vw" }}
+                    primaryTypographyProps={{
+                      sx: {
+                        "@media(max-width: 1000px)": { fontSize: "12px" },
+                      },
+                    }}
+                  />
+                  <ListItemText
+                    primary="年数"
+                    sx={{ flexBasis: "6vw" }}
+                    primaryTypographyProps={{
+                      sx: {
+                        "@media(max-width: 1000px)": { fontSize: "12px" },
+                      },
+                    }}
+                  />
+                </ListItem>
+              </Button>
               <div
                 style={{
                   width: "90%",
@@ -351,53 +401,90 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     style={{ transitionDelay: `${index * 200}ms` }} // 各行に遅延を追加
                     key={exam.lectureName}
                   >
-                    <ListItem
-                      key={exam.lectureName}
-                      sx={{
+                    <Link
+                      href={"/exam/${id}/edit"}
+                      passHref
+                      style={{
+                        color: "inherit",
+                        textDecoration: "none",
                         display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        flexDirection: "column",
                       }}
                     >
-                      <ListItemText
-                        primary={exam.lectureName}
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
                         sx={{
-                          flexBasis: "6vw",
-                        }}
-                        primaryTypographyProps={{
-                          sx: {
-                            "@media(max-width: 1000px)": { fontSize: "12px" },
+                          width: "90%",
+                          borderRadius: 0,
+                          color: "black",
+                          backgroundColor: "#fff",
+                          boxShadow: 0,
+                          "&:hover": {
+                            color: "#fff",
+                            backgroundColor: "#383f6a", // ホバー時の背景色
                           },
                         }}
-                      />
-                      <ListItemText
-                        primary={exam.departmentName}
-                        sx={{ flexBasis: "8vw" }}
-                        primaryTypographyProps={{
-                          sx: {
-                            "@media(max-width: 1000px)": { fontSize: "12px" },
-                          },
-                        }}
-                      />
-                      <ListItemText
-                        primary={exam.professor}
-                        sx={{ flexBasis: "6vw" }}
-                        primaryTypographyProps={{
-                          sx: {
-                            "@media(max-width: 1000px)": { fontSize: "12px" },
-                          },
-                        }}
-                      />
-                      <ListItemText
-                        primary={exam.year}
-                        sx={{ flexBasis: "6vw" }}
-                        primaryTypographyProps={{
-                          sx: {
-                            "@media(max-width: 1000px)": { fontSize: "12px" },
-                          },
-                        }}
-                      />
-                    </ListItem>
+                      >
+                        <ListItem
+                          key={exam.lectureName}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: 1,
+                          }}
+                        >
+                          <ListItemText
+                            primary={exam.lectureName}
+                            sx={{
+                              flexBasis: "6vw",
+                            }}
+                            primaryTypographyProps={{
+                              sx: {
+                                "@media(max-width: 1000px)": {
+                                  fontSize: "12px",
+                                },
+                              },
+                            }}
+                          />
+                          <ListItemText
+                            primary={exam.departmentName}
+                            sx={{ flexBasis: "8vw" }}
+                            primaryTypographyProps={{
+                              sx: {
+                                "@media(max-width: 1000px)": {
+                                  fontSize: "12px",
+                                },
+                              },
+                            }}
+                          />
+                          <ListItemText
+                            primary={exam.professor}
+                            sx={{ flexBasis: "8vw" }}
+                            primaryTypographyProps={{
+                              sx: {
+                                "@media(max-width: 1000px)": {
+                                  fontSize: "12px",
+                                },
+                              },
+                            }}
+                          />
+                          <ListItemText
+                            primary={exam.year}
+                            sx={{ flexBasis: "6vw" }}
+                            primaryTypographyProps={{
+                              sx: {
+                                "@media(max-width: 1000px)": {
+                                  fontSize: "12px",
+                                },
+                              },
+                            }}
+                          />
+                        </ListItem>
+                      </Button>
+                    </Link>
                   </Fade>
                 ))
               ) : (
