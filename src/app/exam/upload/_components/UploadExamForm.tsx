@@ -1,7 +1,7 @@
 "use client";
 
 import LoadingIndicator from "@/app/components/LoadingIndicator";
-import { Department, UploadExamFormData } from "@/app/types";
+import { Department, Tag, UploadExamFormData } from "@/app/types";
 import { validationUploadExamSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -24,11 +24,12 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
-import { getDepartments, getLectureNames, submitExam } from "../actions";
+import { getDepartments, getLectureNames, getTags, submitExam } from "../actions";
 
 const UploadExamForm = () => {
   const [resError, setResError] = useState("");
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const router = useRouter();
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
@@ -58,6 +59,14 @@ const UploadExamForm = () => {
   }, []);
 
   useEffect(() => {
+    const loadTags = async () => {
+      const data = await getTags();
+      setTags(data);
+    };
+    loadTags();
+  }, []);
+
+  useEffect(() => {
     const fetchLectureSuggestions = async () => {
       if (watchLectureName.length > 0) {
         const data = await getLectureNames(watchLectureName);
@@ -79,6 +88,7 @@ const UploadExamForm = () => {
   });
 
   const onSubmit = async (data: UploadExamFormData) => {
+    console.log(data);
     setIsLoading(true);
     const result = await submitExam(data);
     if (result.success) {
@@ -161,6 +171,31 @@ const UploadExamForm = () => {
             />
             {errors.departmentId && (
               <FormHelperText>{errors.departmentId.message}</FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth required error={!!errors.tagId}>
+            <InputLabel id="tag-label">タグ</InputLabel>
+            <Controller
+              name="tagId"
+              control={control}
+              defaultValue={tags[0]?.id || ""}
+              render={({ field }) => (
+                <Select
+                  labelId="tag-label"
+                  label="タグ"
+                  {...field}
+                  value={field.value || ""}
+                >
+                  {tags.map((tag) => (
+                    <MenuItem key={tag.id} value={tag.id}>
+                      {tag.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+            {errors.tagId && (
+              <FormHelperText>{errors.tagId.message}</FormHelperText>
             )}
           </FormControl>
         </div>
