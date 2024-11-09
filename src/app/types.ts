@@ -24,6 +24,7 @@ export interface EditUserFormData {
 export interface UploadExamFormData {
   lectureName: string;
   departmentId: string;
+  tagId: string;
   year: number;
   professor?: string;
   file: File[];
@@ -43,6 +44,11 @@ export interface Department {
   name: string;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+}
+
 export interface UserData {
   id: string;
   name: string;
@@ -58,6 +64,7 @@ export interface ExamData {
   id: string;
   lecture: { name: string };
   department: { name: string };
+  tag: { name: string };
   year: number;
   professor?: string;
   pdfUrl: string;
@@ -66,6 +73,7 @@ export interface ExamData {
 export interface ExamSearchData {
   lectureName?: string;
   departmentId?: string;
+  tagId?: string;
   year?: number;
   professor?: string;
 }
