@@ -16,26 +16,26 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
 
         // フォームデータを取得
-        const lectureName = formData.get('lectureName')?.toString();
-        const departmentId = formData.get('departmentId')?.toString();
-        const year = Number(formData.get('year'));
-        const professor = formData.get('professor')?.toString() || undefined;
-        const file = formData.get('file') as File | null; // 単一のファイルを取得
-
-        console.log(file); // ファイルが何か確認するためのログ出力
+      const lectureName = formData.get('lectureName')?.toString();
+      const departmentId = formData.get('departmentId')?.toString();
+      const tagId = formData.get('tagId')?.toString();
+      const year = Number(formData.get('year'));
+      const professor = formData.get('professor')?.toString() || undefined;
+      const file = formData.get('file') as File | null; // 単一のファイルを取得
 
         if (!file) {
             return new NextResponse(JSON.stringify({ message: 'ファイルが正しくアップロードされていません。' }), { status: 400 });
         }
 
         // バリデーション
-        const validationResult = await validationUploadExamSchema.safeParseAsync({
-            lectureName,
-            departmentId,
-            year,
-            professor,
-            file,
-        });
+      const validationResult = await validationUploadExamSchema.safeParseAsync({
+        lectureName,
+        departmentId,
+        tagId,
+        year,
+        professor,
+        file,
+      });
 
         if (!validationResult.success) {
             const errors = validationResult.error.flatten().fieldErrors;
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
             return new NextResponse(JSON.stringify({ message: '入力値が不正です', errors }), { status: 400 });
         }
 
-        const { lectureName: validLectureName, departmentId: validDepartmentId, year: validYear, professor: validProfessor, file: validFile } = validationResult.data;
+        const { lectureName: validLectureName, departmentId: validDepartmentId, tagId: validTagId, year: validYear, professor: validProfessor, file: validFile } = validationResult.data;
 
         // ファイルのバリデーション
         if (!validFile) {
@@ -70,16 +70,17 @@ export async function POST(req: NextRequest) {
         }
 
         // データベースに過去問データを保存
-        const exam = await prisma.exam.create({
-            data: {
-                lectureId: lecture.id,
-                departmentId: validDepartmentId,
-                year: validYear,
-                professor: validProfessor,
-                fileUrl: uploadedFilePath,
-                uploaderId: currentUserId,
-            },
-        });
+      const exam = await prisma.exam.create({
+        data: {
+          lectureId: lecture.id,
+          departmentId: validDepartmentId,
+          tagId: validTagId,
+          year: validYear,
+          professor: validProfessor,
+          fileUrl: uploadedFilePath,
+          uploaderId: currentUserId,
+        },
+      });
       
         return new NextResponse(JSON.stringify(exam), { status: 200 });
   } catch (error: unknown) {
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
       errorMessage = error.message;
     }
     return new NextResponse(JSON.stringify({ message: errorMessage }), { status: 500 });
-  }
+  };
 };
 
 // ローカルファイルに保存する関数

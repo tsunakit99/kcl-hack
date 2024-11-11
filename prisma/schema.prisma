@@ -89,6 +89,8 @@ model Exam {
   departmentId String
   lecture      Lecture   @relation(fields: [lectureId], references: [id])
   lectureId    String
+  tag          Tag       @relation(fields: [tagId], references: [id])
+  tagId        String
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -110,4 +112,12 @@ model Lecture {
   exams  Exam[]
 
   @@map("lectures")
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  exams Exam[]
+  
+  @@map("tags")
 }
