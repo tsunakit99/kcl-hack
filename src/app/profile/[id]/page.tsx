@@ -6,10 +6,13 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Divider,
   Fade,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
+  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
@@ -17,6 +20,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import DeleteModal from "./_components/DeleteModal";
 import { getUserById, getYourExamByUploaderId } from "./actions";
 
 interface UserProfileProps {
@@ -29,7 +33,8 @@ const UserProfile = ({ params }: UserProfileProps) => {
   const [user, setUser] = useState<UserData>();
   const [exams, setExams] = useState<ExamByIdData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -51,6 +56,14 @@ const UserProfile = ({ params }: UserProfileProps) => {
     };
     fetchUserData();
   }, []);
+
+  const handleOpenDeleteModal = async () => {
+    setOpenDeleteModal(true);
+  }
+
+  const handleDeleteSuccess = () => {
+    setOpenSnackbar(true); // 削除成功時にスナックバーを表示
+  };
 
   if (isLoading) {
     return (
@@ -181,7 +194,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                   }}
                 >
                   <Image
-                    src={user?.imageUrl || "/default-profile.png"} // デフォルト画像を設定
+                    src={user?.imageUrl || "/icon/default-profile.png"} // デフォルト画像を設定
                     alt="プロフィール画像"
                     width={500}
                     height={500}
@@ -263,7 +276,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     学科
                   </Typography>
                   <Typography className="profile-item" gutterBottom>
-                    {user?.department.name || "なし"}
+                    {user?.department?.name || "なし"}
                   </Typography>
                   <Typography
                     className="profile-item-name"
@@ -316,25 +329,12 @@ const UserProfile = ({ params }: UserProfileProps) => {
           >
             投稿した過去問
           </Typography>
-          <Typography
-            gutterBottom
-            color="#444f7c"
-            sx={{
-              fontWeight: 550,
-              fontSize: "15px",
-              "@media(max-width: 1000px)": {
-                fontSize: "10px",
-              },
-            }}
-          >
-            　編集したい過去問をクリックしてください。
-          </Typography>
           {session?.user.id === user?.id && (
             <List>
               <Button
                 disabled
                 sx={{
-                  width: "90%",
+                  width: "100%",
                 }}
               >
                 <ListItem
@@ -348,7 +348,10 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 >
                   <ListItemText
                     primary="講義名"
-                    sx={{ flexBasis: "6vw" }}
+                    sx={{
+                      flexBasis: "8vw",
+                      marginLeft: "5vw"
+                    }}
                     primaryTypographyProps={{
                       sx: {
                         "@media(max-width: 1000px)": { fontSize: "12px" },
@@ -357,7 +360,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                   />
                   <ListItemText
                     primary="学科"
-                    sx={{ flexBasis: "8vw" }}
+                    sx={{ flexBasis: "10vw" }}
                     primaryTypographyProps={{
                       sx: {
                         "@media(max-width: 1000px)": { fontSize: "12px" },
@@ -394,99 +397,134 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 }}
               ></div>
               {exams ? (
-                exams.map((exam: ExamByIdData, index) => (
-                  <Fade
-                    in={true}
-                    timeout={500} // アニメーションの速度
-                    style={{ transitionDelay: `${index * 200}ms` }} // 各行に遅延を追加
-                    key={exam.lectureName}
-                  >
-                    <Link
-                      href={"/exam/${id}/edit"}
-                      passHref
-                      style={{
-                        color: "inherit",
-                        textDecoration: "none",
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
+                <List>
+                  {exams.map((exam: ExamByIdData, index) => (
+                    <Fade
+                      in={true}
+                      timeout={500}
+                      style={{ transitionDelay: `${index * 200}ms` }}
+                      key={exam.lectureName}
                     >
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
+                      <ListItem
+                        disablePadding
                         sx={{
-                          width: "90%",
-                          borderRadius: 0,
-                          color: "black",
-                          backgroundColor: "#fff",
-                          boxShadow: 0,
-                          "&:hover": {
-                            color: "#fff",
-                            backgroundColor: "#383f6a", // ホバー時の背景色
-                          },
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          paddingY: 1,
                         }}
                       >
-                        <ListItem
-                          key={exam.lectureName}
-                          sx={{
+                        {/* 削除ボタンのアイコンを条件付きで表示 */}
+                        {session?.user.id === user?.id && (
+                          <ListItemIcon
+                            sx={{
+                              minWidth: "20px",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Button
+                              onClick={() => handleOpenDeleteModal()} // 削除関数を呼び出すハンドラー
+                              sx={{
+                                minWidth: "20px",
+                                minHeight: "20px",
+                                backgroundColor: "transparent",
+                                "&:hover": {
+                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                },
+                              }}
+                            >
+                              <Image src="/icon/delete.png" alt="delete icon" width="20" height="20" />
+                            </Button>
+                            {openDeleteModal && (
+                              <DeleteModal
+                                examId={exam.id}
+                                open={openDeleteModal}
+                                onClose={() => setOpenDeleteModal(false)}
+                                onDeleteSuccess={handleDeleteSuccess}
+                              />
+                              
+                            )}
+                          </ListItemIcon>
+                        )}
+                        <Snackbar
+                          open={openSnackbar}
+                          autoHideDuration={3000}
+                          onClose={() => setOpenSnackbar(false)}
+                          message="過去問投稿が完了しました"
+                          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                        />
+
+                        {/* リンク付きのリスト内容 */}
+                        <Link
+                          href={`/exam/${exam.id}`}
+                          passHref
+                          style={{
+                            color: "inherit",
+                            textDecoration: "none",
+                            flexGrow: 1,
                             display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            gap: 1,
                           }}
                         >
-                          <ListItemText
-                            primary={exam.lectureName}
+                          <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
                             sx={{
-                              flexBasis: "6vw",
-                            }}
-                            primaryTypographyProps={{
-                              sx: {
-                                "@media(max-width: 1000px)": {
-                                  fontSize: "12px",
-                                },
+                              width: "95%",
+                              borderRadius: 0,
+                              color: "black",
+                              backgroundColor: "#fff",
+                              boxShadow: 0,
+                              "&:hover": {
+                                color: "#fff",
+                                backgroundColor: "#383f6a",
                               },
                             }}
-                          />
-                          <ListItemText
-                            primary={exam.departmentName}
-                            sx={{ flexBasis: "8vw" }}
-                            primaryTypographyProps={{
-                              sx: {
-                                "@media(max-width: 1000px)": {
-                                  fontSize: "12px",
-                                },
-                              },
-                            }}
-                          />
-                          <ListItemText
-                            primary={exam.professor}
-                            sx={{ flexBasis: "8vw" }}
-                            primaryTypographyProps={{
-                              sx: {
-                                "@media(max-width: 1000px)": {
-                                  fontSize: "12px",
-                                },
-                              },
-                            }}
-                          />
-                          <ListItemText
-                            primary={exam.year}
-                            sx={{ flexBasis: "6vw" }}
-                            primaryTypographyProps={{
-                              sx: {
-                                "@media(max-width: 1000px)": {
-                                  fontSize: "12px",
-                                },
-                              },
-                            }}
-                          />
-                        </ListItem>
-                      </Button>
-                    </Link>
-                  </Fade>
-                ))
+                          >
+                            <ListItemText
+                              primary={exam.lectureName}
+                              sx={{ flexBasis: "6vw" }}
+                              primaryTypographyProps={{
+                                sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                              }}
+                            />
+                            <ListItemText
+                              primary={exam.departmentName}
+                              sx={{ flexBasis: "8vw" }}
+                              primaryTypographyProps={{
+                                sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                              }}
+                            />
+                            <ListItemText
+                              primary={exam.professor}
+                              sx={{ flexBasis: "8vw" }}
+                              primaryTypographyProps={{
+                                sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                              }}
+                            />
+                            <ListItemText
+                              primary={exam.year}
+                              sx={{ flexBasis: "6vw" }}
+                              primaryTypographyProps={{
+                                sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                              }}
+                            />
+                          </Button>
+                        </Link>
+                        <Divider
+                          sx={{
+                            width: "90%",
+                            position: "absolute",
+                            bottom: 0,
+                            backgroundColor: "#ddd",
+                          }}
+                        />
+                      </ListItem>
+                    </Fade>
+                  ))}
+                </List>
               ) : (
                 <ListItem>
                   <ListItemText primary="投稿した過去問はまだありません。" />
