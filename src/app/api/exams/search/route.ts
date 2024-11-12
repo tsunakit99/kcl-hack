@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-      const { lectureName, departmentId, year, professor } = await req.json();  
+      const { lectureName, departmentId, tagId, year, professor } = await req.json();  
 
       const exams = await prisma.exam.findMany({
           where: {
@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
                   },
               }),
               ...(departmentId && { departmentId }),
+              ...(tagId && { tagId }),
               ...(year && { year: parseInt(year) }),
               ...(professor && {
                   professor: {
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
           include: {
               lecture: true,
               department: true,
+              tag: true,
           },
       });
 

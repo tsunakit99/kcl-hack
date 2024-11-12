@@ -18,20 +18,23 @@ export async function POST(req: NextRequest) {
         // フォームデータを取得
         const lectureName = formData.get('lectureName')?.toString();
         const departmentId = formData.get('departmentId')?.toString();
+        const tagId = formData.get('tagId')?.toString();
         const year = Number(formData.get('year'));
         const professor = formData.get('professor')?.toString() || undefined;
-        const file = formData.get('file') as File | null; // 単一のファイルを取得
-
-        console.log(file); // ファイルが何か確認するためのログ出力
+        const file = formData.get('file') as File | null;
 
         if (!file) {
             return new NextResponse(JSON.stringify({ message: 'ファイルが正しくアップロードされていません。' }), { status: 400 });
         }
 
+        // 元のファイル名を取得
+        const originalFileName = file.name;
+
         // バリデーション
         const validationResult = await validationUploadExamSchema.safeParseAsync({
             lectureName,
             departmentId,
+            tagId,
             year,
             professor,
             file,
@@ -43,23 +46,21 @@ export async function POST(req: NextRequest) {
             return new NextResponse(JSON.stringify({ message: '入力値が不正です', errors }), { status: 400 });
         }
 
-        const { lectureName: validLectureName, departmentId: validDepartmentId, year: validYear, professor: validProfessor, file: validFile } = validationResult.data;
+        const { lectureName: validLectureName, departmentId: validDepartmentId, tagId: validTagId, year: validYear, professor: validProfessor, file: validFile } = validationResult.data;
 
         // ファイルのバリデーション
         if (!validFile) {
             return new NextResponse(JSON.stringify({ message: 'PDFファイルをアップロードしてください。' }), { status: 400 });
         }
 
-        // ファイル名を生成
+        // 一意のファイル名を生成
         const fileName = uuidv4() + '.pdf';
 
-        const filePath = `exams/${fileName}`; // バケット内のパス
-        
-        // ファイル保存処理(本番環境)
-        const uploadedFilePath = await uploadFileToSupabase(validFile, filePath);
+        // ファイル保存パスをuploaderIdごとに設定
+        const filePath = `exams/${currentUserId}/${fileName}`; // 各ユーザーのフォルダ内に保存
 
-        // ファイル保存処理(ローカル環境)
-        // const fileUrl = await saveFileToLocal(validFile);
+        // Supabaseにファイルをアップロード
+        const uploadedFilePath = await uploadFileToSupabase(validFile, filePath);
 
         const lecture = await prisma.lecture.findUnique({
             where: { name: validLectureName },
@@ -74,53 +75,40 @@ export async function POST(req: NextRequest) {
             data: {
                 lectureId: lecture.id,
                 departmentId: validDepartmentId,
+                tagId: validTagId,
                 year: validYear,
                 professor: validProfessor,
                 fileUrl: uploadedFilePath,
+                originalFileName, // 元のファイル名を保存
                 uploaderId: currentUserId,
             },
         });
       
         return new NextResponse(JSON.stringify(exam), { status: 200 });
-  } catch (error: unknown) {
-    console.error(error);
-    let errorMessage = 'サーバーエラーが発生しました。';
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    }
-    return new NextResponse(JSON.stringify({ message: errorMessage }), { status: 500 });
-  }
-};
-
-// ローカルファイルに保存する関数
-// async function saveFileToLocal(file: any): Promise<string> {
-//     const arrayBuffer = await file.arrayBuffer();
-//     const buffer = Buffer.from(arrayBuffer);
-
-//     const fileName = uuidv4() + path.extname(file.name || '');
-//     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-//     await fs.mkdir(uploadDir, { recursive: true });
-//     const filePath = path.join(uploadDir, fileName);
-
-//     await fs.writeFile(filePath, buffer);
-
-//     return `/uploads/${fileName}`;
-// }
+    } catch (error: unknown) {
+        console.error(error);
+        let errorMessage = 'サーバーエラーが発生しました。';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        return new NextResponse(JSON.stringify({ message: errorMessage }), { status: 500 });
+    };
+}
 
 // Supabase Storageにファイルを保存する関数
 async function uploadFileToSupabase(file: File, path: string): Promise<string> {
-  const { data, error } = await supabaseServer.storage
-    .from('uploads') // バケット名
-    .upload(path, file, {
-      cacheControl: '3600',
-      upsert: false,
-    });
+    const { data, error } = await supabaseServer.storage
+        .from('uploads') // バケット名
+        .upload(path, file, {
+            cacheControl: '3600',
+            upsert: false,
+        });
 
-  if (error) {
-    console.error('ファイルのアップロードに失敗しました：', error);
-    throw new Error('ファイルのアップロードに失敗しました');
-  }
+    if (error) {
+        console.error('ファイルのアップロードに失敗しました：', error);
+        throw new Error('ファイルのアップロードに失敗しました');
+    }
 
-  // data.path がアップロードされたファイルのパス
-  return data.path;
+    // data.path がアップロードされたファイルのパス
+    return data.path;
 }

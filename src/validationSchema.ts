@@ -68,6 +68,7 @@ export const validationEditSchema = z.object({
 export const validationUploadExamSchema = z.object({
     lectureName: z.string().min(1, '講義名は必須です'),
     departmentId: z.string().min(1, '学科を選択してください'),
+    tagId: z.string().min(1, 'タグを選択してください'),
     year: z
         .number({ invalid_type_error: '年度は数値で入力してください' })
         .int('年度は整数で入力してください')
@@ -88,6 +89,7 @@ export const validationUploadExamSchema = z.object({
 export const examSearchSchema = z.object({
     lectureName: z.string().optional(),
     departmentId: z.string().optional(),
+    tagId: z.string().optional(),
     year: z
         .coerce
         .number({ invalid_type_error: '年度は数値で入力してください' })

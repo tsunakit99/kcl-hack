@@ -24,6 +24,7 @@ export interface EditUserFormData {
 export interface UploadExamFormData {
   lectureName: string;
   departmentId: string;
+  tagId: string;
   year: number;
   professor?: string;
   file: File[];
@@ -31,6 +32,7 @@ export interface UploadExamFormData {
 
 // 自身が投稿した過去問の表示の型定義
 export interface ExamByIdData{
+  id: string;
   lectureName: string;
   departmentName: string;
   year: number;
@@ -39,6 +41,11 @@ export interface ExamByIdData{
 }
 
 export interface Department {
+  id: string;
+  name: string;
+}
+
+export interface Tag {
   id: string;
   name: string;
 }
@@ -58,6 +65,7 @@ export interface ExamData {
   id: string;
   lecture: { name: string };
   department: { name: string };
+  tag: { name: string };
   year: number;
   professor?: string;
   pdfUrl: string;
@@ -66,6 +74,7 @@ export interface ExamData {
 export interface ExamSearchData {
   lectureName?: string;
   departmentId?: string;
+  tagId?: string;
   year?: number;
   professor?: string;
 }

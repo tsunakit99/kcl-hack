@@ -15,6 +15,21 @@ export const getDepartments = async () => {
 
 }
 
+export const getTags = async () => {
+    const res = await fetch('/api/exams/tags', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    });
+    if (res.ok) {
+        const data = await res.json();
+        return data;
+    } else {
+        const resError = await res.json();
+        return resError.error;
+    }
+
+}
+
 export const getLectureNames = async (query: string) => {
     const res = await fetch(`/api/exams/lectures?query=${encodeURIComponent(query)}`);
     const data = await res.json();
@@ -25,6 +40,7 @@ export const submitExam = async (formData: UploadExamFormData) => {
   const data = new FormData();
   data.append('lectureName', formData.lectureName);
   data.append('departmentId', formData.departmentId);
+  data.append('tagId', formData.tagId);
   data.append('year', String(formData.year));
   if (formData.professor) {
     data.append('professor', formData.professor);

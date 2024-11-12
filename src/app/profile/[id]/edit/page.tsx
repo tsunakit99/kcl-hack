@@ -1,8 +1,7 @@
 "use client";
 import { UserData } from "@/app/types";
-import { Card, CardContent, Typography, Box } from "@mui/material";
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getUserById } from "../actions";
 import EditUserForm from "./_components/EditUserForm";
@@ -12,16 +11,9 @@ interface EditUserPageProps {
 }
 
 const EditUserPage = ({ params }: EditUserPageProps) => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const { data: session } = useSession();
   const { id } = params;
   const [user, setUser] = useState<UserData>();
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,16 +24,16 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
   }, []);
 
   if (!user) {
-    return <Typography>ユーザーが見つかりません。</Typography>;
+    return <Typography textAlign={"center"}>ユーザーが見つかりません。</Typography>;
   }
 
   if (user.id !== session?.user.id) {
-    return <Typography>このページにアクセスする権限がありません。</Typography>;
+    return <Typography textAlign={"center"}>このページにアクセスする権限がありません。</Typography>;
   }
 
   return (
     <Box
-      style={{
+      sx={{
         width: "100vw",
         height: "100vh",
         background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
@@ -50,7 +42,8 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
     >
       <Card
         sx={{
-          maxWidth: "60%",
+          width: "50%",
+          maxWidth: "100%",
           margin: "auto",
           overflowY: "auto",
           mt: 5,
@@ -67,17 +60,10 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
             alignItems: "center",
           }}
         >
-          <Typography
-            variant="h5"
-            sx={{
-              position: "relative",
-              top: "10px",
-              fontFamily: "Monospace",
-              margin: "0 auto",
-            }}
-          >
-            プロフィール編集
-          </Typography>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mt: 4, mb: 1 }}>
+              プロフィール編集
+            </Typography>
+            <Divider sx={{ width: "100%"}} />
           <EditUserForm
             id={user.id}
             currentName={user.name || ""}

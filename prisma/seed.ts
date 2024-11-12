@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  const departments = ['共通', '知能情報工学科', '情報通信工学科', '知的システム工学科', '物理情報工学科', '生命化学情報工学科']; // 事前に用意した学科名
+  const departments = ['共通', '知能情報工学科', '情報通信工学科', '知的システム工学科', '物理情報工学科', '生命化学情報工学科']; 
 
   for (const name of departments) {
     await prisma.department.upsert({
@@ -48,6 +48,25 @@ async function main() {
       where: { name },
       update: {},
       create: { name },
+    });
+  }
+
+  const tags = [
+    { name: '期末' },
+    { name: '期末解説' },
+    { name: '中間' },
+    { name: '中間解説' },
+    { name: '小テ' },
+    { name: '小テ解説' },
+    { name: '講義資料' },
+    { name: 'その他' },
+  ];
+
+  for (const tag of tags) {
+    await prisma.tag.upsert({
+      where: { name: tag.name },
+      update: {},
+      create: tag,
     });
   }
 }
