@@ -1,75 +1,141 @@
-import { Box, Card, CardContent, Stack, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Divider, Stack, Typography } from '@mui/material';
+import Image from "next/image";
 import Link from 'next/link';
-import { getExamById } from './actions';
+import { getExamById, getImageById } from './actions';
 
 interface ExamPageProps {
   params: { id: string };
 }
-
-export const generateMetadata = async ({ params }: ExamPageProps) => {
-  const exam = await getExamById(params.id);
-  return {
-    title: `試験 - ${exam?.id || '不明'}`,
-  };
-};
 
 const ExamPage = async ({ params }: ExamPageProps) => {
   try {
     const exam = await getExamById(params.id);
 
     if (!exam) {
-      return <div>試験情報が見つかりませんでした。</div>;
+      return <Typography textAlign={'center'}>過去問情報が見つかりませんでした。もう一度お試しください。</Typography>
     }
 
+    const imageUrl = await getImageById(exam.uploaderId);
+
     return (
-      <Card sx={{ maxWidth: 600, margin: "auto", mt: 5 }}>
-        <Card sx={{ maxWidth: 600, margin: "auto" }}>
-          <CardContent>
-            <Typography variant="h4" gutterBottom>
-              過去問詳細
-            </Typography>
-            <Box sx={{ maxWidth: "100%", margin: "auto", mt: 10 }}>
-              <Stack direction="row" spacing={2}>    
-                <CardContent>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    講義名
-                  </Typography>
-                  <Typography variant="h6" gutterBottom>
-                    {exam.lecture.name}
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    学科
-                  </Typography>
-                  <Typography variant="h6" gutterBottom>
-                    {exam.department.name}
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    年度
-                  </Typography>
-                  <Typography variant="h6" gutterBottom>
-                    {exam.year}
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    教授名
-                  </Typography>
-                  <Typography variant="h6" gutterBottom>
-                    {exam.professor || "不明"}
-                  </Typography>
-                  <Link href={exam.fileUrl}>
-                  <Typography variant="h6" gutterBottom>
-                    ファイル
-                    </Typography>
-                  </Link>
-                </CardContent>   
-              </Stack>
+      <Box
+        sx={{
+          width: "100vw",
+          height: "100vh",
+          background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Card sx={{
+          width: "40%",
+          margin: 'auto',
+          borderRadius: 2,
+          overflowY: "auto",
+          mt: 5,
+          mb: 5,
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.7)",
+        }}>
+          <CardContent sx={{ textAlign: 'center', p: 4 }}>
+            <Box sx={{
+              display: "flex",
+              justifyContent: "space-between"
+            }}>
+              <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', textAlign: "left" }}>
+                過去問詳細
+              </Typography>
+              <Link
+                href={`/profile/${exam.uploaderId}`}
+                passHref
+                style={{
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              >
+                <Box sx={{
+                  display: "flex",
+                  justifyContent: "right",
+                  alignItems: "center"
+                }}>
+                  <Typography sx={{ color: "gray" }}>投稿者:</Typography>
+                  <Box
+                  sx={{
+                    width: "50px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    ml: 2,
+                    border: "2px solid #000",
+                  }}
+                >
+                  <Image src={imageUrl || "/icon/default-profile.png"}
+                    alt="プロフィール画像"
+                    width={500}
+                    height={500}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                      objectFit: "cover",
+                    }}
+                    />
+                    </Box>
+                  <Typography sx={{ fontSize: "20px" }}>{exam.uploader.name}</Typography>
+                </Box>
+              </Link>
             </Box>
+            <Divider sx={{ my: 2 }} />
+
+            <Stack direction="column" spacing={3} sx={{ textAlign: 'left' }}>
+              <Box>
+                <Typography variant="subtitle1" color="textSecondary">
+                  講義名
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {exam.lecture.name}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle1" color="textSecondary">
+                  学科
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {exam.department.name}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle1" color="textSecondary">
+                  年度
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {exam.year}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle1" color="textSecondary">
+                  教授名
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {exam.professor || '不明'}
+                </Typography>
+              </Box>
+
+              <Link href={exam.fileUrl} passHref>
+                <Button variant="contained" color="primary" sx={{ mt: 2, fontWeight: 'bold' }}>
+                  {exam.originalFileName}を閲覧
+                </Button>
+              </Link>
+            </Stack>
           </CardContent>
         </Card>
-      </Card>
+      </Box>
     );
   } catch (error) {
     console.error('試験情報の取得中にエラーが発生しました：', error);
-    return <div>試験情報の取得中にエラーが発生しました。</div>;
+    return <Typography textAlign={'center'}>過去問情報取得中にエラーが発生しました。もう一度お試しください。</Typography>
   }
 };
 
