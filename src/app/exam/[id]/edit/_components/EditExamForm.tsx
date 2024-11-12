@@ -50,6 +50,7 @@ const EditExamForm = ({
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
   const [lectureNames, setLectureNames] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+  const [fileName, setFileName] = useState<string[]>([]);
 
   const {
     control,
@@ -82,13 +83,17 @@ const EditExamForm = ({
         file: examResult.fileUrl
       });
       setValue("lectureName", examResult.lecture.name);
-      setValue("file", [new File([], examResult.fileUrl)]);
+      setFiles(examResult.fileUrl);
+      // URLからファイル名を取得
+      const url = examResult.fileUrl.split("/");
+      const FileName = url[url.length - 1];
+      setFileName(FileName);
       setValue("departmentId", examResult.departmentId);
       setValue("year", examResult.year);
       setValue("professor", examResult.professor || "");
     };
     fetchExamData();
-  }, [id, setValue]);
+  }, [id, setValue, setFiles, setFileName]);
 
   const watchLectureName = watch("lectureName", "");
 
@@ -182,7 +187,6 @@ const EditExamForm = ({
                   {...params}
                   label="講義名"
                   required
-                  // {...register("lectureName")}
                   error={!!errors.lectureName}
                   helperText={errors.lectureName?.message as React.ReactNode}
                 />
@@ -256,7 +260,7 @@ const EditExamForm = ({
                     height={30}
                     style={{ marginRight: 8 }}
                   />
-                  {files[0].name}
+                  {fileName}
                 </Typography>
               </>
             ) : (
