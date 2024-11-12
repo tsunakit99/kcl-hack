@@ -52,7 +52,7 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
       setValue("departmentId", examResult.departmentId);
       setValue("year", examResult.year);
       setValue("professor", examResult.professor || "");
-      setValue("file", examResult.file);
+      setValue("file", examResult.fileUrl);
     };
     fetchExamData();
   }, []);
