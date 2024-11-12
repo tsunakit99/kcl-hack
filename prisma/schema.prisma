@@ -83,6 +83,7 @@ model Exam {
   year         Int
   professor    String?
   fileUrl      String
+  originalFileName String?
   uploader     User      @relation(fields: [uploaderId], references: [id])
   uploaderId   String
   department   Department  @relation(fields: [departmentId], references: [id])

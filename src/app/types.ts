@@ -32,6 +32,7 @@ export interface UploadExamFormData {
 
 // 自身が投稿した過去問の表示の型定義
 export interface ExamByIdData{
+  id: string;
   lectureName: string;
   departmentName: string;
   year: number;

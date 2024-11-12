@@ -6,6 +6,7 @@ export async function GET(req: NextRequest, { params }: { params: { uploaderId: 
     const exams = await prisma.exam.findMany({
         where: { uploaderId },
         select: {
+            id: true,
             lecture: {
                 select: { name: true },
             },
@@ -18,6 +19,7 @@ export async function GET(req: NextRequest, { params }: { params: { uploaderId: 
     });
 
     const formattedExams = exams.map(exam => ({
+        id: exam.id,
         lectureName: exam.lecture.name, // lectureのnameを抽出
         departmentName: exam.department.name, // departmentのnameを抽出
         professor: exam.professor, // professorそのまま
