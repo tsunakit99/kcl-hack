@@ -13,6 +13,7 @@ export async function GET(
     const exam = await prisma.exam.findUnique({
       where: { id },
       include: {
+        uploader: true,
         lecture: true,
         department: true,
       },
