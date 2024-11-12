@@ -263,7 +263,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     学科
                   </Typography>
                   <Typography className="profile-item" gutterBottom>
-                    {user?.department.name}
+                    {user?.department.name || "なし"}
                   </Typography>
                   <Typography
                     className="profile-item-name"
@@ -374,7 +374,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     }}
                   />
                   <ListItemText
-                    primary="年数"
+                    primary="年度"
                     sx={{ flexBasis: "6vw" }}
                     primaryTypographyProps={{
                       sx: {
@@ -489,7 +489,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 ))
               ) : (
                 <ListItem>
-                  <ListItemText primary="過去問はまだありません。" />
+                  <ListItemText primary="投稿した過去問はまだありません。" />
                 </ListItem>
               )}
             </List>
