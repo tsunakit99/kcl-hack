@@ -81,7 +81,7 @@ const EditUserForm = ({
 
     if (result.success) {
       setIsLoading(false);
-      router.push(`/profile/${id}`);
+      router.push(`/profile/${id}?success=true`);
     } else {
       setIsLoading(false);
       setResError(result.error);

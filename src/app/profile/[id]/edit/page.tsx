@@ -1,6 +1,6 @@
 "use client";
 import { UserData } from "@/app/types";
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { getUserById } from "../actions";
@@ -33,7 +33,7 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
 
   return (
     <Box
-      style={{
+      sx={{
         width: "100vw",
         height: "100vh",
         background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
@@ -60,17 +60,10 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
             alignItems: "center",
           }}
         >
-          <Typography
-            variant="h5"
-            sx={{
-              position: "relative",
-              top: "10px",
-              fontFamily: "Monospace",
-              margin: "0 auto",
-            }}
-          >
-            プロフィール編集
-          </Typography>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mt: 4, mb: 1 }}>
+              プロフィール編集
+            </Typography>
+            <Divider sx={{ width: "100%"}} />
           <EditUserForm
             id={user.id}
             currentName={user.name || ""}
