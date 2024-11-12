@@ -7,22 +7,20 @@ import {
   Alert,
   Box,
   Button,
-  CardContent,
   FormControl,
   FormHelperText,
   InputLabel,
   MenuItem,
   Select,
   Stack,
-  TextField,
+  TextField
 } from "@mui/material";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { getDepartments, UpdateUserInfo } from "../actions";
 import LoadingIndicator from "../../../../components/LoadingIndicator";
+import { getDepartments, UpdateUserInfo } from "../actions";
 
 interface EditUserFormProps {
   id: string;
@@ -42,15 +40,8 @@ const EditUserForm = ({
   const [resError, setResError] = useState<string | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const router = useRouter();
-  const { status } = useSession();
   const [imagePreview, setImagePreview] = useState<string>(currentIcon || "");
-   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -120,12 +111,12 @@ const EditUserForm = ({
       <Stack
         spacing={2}
         sx={{
+          width: "500px",
           display: "flex",
-          flexDirection: "row",
-          gap: 5,
-          "@media(max-width: 1000px)": {
-            flexDirection: "column",
-          },
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
         }}
       >
         {resError && (
@@ -137,8 +128,7 @@ const EditUserForm = ({
               ))}
           </Alert>
         )}
-        <Stack>
-          {imagePreview && (
+          {imagePreview ? (
             <Box
               sx={{
                 width: 150,
@@ -156,6 +146,30 @@ const EditUserForm = ({
             >
               <Image
                 src={imagePreview}
+                alt="プロフィール画像プレビュー"
+                width={500}
+                height={500}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </Box>
+        ) : (
+            <Box
+              sx={{
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                overflow: "hidden",
+                mt: 5,
+                mb: 5,
+                border: "2px solid #000",
+                "@media(max-width: 1000px)": {
+                  margin: "0 auto",
+                  mb: 5,
+                },
+              }}
+            >
+              <Image
+                src="/icon/default-profile.png"
                 alt="プロフィール画像プレビュー"
                 width={500}
                 height={500}
@@ -187,9 +201,6 @@ const EditUserForm = ({
           {errors.image && (
             <FormHelperText error> {errors.image.message}</FormHelperText>
           )}
-        </Stack>
-        <Stack>
-          <CardContent>
             <TextField
               label="名前"
               fullWidth
@@ -232,8 +243,6 @@ const EditUserForm = ({
               error={!!errors.introduction}
               helperText={errors.introduction?.message as React.ReactNode}
             />
-          </CardContent>
-        </Stack>
       </Stack>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Button
