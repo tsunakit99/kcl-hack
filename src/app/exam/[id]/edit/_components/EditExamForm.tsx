@@ -70,18 +70,25 @@ const EditExamForm = ({
     }
   });
 
-  // useEffect(() => {
-  //   const fetchExamData = async () => {
-  //     const examResult = await getExamById(id);
-  //     setExam(examResult);
-  //     setValue("lectureName", examResult.lectureName);
-  //     setValue("file", examResult.file);
-  //     setValue("departmentId", examResult.departmentId);
-  //     setValue("year", examResult.year);
-  //     setValue("professor", examResult.professor || "");
-  //   };
-  //   fetchExamData();
-  // }, [id, setValue]);
+  useEffect(() => {
+    const fetchExamData = async () => {
+      const examResult = await getExamById(id);
+      setExam({
+        id: examResult.id,
+        lectureName: examResult.lecture.name,
+        departmentId: examResult.departmentId,
+        year: examResult.year,
+        professor: examResult.professor || "",
+        file: examResult.fileUrl
+      });
+      setValue("lectureName", examResult.lecture.name);
+      setValue("file", [new File([], examResult.fileUrl)]);
+      setValue("departmentId", examResult.departmentId);
+      setValue("year", examResult.year);
+      setValue("professor", examResult.professor || "");
+    };
+    fetchExamData();
+  }, [id, setValue]);
 
   const watchLectureName = watch("lectureName", "");
 
@@ -168,7 +175,7 @@ const EditExamForm = ({
             <Autocomplete
               freeSolo
               options={lectureNames}
-              // value={field.value}
+              value={field.value}
               onInputChange={(e, value) => field.onChange(value)}
               renderInput={(params) => (
                 <TextField

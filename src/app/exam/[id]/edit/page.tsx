@@ -40,12 +40,19 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
   useEffect(() => {
     const fetchExamData = async () => {
       const examResult = await getExamById(id);
-      setExam(examResult);
-      // setValue("lectureId", examResult.lectureId);
-      // setValue("departmentId", examResult.departmentId);
-      // setValue("year", examResult.year);
-      // setValue("professor", examResult.professor || "");
-      // setValue("file", examResult.file);
+      setExam({
+        id: examResult.id,
+        lectureName: examResult.lecture.name, // lectureオブジェクトのnameをlectureNameとして設定
+        departmentId: examResult.departmentId,
+        year: examResult.year,
+        professor: examResult.professor || "",
+        file: examResult.fileUrl
+      });
+      setValue("lectureName", examResult.lecture.name);
+      setValue("departmentId", examResult.departmentId);
+      setValue("year", examResult.year);
+      setValue("professor", examResult.professor || "");
+      setValue("file", examResult.file);
     };
     fetchExamData();
   }, []);
