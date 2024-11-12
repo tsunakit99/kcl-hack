@@ -1,21 +1,36 @@
 "use client";
 
-import { Box, Container, Divider, Typography } from "@mui/material";
+import { Box, CircularProgress, Container, Divider, Typography } from "@mui/material";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import UploadExamForm from "./_components/UploadExamForm";
 
 const UploadExam = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // 画面遷移後にフェードインを開始
     const timer = setTimeout(() => {
       setIsVisible(true);
+      setIsLoading(false);
     }, 100); // 遅延を少し入れる場合
 
     return () => clearTimeout(timer); // クリーンアップ
   }, []);
+
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
