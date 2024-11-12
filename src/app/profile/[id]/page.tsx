@@ -19,9 +19,10 @@ import {
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import DeleteModal from "./_components/DeleteModal";
-import { getUserById, getYourExamByUploaderId } from "./actions";
+import { getExamByUploaderId, getUserById } from "./actions";
 
 interface UserProfileProps {
   params: { id: string; uploaderId: string };
@@ -30,12 +31,17 @@ interface UserProfileProps {
 const UserProfile = ({ params }: UserProfileProps) => {
   const { id } = params;
   const { data: session } = useSession();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<UserData>();
   const [exams, setExams] = useState<ExamByIdData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [openDeleteSnackbar, setOpenDeleteSnackbar] = useState(false);
+  const [openProfSnackbar, setOpenProfSnackbar] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+
+  const isSuccessful = searchParams.get("success") === "true";
 
   useEffect(() => {
     // 画面遷移後にフェードインを開始
@@ -49,7 +55,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
   useEffect(() => {
     const fetchUserData = async () => {
       const userResult = await getUserById(id);
-      const examResult = await getYourExamByUploaderId(id);
+      const examResult = await getExamByUploaderId(id);
       setUser(userResult);
       setExams(examResult);
       setIsLoading(false);
@@ -57,12 +63,22 @@ const UserProfile = ({ params }: UserProfileProps) => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    // クエリパラメータのisSuccessfulがtrueの場合にスナックバーを表示
+    if (isSuccessful) {
+      setOpenProfSnackbar(true);
+      const params = new URLSearchParams(searchParams);
+      params.delete("success");
+      router.replace(`${window.location.pathname}?${params.toString()}`);
+    }
+  }, [isSuccessful]);
+
   const handleOpenDeleteModal = async () => {
     setOpenDeleteModal(true);
   }
 
   const handleDeleteSuccess = () => {
-    setOpenSnackbar(true); // 削除成功時にスナックバーを表示
+    setOpenDeleteSnackbar(true); // 削除成功時にスナックバーを表示
   };
 
   if (isLoading) {
@@ -249,6 +265,15 @@ const UserProfile = ({ params }: UserProfileProps) => {
                       </Button>
                     </Link>
                   )}
+                  {isSuccessful && (
+                    <Snackbar
+          open={openProfSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenProfSnackbar(false)}
+          message="プロフィール編集が完了しました"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
+                  )}
                 </Box>
               </Box>
               <Stack
@@ -329,7 +354,6 @@ const UserProfile = ({ params }: UserProfileProps) => {
           >
             投稿した過去問
           </Typography>
-          {session?.user.id === user?.id && (
             <List>
               <Button
                 disabled
@@ -449,10 +473,10 @@ const UserProfile = ({ params }: UserProfileProps) => {
                           </ListItemIcon>
                         )}
                         <Snackbar
-                          open={openSnackbar}
+                          open={openDeleteSnackbar}
                           autoHideDuration={3000}
-                          onClose={() => setOpenSnackbar(false)}
-                          message="過去問投稿が完了しました"
+                          onClose={() => setOpenDeleteSnackbar(false)}
+                          message="過去問削除が完了しました"
                           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                         />
 
@@ -531,7 +555,6 @@ const UserProfile = ({ params }: UserProfileProps) => {
                 </ListItem>
               )}
             </List>
-          )}
         </CardContent>
       </Box>
       <div

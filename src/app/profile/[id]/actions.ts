@@ -34,7 +34,7 @@ export const deleteExamById = async (examId: string) => {
     }
 };
 
-export const getYourExamByUploaderId = async (uploaderId: string) => {
+export const getExamByUploaderId = async (uploaderId: string) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/exams/${uploaderId}`, {
         method: 'GET',
         cache: 'no-store',
