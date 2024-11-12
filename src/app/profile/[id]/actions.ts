@@ -17,6 +17,23 @@ export const getUserById = async (id: string) => {
     }
 };
 
+export const deleteExamById = async (examId: string) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/exams/${examId}`, {
+        method: 'DELETE',
+        cache: 'no-store',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (res.ok) {
+        return { success: true };
+    } else {
+        const resError = await res.json();
+        return { success: false, error: resError.message || 'エラーが発生しました。' };
+    }
+};
+
 export const getYourExamByUploaderId = async (uploaderId: string) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/exams/${uploaderId}`, {
         method: 'GET',
@@ -25,12 +42,6 @@ export const getYourExamByUploaderId = async (uploaderId: string) => {
             'Content-Type': 'application/json',
         },
     });
-
-    // //デバッグ用
-    // console.log('getYourExamByUploaderIdの確認')
-    // const text = await res.text();
-    // console.log(text); //レスポンスの確認
-    // console.log(res.status); // ステータスコードを出力
 
     if (res.ok) {
         const data = await res.json(); // JSONデータを取得
