@@ -1,5 +1,3 @@
-import { stringify } from "querystring";
-
 // サインアップフォームの型定義
 export interface SignupFormData {
     name: string;

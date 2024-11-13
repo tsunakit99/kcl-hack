@@ -1,8 +1,7 @@
 "use client";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import CircleIcon from "./CircleIcon"; // CircleIconコンポーネントのインポート
 
 const MenuSidebar: React.FC = () => {
