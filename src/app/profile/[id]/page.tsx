@@ -374,7 +374,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                     primary="講義名"
                     sx={{
                       flexBasis: "8vw",
-                      marginLeft: "5vw"
+                      marginLeft: "6vw"
                     }}
                     primaryTypographyProps={{
                       sx: {
@@ -449,7 +449,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                             }}
                           >
                             <Button
-                              onClick={() => router.push('/exam/${id}/edit')} // 編集ページへ遷移
+                              onClick={() => router.push(`/exam/${exam.id}/edit`)} // 編集ページへ遷移
                               sx={{
                                 minWidth: "20px",
                                 minHeight: "20px",
