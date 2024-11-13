@@ -8,13 +8,14 @@ import {
   CircularProgress,
   Divider,
   Fade,
+  IconButton,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
+  Popover,
   Snackbar,
   Stack,
-  Typography,
+  Typography
 } from "@mui/material";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -35,6 +36,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
   const searchParams = useSearchParams();
   const [user, setUser] = useState<UserData>();
   const [exams, setExams] = useState<ExamByIdData[]>([]);
+  const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openDeleteSnackbar, setOpenDeleteSnackbar] = useState(false);
@@ -42,6 +44,11 @@ const UserProfile = ({ params }: UserProfileProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const isSuccessful = searchParams.get("success") === "true";
+
+   // メニュー関連の状態管理
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuExamId, setMenuExamId] = useState<string | null>(null);
+  
 
   useEffect(() => {
     // 画面遷移後にフェードインを開始
@@ -73,12 +80,53 @@ const UserProfile = ({ params }: UserProfileProps) => {
     }
   }, [isSuccessful]);
 
-  const handleOpenDeleteModal = async () => {
+  const handleOpenDeleteModal = () => {
     setOpenDeleteModal(true);
-  }
+  };
 
   const handleDeleteSuccess = () => {
     setOpenDeleteSnackbar(true); // 削除成功時にスナックバーを表示
+    // 削除後、リストから削除された過去問を取り除く
+    if (selectedExamId) {
+      setExams(exams.filter((exam) => exam.id !== selectedExamId));
+    }
+  };
+
+  // メニューを開く
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, examId: string) => {
+    setAnchorEl(event.currentTarget);
+    setMenuExamId(examId);
+  };
+
+  // メニューを閉じる
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+    setMenuExamId(null);
+  };
+
+  // 削除ボタンの処理
+  const handleDelete = () => {
+    if (menuExamId) {
+      setSelectedExamId(menuExamId);
+      handleOpenDeleteModal();
+      handleCloseMenu();
+    }
+  };
+
+  // 編集ボタンの処理
+  const handleEdit = () => {
+    if (menuExamId) {
+      router.push(`/exam/${menuExamId}/edit`);
+      handleCloseMenu();
+    }
+  };
+
+  // 詳細ボタンの処理
+  const handleDetail = () => {
+    if (menuExamId) {
+      router.push(`/exam/${menuExamId}`);
+      handleCloseMenu();
+    }
   };
 
   if (isLoading) {
@@ -373,8 +421,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                   <ListItemText
                     primary="講義名"
                     sx={{
-                      flexBasis: "8vw",
-                      marginLeft: "6vw"
+                      flexBasis: "6vw",
                     }}
                     primaryTypographyProps={{
                       sx: {
@@ -384,7 +431,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                   />
                   <ListItemText
                     primary="学科"
-                    sx={{ flexBasis: "10vw" }}
+                    sx={{ flexBasis: "8vw" }}
                     primaryTypographyProps={{
                       sx: {
                         "@media(max-width: 1000px)": { fontSize: "12px" },
@@ -419,169 +466,149 @@ const UserProfile = ({ params }: UserProfileProps) => {
                   position: "relative",
                   margin: "2px 0 4px 0",
                 }}
-              ></div>
-              {exams ? (
-                <List>
-                  {exams.map((exam: ExamByIdData, index) => (
-                    <Fade
-                      in={true}
-                      timeout={500}
-                      style={{ transitionDelay: `${index * 200}ms` }}
-                      key={exam.lectureName}
+            ></div>
+            {exams ? (
+              <List>
+                {exams.map((exam: ExamByIdData, index) => (
+                  <Fade
+                    in={true}
+                    timeout={500}
+                    style={{ transitionDelay: `${index * 200}ms` }}
+                    key={exam.id}
+                  >
+                    <ListItem
+                      disablePadding
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        paddingY: 1,
+                      }}
                     >
-                      <ListItem
-                        disablePadding
+                      {/* リスト項目のクリック処理 */}
+                      <Button
+                        onClick={(event) => {
+                          if (session?.user.id === user?.id) {
+                            handleOpenMenu(event, exam.id);
+                          } else {
+                            router.push(`/exam/${exam.id}`);
+                          }
+                        }}
                         sx={{
+                          width: "100%",
                           display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                          paddingY: 1,
+                          textAlign: "left",
+                          color: "inherit",
+                          textDecoration: "none",
+                          borderRadius: 0,
+                          backgroundColor: "#fff",
+                          "&:hover": {
+                            backgroundColor: "#f0f0f0",
+                          },
                         }}
                       >
-                        {/* 編集ボタンのアイコンを条件付きで表示 */}
-                        {session?.user.id === user?.id && (
-                          <ListItemIcon
-                            sx={{
-                              minWidth: "20px",
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Button
-                              onClick={() => router.push(`/exam/${exam.id}/edit`)} // 編集ページへ遷移
-                              sx={{
-                                minWidth: "20px",
-                                minHeight: "20px",
-                                backgroundColor: "transparent",
-                                "&:hover": {
-                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
-                                },
-                              }}
-                            >
-                              <Image src="/icon/pen2.png" alt="delete icon" width="20" height="20" />
-                            </Button>
-                          </ListItemIcon>
-                        )}
-                        {/* 削除ボタンのアイコンを条件付きで表示 */}
-                        {session?.user.id === user?.id && (
-                          <ListItemIcon
-                            sx={{
-                              minWidth: "20px",
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Button
-                              onClick={() => handleOpenDeleteModal()} // 削除関数を呼び出すハンドラー
-                              sx={{
-                                minWidth: "20px",
-                                minHeight: "20px",
-                                backgroundColor: "transparent",
-                                "&:hover": {
-                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
-                                },
-                              }}
-                            >
-                              <Image src="/icon/delete2.png" alt="delete icon" width="20" height="20" />
-                            </Button>
-                            {openDeleteModal && (
-                              <DeleteModal
-                                examId={exam.id}
-                                open={openDeleteModal}
-                                onClose={() => setOpenDeleteModal(false)}
-                                onDeleteSuccess={handleDeleteSuccess}
-                              />
-                              
-                            )}
-                          </ListItemIcon>
-                        )}
-                        <Snackbar
-                          open={openDeleteSnackbar}
-                          autoHideDuration={3000}
-                          onClose={() => setOpenDeleteSnackbar(false)}
-                          message="過去問削除が完了しました"
-                          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                        <ListItemText
+                          primary={exam.lectureName}
+                          sx={{ flexBasis: "6vw" }}
+                          primaryTypographyProps={{
+                            sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                          }}
                         />
+                        <ListItemText
+                          primary={exam.departmentName}
+                          sx={{ flexBasis: "8vw" }}
+                          primaryTypographyProps={{
+                            sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                          }}
+                        />
+                        <ListItemText
+                          primary={exam.professor}
+                          sx={{ flexBasis: "8vw" }}
+                          primaryTypographyProps={{
+                            sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                          }}
+                        />
+                        <ListItemText
+                          primary={exam.year}
+                          sx={{ flexBasis: "6vw" }}
+                          primaryTypographyProps={{
+                            sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                          }}
+                        />
+                      </Button>
 
-                        {/* リンク付きのリスト内容 */}
-                        <Link
-                          href={`/exam/${exam.id}`}
-                          passHref
-                          style={{
-                            color: "inherit",
-                            textDecoration: "none",
-                            flexGrow: 1,
+                      {/* メニュー */}
+                      <Popover
+                        open={Boolean(anchorEl) && menuExamId === exam.id}
+                        anchorEl={anchorEl}
+                        onClose={handleCloseMenu}
+                        anchorOrigin={{
+                          vertical: "top",
+                          horizontal: "center",
+                        }}
+                        transformOrigin={{
+                          vertical: "bottom",
+                          horizontal: "center",
+                        }}
+                        PaperProps={{
+                          sx: {
+                            padding: "8px",
                             display: "flex",
-                          }}
-                        >
-                          <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                              width: "95%",
-                              borderRadius: 0,
-                              color: "black",
-                              backgroundColor: "#fff",
-                              boxShadow: 0,
-                              "&:hover": {
-                                color: "#fff",
-                                backgroundColor: "#383f6a",
-                              },
-                            }}
-                          >
-                            <ListItemText
-                              primary={exam.lectureName}
-                              sx={{ flexBasis: "6vw" }}
-                              primaryTypographyProps={{
-                                sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
-                              }}
-                            />
-                            <ListItemText
-                              primary={exam.departmentName}
-                              sx={{ flexBasis: "8vw" }}
-                              primaryTypographyProps={{
-                                sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
-                              }}
-                            />
-                            <ListItemText
-                              primary={exam.professor}
-                              sx={{ flexBasis: "8vw" }}
-                              primaryTypographyProps={{
-                                sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
-                              }}
-                            />
-                            <ListItemText
-                              primary={exam.year}
-                              sx={{ flexBasis: "6vw" }}
-                              primaryTypographyProps={{
-                                sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
-                              }}
-                            />
-                          </Button>
-                        </Link>
-                        <Divider
-                          sx={{
-                            width: "90%",
-                            position: "absolute",
-                            bottom: 0,
-                            backgroundColor: "#ddd",
-                          }}
-                        />
-                      </ListItem>
-                    </Fade>
-                  ))}
-                </List>
-              ) : (
-                <ListItem>
-                  <ListItemText primary="投稿した過去問はまだありません。" />
-                </ListItem>
-              )}
-            </List>
+                            alignItems: "center",
+                            borderRadius: "12px",
+                            backgroundColor: "#fff",
+                            boxShadow: "0px 3px 6px rgba(0,0,0,0.1)",
+                          },
+                        }}
+                      >
+                        <IconButton onClick={handleDetail} sx={{ margin: "0 8px" }}>
+                          <Image src="/icon/post2.png" alt="detail icon" width="24" height="24" />
+                        </IconButton>
+                        <IconButton onClick={handleEdit} sx={{ margin: "0 8px" }}>
+                          <Image src="/icon/pen2.png" alt="edit icon" width="24" height="24" />
+                        </IconButton>
+                        <IconButton onClick={handleDelete} sx={{ margin: "0 8px" }}>
+                          <Image src="/icon/delete2.png" alt="delete icon" width="24" height="24" />
+                        </IconButton>
+                      </Popover>
+
+                      <Divider
+                        sx={{
+                          width: "90%",
+                          position: "absolute",
+                          bottom: 0,
+                          backgroundColor: "#ddd",
+                        }}
+                      />
+                    </ListItem>
+                  </Fade>
+                ))}
+              </List>
+            ) : (
+              <ListItem>
+                <ListItemText primary="投稿した過去問はまだありません。" />
+              </ListItem>
+            )}
+          </List>
         </CardContent>
       </Box>
+      {/* 削除モーダル */}
+      {openDeleteModal && selectedExamId && (
+        <DeleteModal
+          examId={selectedExamId}
+          open={openDeleteModal}
+          onClose={() => setOpenDeleteModal(false)}
+          onDeleteSuccess={handleDeleteSuccess}
+        />
+      )}
+      {/* 削除スナックバー */}
+      <Snackbar
+        open={openDeleteSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setOpenDeleteSnackbar(false)}
+        message="過去問削除が完了しました"
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
       <div
         style={{
           width: "4vw",
