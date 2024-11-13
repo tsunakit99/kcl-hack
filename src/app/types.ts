@@ -67,7 +67,10 @@ export interface ExamData {
   id: string;
   lecture: { name: string };
   department: { name: string };
-  tag: { name: string };
+  tag: {
+    id: string;
+    name: string;   
+  };
   year: number;
   professor?: string;
   pdfUrl: string;
