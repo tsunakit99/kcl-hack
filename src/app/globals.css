@@ -85,6 +85,12 @@ body {
   }
 }
 
+.book-icon {
+  &:hover {
+    background-color: #959ab7;
+  }
+}
+
 /* アイコンとテキストの初期スタイル */
 .button-content img {
   position: absolute;

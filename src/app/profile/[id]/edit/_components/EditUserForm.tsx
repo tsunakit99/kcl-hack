@@ -120,13 +120,7 @@ const EditUserForm = ({
         }}
       >
         {resError && (
-          <Alert severity="error">
-            {Object.values(resError)
-              .flat()
-              .map((error, index) => (
-                <p key={index}>{error}</p>
-              ))}
-          </Alert>
+          <Alert severity="error">{resError}</Alert>
         )}
           {imagePreview ? (
             <Box
