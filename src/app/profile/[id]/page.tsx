@@ -438,6 +438,31 @@ const UserProfile = ({ params }: UserProfileProps) => {
                           paddingY: 1,
                         }}
                       >
+                        {/* 編集ボタンのアイコンを条件付きで表示 */}
+                        {session?.user.id === user?.id && (
+                          <ListItemIcon
+                            sx={{
+                              minWidth: "20px",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Button
+                              onClick={() => router.push('/exam/${id}/edit')} // 編集ページへ遷移
+                              sx={{
+                                minWidth: "20px",
+                                minHeight: "20px",
+                                backgroundColor: "transparent",
+                                "&:hover": {
+                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                },
+                              }}
+                            >
+                              <Image src="/icon/pen2.png" alt="delete icon" width="20" height="20" />
+                            </Button>
+                          </ListItemIcon>
+                        )}
                         {/* 削除ボタンのアイコンを条件付きで表示 */}
                         {session?.user.id === user?.id && (
                           <ListItemIcon
@@ -459,7 +484,7 @@ const UserProfile = ({ params }: UserProfileProps) => {
                                 },
                               }}
                             >
-                              <Image src="/icon/delete.png" alt="delete icon" width="20" height="20" />
+                              <Image src="/icon/delete2.png" alt="delete icon" width="20" height="20" />
                             </Button>
                             {openDeleteModal && (
                               <DeleteModal
