@@ -1,6 +1,12 @@
 "use client";
 
-import { Box, CircularProgress, Container, Divider, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Divider,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import UploadExamForm from "./_components/UploadExamForm";
@@ -140,7 +146,7 @@ const UploadExam = () => {
         <Container
           sx={{
             width: "50vw",
-            height: "100%",
+            height: "98%",
             borderRadius: "16px",
             boxShadow: 0,
             backgroundColor: "rgba(0,0,0,0)",

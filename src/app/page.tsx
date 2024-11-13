@@ -18,7 +18,7 @@ import {
   Snackbar,
   TextField,
   Typography,
-  useMediaQuery
+  useMediaQuery,
 } from "@mui/material";
 import Select from "@mui/material/Select";
 import { alpha, styled } from "@mui/material/styles";
@@ -27,7 +27,11 @@ import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getExams, searchExams } from "./actions"; // デフォルトの過去問データを取得する関数
 import ScrollButton from "./components/ScrollButton";
-import { getDepartments, getLectureNames, getTags } from "./exam/upload/actions";
+import {
+  getDepartments,
+  getLectureNames,
+  getTags,
+} from "./exam/upload/actions";
 import { Department, ExamData, ExamSearchData, Tag } from "./types";
 // import { searchExams } from "./actions"; // 検索クエリに基づいたデータを取得する関数
 
@@ -73,7 +77,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const SearchButton = styled(Button)(({ }) => ({
+const SearchButton = styled(Button)(({}) => ({
   position: "absolute",
   right: "2%",
   top: "50%",
@@ -94,7 +98,6 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 }
 
 export default function Home() {
-
   const [departments, setDepartments] = useState<Department[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [lectureName, setLectureName] = useState("");
@@ -107,12 +110,13 @@ export default function Home() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [updateFlag, setUpdateFlag] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  
-  const { control,
+
+  const {
+    control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<ExamSearchData>({
-    mode: 'onTouched',
+    mode: "onTouched",
     resolver: zodResolver(examSearchSchema),
   });
 
@@ -122,14 +126,14 @@ export default function Home() {
       const examData = await searchExams(data);
       setExams(examData);
       setIsToggled(false); // 検索結果画面に切り替える
-  } catch (error: unknown) {
-    console.error('検索エラー:', error);
-  }
-};
+    } catch (error: unknown) {
+      console.error("検索エラー:", error);
+    }
+  };
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
-  const totalPages = Math.ceil(exams.length / 6);
+  const totalPages = Math.ceil(exams.length / 4);
 
   const scroll = (direction: number) => {
     if (scrollRef.current) {
@@ -166,51 +170,51 @@ export default function Home() {
     }
   }, []);
 
-    useEffect(() => {
-      const loadDepartments = async () => {
-        const data = await getDepartments();
-        setDepartments(data);
-      };
-      loadDepartments();
-    }, []);
-  
   useEffect(() => {
-      const loadTags = async () => {
-        const data = await getTags();
-        setTags(data);
-      };
-      loadTags();
-    }, []);
-
-    useEffect(() => {
-      const fetchLectureNames = async () => {
-        if (lectureName.length > 0) {
-          const data = await getLectureNames(lectureName);
-          setLectureOptions(data);
-        }
-      };
-      fetchLectureNames();
-    }, [lectureName]);
-
-    useEffect(() => {
-      const fetchExams = async () => {
-        setIsLoading(true);
-        try {
-          const examData = await getExams();
-          setExams(examData);
-          setOpenSnackbar(true);
-        } catch (error: unknown) {
-          console.error("データの取得に失敗しました:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchExams();
-    }, [updateFlag]);
-
-    const handleUpdate = () => {
-      setUpdateFlag((prevFlag) => !prevFlag); // フラグをトグル
+    const loadDepartments = async () => {
+      const data = await getDepartments();
+      setDepartments(data);
     };
+    loadDepartments();
+  }, []);
+
+  useEffect(() => {
+    const loadTags = async () => {
+      const data = await getTags();
+      setTags(data);
+    };
+    loadTags();
+  }, []);
+
+  useEffect(() => {
+    const fetchLectureNames = async () => {
+      if (lectureName.length > 0) {
+        const data = await getLectureNames(lectureName);
+        setLectureOptions(data);
+      }
+    };
+    fetchLectureNames();
+  }, [lectureName]);
+
+  useEffect(() => {
+    const fetchExams = async () => {
+      setIsLoading(true);
+      try {
+        const examData = await getExams();
+        setExams(examData);
+        setOpenSnackbar(true);
+      } catch (error: unknown) {
+        console.error("データの取得に失敗しました:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchExams();
+  }, [updateFlag]);
+
+  const handleUpdate = () => {
+    setUpdateFlag((prevFlag) => !prevFlag); // フラグをトグル
+  };
 
   return (
     <>
@@ -232,12 +236,12 @@ export default function Home() {
           autoHideDuration={3000}
           onClose={() => setOpenSnackbar(false)}
           message="直近の過去問一覧を更新しました"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         />
         <div
           style={{
             display: "flex",
-            height: "95%",
+            height: "96%",
             margin: "2% 0 2% 2%",
             gap: "4vw", // 間隔を調整
           }}
@@ -246,7 +250,7 @@ export default function Home() {
             <Box
               sx={{
                 width: "45vw",
-                marginLeft: "10vw",
+                marginLeft: "6vw",
                 flexDirection: "column",
                 zIndex: 999,
                 overflowY: "auto",
@@ -266,88 +270,177 @@ export default function Home() {
                 sx={{
                   position: "relative",
                   top: "0px",
-                  left: "0px",
+                  left: "5px",
+                  width: "30px",
                   backgroundColor: "#444f7c",
                   color: "#fff",
+                  mb: 1,
                   "&:hover": {
                     backgroundColor: "#383f6a",
                   },
+                  "@media(max-width: 1000px)": {
+                    width: "24px",
+                  },
                 }}
               >
-                {isLoading ? <CircularProgress size={24} color="inherit" /> : "↺"}
-          
+                {isLoading ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  "↺"
+                )}
               </Button>
               <Divider
                 textAlign="center"
                 sx={{
-                  marginBottom: "20px",
+                  width: "94%",
+                  marginBottom: "2px",
                   marginTop: "-15px",
-                  padding: "12px 0",
+                  padding: "14px 0",
                 }}
               >
                 直近に投稿された過去問一覧
               </Divider>
+              <Typography
+                component="div"
+                sx={{
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  textAlign: "center",
+                  mb: 3,
+                  padding: "3px",
+                }}
+              >
+                過去問をpdf表示・保存したい場合はカードを、
+                <br />
+                詳細を確認したい場合は本のアイコンをクリックしてください。
+              </Typography>
               <Box
                 sx={{
                   display: "flex",
                   flexWrap: "wrap",
-                  gap: 4,
+                  gap: 1,
                 }}
               >
                 {exams.map((exam) => (
                   <Box
                     key={exam.id}
                     sx={{
-                      flexBasis: "calc(40% - 4px)", // 2列レイアウト
-                      minWidth: "220px", // カードの最小幅を設定
+                      flexBasis: "40%", // 2列レイアウト
+                      minWidth: "260px", // カードの最小幅を設定
+                      marginLeft: "1vw",
                     }}
                   >
-                    <Link href={`/exam/${exam.id}`} style={{ textDecoration: "none" }}>
+                    <Link
+                      href={`/exam/${exam.id}`}
+                      style={{ textDecoration: "none" }}
+                    >
                       <Card
                         sx={{
-                          height: "25vh",
+                          height: "180px",
                           backgroundColor: "#ffffff",
                           boxShadow: 3,
                           display: "flex",
+                          position: "relative",
+                          mb: 1,
+                          transition: "box-shadow 0.3s ease", // 影のトランジションを追加
+                          "&:hover": {
+                            boxShadow: 8, // ホバー時の影
+                          },
                         }}
                       >
-                        <Box
-                          component="img"
-                          src="/icon/book.png"
-                          alt="book"
-                          sx={{
-                            position: "relative",
-                            top: "15%", // カード内で位置調整
-                            width: "30%", // 相対的にサイズを設定
-                            height: "auto", // アスペクト比を保つ
-                            objectFit: "contain", // 画像がコンテナに収まるようにする
-                          }}
-                        />
-                        <CardContent>
-                          <Typography variant="h6" component="div">
+                        <Box sx={{ display: "flex", flexDirection: "column" }}>
+                          <Typography
+                            component="div"
+                            sx={{
+                              padding: "15px",
+                              fontSize: "18px",
+                              fontWeight: 500,
+                            }}
+                          >
                             {exam.lecture.name} ({exam.year})
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            学科: {exam.department.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            教授名: {exam.professor || "不明"}
-                          </Typography>
-                          <Box sx={{
-                            padding: "3px",
-                            width: "50%",
-                          position: "relative",
-                          bottom: "-10px",
-                            right: "0px",
-                            border: "medium solid gray",
-                            borderRadius: "10px",
-                          background: "linear-gradient(45deg, #c0d7d2, #33d4e2)",
-                        }}>
-                          <Typography variant="body2" textAlign={"center"} color="text.primary">
-                          {exam.tag.name || "不明"}
-                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              position: "absolute", // 親要素(Card)の相対位置に基づく
+                              bottom: 0,
+                            }}
+                          >
+                            <Link
+                              href={`/exam/${exam.id}`}
+                              style={{
+                                textDecoration: "none",
+                                width: "30%",
+                                height: "auto",
+                              }}
+                            >
+                              <Image
+                                className="book-icon"
+                                src="/icon/book.png"
+                                alt="book"
+                                width={500}
+                                height={500}
+                                style={{
+                                  position: "relative",
+                                  top: "10%", // カード内で位置調整
+                                  width: "100%", // 相対的にサイズを設定
+                                  height: "auto", // アスペクト比を保つ
+                                  borderRadius: 3,
+                                  objectFit: "contain", // 画像がコンテナに収まるようにする
+                                }}
+                              />
+                              <Typography
+                                sx={{
+                                  position: "relative",
+                                  top: "-20px",
+                                  left: "30px",
+                                  width: "30px",
+                                  color: "#fff",
+                                  fontSize: "8px",
+                                  fontWeight: 500,
+                                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)", // 軽い影をつける
+                                }}
+                              >
+                                詳細へ
+                              </Typography>
+                            </Link>
+                            <CardContent>
+                              <Typography
+                                color="text.secondary"
+                                sx={{ fontSize: "12px" }}
+                              >
+                                学科: {exam.department.name}
+                              </Typography>
+                              <Typography
+                                color="text.secondary"
+                                sx={{ fontSize: "12px" }}
+                              >
+                                教授名: {exam.professor || "不明"}
+                              </Typography>
+                              <Box
+                                sx={{
+                                  padding: "3px",
+                                  width: "50%",
+                                  position: "relative",
+                                  bottom: "-10px",
+                                  right: "0px",
+                                  border: "medium solid gray",
+                                  borderRadius: "10px",
+                                  background:
+                                    "linear-gradient(45deg, #c0d7d2, #33d4e2)",
+                                }}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  textAlign={"center"}
+                                  color="text.primary"
+                                >
+                                  {exam.tag.name || "不明"}
+                                </Typography>
+                              </Box>
+                            </CardContent>
+                          </Box>
                         </Box>
-                        </CardContent>
                       </Card>
                     </Link>
                   </Box>
@@ -357,10 +450,10 @@ export default function Home() {
           ) : (
             <Box
               sx={{
-                width: "50vw",
-                marginLeft: "5vw",
+                width: "45vw",
+                marginLeft: "6vw",
                 overflow: "hidden",
-                padding: 2,
+                padding: 1,
                 borderRadius: 2,
                 flexDirection: "column",
                 zIndex: 999,
@@ -370,20 +463,21 @@ export default function Home() {
                 textAlign="center"
                 sx={{
                   marginBottom: "20px",
-                  marginTop: "-15px",
+                  marginTop: "-10px",
                 }}
               >
                 検索結果　{exams.length}件
               </Divider>
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: "2vw" }}>
-                {/* 左スクロールボタン */}
-                <ScrollButton
-                  text="←"
-                  scroll={() => scroll(-1)}
-                  color="#444f7c"
-                  hoverColor="#5a6aa1"
-                />
+              <Box sx={{ display: "flex", alignItems: "center", gap: "0.5vw" }}>
+                {totalPages > 1 && (
+                  <ScrollButton
+                    text="←"
+                    scroll={() => scroll(-1)}
+                    color="#444f7c"
+                    hoverColor="#5a6aa1"
+                  />
+                )}
 
                 {/* 横スクロール可能なコンテナ */}
                 <Box
@@ -397,7 +491,7 @@ export default function Home() {
                   }}
                 >
                   {/* examsを6件ごとのチャンクに分割して表示 */}
-                  {chunkArray(exams, 6).map((examChunk, index) => (
+                  {chunkArray(exams, 4).map((examChunk, index) => (
                     <Box
                       key={index}
                       sx={{
@@ -416,55 +510,107 @@ export default function Home() {
                           <Box
                             key={exam.id}
                             sx={{
-                              minWidth: "220px",
+                              minWidth: "230px",
                             }}
                           >
-                            <Link href={`/exam/${exam.id}`} style={{ textDecoration: "none" }}>
+                            <Link
+                              href={`/exam/${exam.id}`}
+                              style={{ textDecoration: "none" }}
+                            >
                               <Card
                                 sx={{
-                                  height: "25vh",
+                                  height: "180px",
                                   backgroundColor: "#ffffff",
                                   boxShadow: 3,
                                   display: "flex",
+                                  position: "relative",
+                                  transition: "box-shadow 0.3s ease", // 影のトランジションを追加
+                                  "&:hover": {
+                                    boxShadow: 8, // ホバー時の影
+                                  },
                                 }}
                               >
                                 <Box
-                                  component="img"
-                                  src="/icon/book.png"
-                                  alt="book"
                                   sx={{
-                                    position: "relative",
-                                    top: "15%",
-                                    width: "30%",
-                                    height: "auto",
-                                    objectFit: "contain",
+                                    display: "flex",
+                                    flexDirection: "column",
                                   }}
-                                />
-                                <CardContent>
-                                  <Typography variant="h6" component="div">
+                                >
+                                  <Typography
+                                    component="div"
+                                    sx={{
+                                      padding: "15px",
+                                      fontSize: "16px",
+                                      fontWeight: 500,
+                                    }}
+                                  >
                                     {exam.lecture.name} ({exam.year})
                                   </Typography>
-                                  <Typography variant="body2" color="text.secondary">
-                                    学科: {exam.department.name}
-                                  </Typography>
-                                  <Typography variant="body2" color="text.secondary">
-                                    教授名: {exam.professor || "不明"}
-                                  </Typography>
-                                  <Box sx={{
-                            padding: "3px",
-                            width: "50%",
-                          position: "relative",
-                          bottom: "-10px",
-                            right: "0px",
-                            border: "medium solid gray",
-                            borderRadius: "10px",
-                          background: "linear-gradient(45deg, #c0d7d2, #33d4e2)",
-                        }}>
-                          <Typography variant="body2" textAlign={"center"} color="text.primary">
-                          {exam.tag.name || "不明"}
-                          </Typography>
-                        </Box>
-                                </CardContent>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      position: "absolute", // 親要素(Card)の相対位置に基づく
+                                      bottom: 0,
+                                    }}
+                                  >
+                                    <Link
+                                      href={`/exam/${exam.id}`}
+                                      style={{
+                                        textDecoration: "none",
+                                        width: "30%",
+                                        height: "auto",
+                                      }}
+                                    >
+                                      <Box
+                                        component="img"
+                                        src="/icon/book.png"
+                                        alt="book"
+                                        sx={{
+                                          position: "relative",
+                                          top: "10%", // カード内で位置調整
+                                          width: "100%", // 相対的にサイズを設定
+                                          height: "auto", // アスペクト比を保つ
+                                          objectFit: "contain", // 画像がコンテナに収まるようにする
+                                        }}
+                                      />
+                                    </Link>
+                                    <CardContent>
+                                      <Typography
+                                        color="text.secondary"
+                                        sx={{ fontSize: "11px" }}
+                                      >
+                                        学科: {exam.department.name}
+                                      </Typography>
+                                      <Typography
+                                        color="text.secondary"
+                                        sx={{ fontSize: "11px" }}
+                                      >
+                                        教授名: {exam.professor || "不明"}
+                                      </Typography>
+                                      <Box
+                                        sx={{
+                                          padding: "3px",
+                                          width: "50%",
+                                          position: "relative",
+                                          bottom: "-10px",
+                                          right: "0px",
+                                          border: "medium solid gray",
+                                          borderRadius: "10px",
+                                          background:
+                                            "linear-gradient(45deg, #c0d7d2, #33d4e2)",
+                                        }}
+                                      >
+                                        <Typography
+                                          textAlign={"center"}
+                                          color="text.primary"
+                                          sx={{ fontSize: "11px" }}
+                                        >
+                                          {exam.tag.name || "不明"}
+                                        </Typography>
+                                      </Box>
+                                    </CardContent>
+                                  </Box>
+                                </Box>
                               </Card>
                             </Link>
                           </Box>
@@ -474,17 +620,18 @@ export default function Home() {
                   ))}
                 </Box>
 
-                {/* 右スクロールボタン */}
-                <ScrollButton
-                  text="→"
-                  scroll={() => scroll(1)}
-                  color="#444f7c"
-                  hoverColor="#5a6aa1"
-                />
+                {totalPages > 1 && (
+                  <ScrollButton
+                    text="→"
+                    scroll={() => scroll(1)}
+                    color="#444f7c"
+                    hoverColor="#5a6aa1"
+                  />
+                )}
               </Box>
 
               {/* ページ番号の表示 */}
-              <Typography textAlign="center" sx={{ marginTop: "10px" }}>
+              <Typography textAlign="center" sx={{ marginTop: "20px" }}>
                 ページ {currentPage} / {totalPages}
               </Typography>
 
@@ -662,7 +809,10 @@ export default function Home() {
                         />
                       )}
                     />
-                    <SearchButton variant="contained" onClick={handleSubmit(handleSearch)}>
+                    <SearchButton
+                      variant="contained"
+                      onClick={handleSubmit(handleSearch)}
+                    >
                       検索
                     </SearchButton>
                   </Search>
@@ -845,9 +995,9 @@ export default function Home() {
                     sx={{
                       color: "#ffffff",
                       fontWeight: 450,
-                      fontSize: "20px",
+                      fontSize: "18px",
                       "@media(max-width: 1200px)": {
-                        fontSize: "16px",
+                        fontSize: "14px",
                       },
                     }}
                   >
@@ -1042,7 +1192,8 @@ export default function Home() {
                       marginLeft: "2vw",
                       marginRight: "2vw",
                     },
-                  }}>
+                  }}
+                >
                   <Controller
                     name="professor"
                     control={control}
@@ -1093,4 +1244,4 @@ export default function Home() {
       </Box>
     </>
   );
-};
+}
