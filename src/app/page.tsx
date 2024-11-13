@@ -180,7 +180,30 @@ export default function Home() {
         setTags(data);
       };
       loadTags();
-    }, []);
+  }, []);
+  
+  const tagColor = (id: string): string => {
+    switch (id) {
+      case 'cm3ft8mgr0060om2bhdfe4i9s':
+        return '#ff9e9e';
+      case 'cm3ft8mh10061om2bpl65w3kk':
+        return '#ff9ece';
+      case 'cm3ft8mh80062om2b5vbhoq1l':
+        return '#9e9eff';
+      case 'cm3ft8mhf0063om2buwr330u9':
+        return '#9eceff';
+      case 'cm3ft8mhk0064om2b2mhj36zm':
+        return '#9eff9e';
+      case 'cm3ft8mht0065om2buqo1a5qw':
+        return '#ceff9e'
+      case 'cm3ft8mi10066om2bbtcnvtic':
+        return '#ffff9e'
+      case 'cm3ft8mi90067om2bkqkgk6o6':
+        return '#e6e6e6';
+      default:
+        return '#e6e6e6';  // デフォルトの色
+    }
+  };
 
     useEffect(() => {
       const fetchLectureNames = async () => {
@@ -336,18 +359,18 @@ export default function Home() {
                           <Box sx={{
                             padding: "3px",
                             width: "50%",
-                          position: "relative",
-                          bottom: "-10px",
+                            position: "relative",
+                            bottom: "-10px",
                             right: "0px",
                             border: "medium solid gray",
                             borderRadius: "10px",
-                          background: "linear-gradient(45deg, #c0d7d2, #33d4e2)",
-                        }}>
+                            background: tagColor(exam.tag.id) || "#FFFFFF"
+                            }}>
                           <Typography variant="body2" textAlign={"center"} color="text.primary">
                           {exam.tag.name || "不明"}
                           </Typography>
                         </Box>
-                        </CardContent>
+                       </CardContent>
                       </Card>
                     </Link>
                   </Box>
@@ -458,7 +481,7 @@ export default function Home() {
                             right: "0px",
                             border: "medium solid gray",
                             borderRadius: "10px",
-                          background: "linear-gradient(45deg, #c0d7d2, #33d4e2)",
+                          background: tagColor(exam.tag.id) || "#FFFFFF",
                         }}>
                           <Typography variant="body2" textAlign={"center"} color="text.primary">
                           {exam.tag.name || "不明"}
