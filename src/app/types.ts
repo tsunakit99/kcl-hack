@@ -1,5 +1,3 @@
-import { stringify } from "querystring";
-
 // サインアップフォームの型定義
 export interface SignupFormData {
     name: string;
@@ -31,6 +29,26 @@ export interface UploadExamFormData {
   professor?: string;
   file: File[];
 }
+
+export interface EditExamFormData {
+  lectureName: string;
+  departmentId: string;
+  tagId: string;
+  year: number;
+  professor?: string;
+  file: File[];
+}
+
+export interface UpdateExamData {
+  lectureId: string;
+  departmentId: string;
+  tagId: string;
+  year: number;
+  professor?: string;
+  fileUrl?: string;
+  originalFileName?: string;
+}
+
 
 // 自身が投稿した過去問の表示の型定義
 export interface ExamByIdData{
@@ -65,15 +83,19 @@ export interface UserData {
 // Examデータの型定義
 export interface ExamData {
   id: string;
+  lectureName: string;
   lecture: { name: string };
+  departmentId: string;
   department: { name: string };
   tag: {
     id: string;
     name: string;   
   };
+  tagId: string;
   year: number;
   professor?: string;
-  pdfUrl: string;
+  originalFileName: string;
+  fileUrl: string;
 }
 
 export interface ExamSearchData {

@@ -10,6 +10,7 @@ interface CircleIconProps {
   alt?: string; // 画像の代替テキスト
   text?: string; // 表示するテキスト
   linkUrl?: string; // 遷移先のURL
+  fontSize: string;
 }
 
 const CircleIcon: React.FC<CircleIconProps> = ({
@@ -17,6 +18,7 @@ const CircleIcon: React.FC<CircleIconProps> = ({
   alt = "icon",
   text = "",
   linkUrl = "", // URLのデフォルトを空文字に設定
+  fontSize = "12px",
 }) => {
   const router = useRouter();
 
@@ -36,14 +38,14 @@ const CircleIcon: React.FC<CircleIconProps> = ({
         gap: 1, // アイコンとテキストの間の隙間
         width: "100%", // Boxの幅を100%に設定
         marginTop: 2,
-        cursor: "pointer"
+        cursor: "pointer",
       }}
       onClick={handleClick} // クリックイベントを追加
     >
       <Box
         sx={{
-          width: "4vw", // アイコンの幅
-          height: "4vw", // アイコンの高さ
+          width: "3.5vw", // アイコンの幅
+          height: "3.5vw", // アイコンの高さ
           borderRadius: "50%", // 円形にするためのスタイル
           overflow: "hidden", // 円形の枠から画像がはみ出ないようにする
           display: "flex", // 中央揃えに必要
@@ -61,25 +63,23 @@ const CircleIcon: React.FC<CircleIconProps> = ({
         <Image
           src={src}
           alt={alt}
-          width={500}  // 必須のwidthを指定 (任意の値)
+          width={500} // 必須のwidthを指定 (任意の値)
           height={500} // 必須のheightを指定 (任意の値)
           style={{
-            width: "50%",    // スタイルとして幅を50%に
-            height: "50%",   // スタイルとして高さを50%に
+            width: "50%", // スタイルとして幅を50%に
+            height: "50%", // スタイルとして高さを50%に
             objectFit: "cover",
           }}
         />
       </Box>
       {text && (
         <Typography
-          variant="body2"
           sx={{
             textAlign: "center", // テキストを中央揃え
             marginTop: 1, // テキストとアイコンの間にマージンを設定
-            marginBottom: 2,
             color: "#c0d7d2",
             fontWeight: 550,
-            fontSize: "15px",
+            fontSize: { fontSize },
           }}
         >
           {text}
