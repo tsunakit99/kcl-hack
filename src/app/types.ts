@@ -91,9 +91,9 @@ export interface ExamData {
     id: string;
     name: string;   
   };
-  tagId: string;
   year: number;
   professor?: string;
+  uploader: { id: string, name: string };
   originalFileName: string;
   fileUrl: string;
 }

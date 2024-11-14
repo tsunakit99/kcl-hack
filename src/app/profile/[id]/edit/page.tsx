@@ -1,6 +1,7 @@
 "use client";
+import ErrorMessage from "@/app/components/ErrorMessage";
 import { UserData } from "@/app/types";
-import { Box, Card, CardContent, Divider, Typography } from "@mui/material";
+import { Box, Card, CardContent, CircularProgress, Divider, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { getUserById } from "../actions";
@@ -14,22 +15,48 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
   const { data: session } = useSession();
   const { id } = params;
   const [user, setUser] = useState<UserData>();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
       const result = await getUserById(id);
       setUser(result);
+      setIsLoading(false);
     };
     fetchUserData();
   }, []);
 
-  if (!user) {
-    return <Typography textAlign={"center"}>ユーザーが見つかりません。</Typography>;
-  }
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+    }
 
-  if (user.id !== session?.user.id) {
-    return <Typography textAlign={"center"}>このページにアクセスする権限がありません。</Typography>;
-  }
+  if (!user) {
+  return (
+    <ErrorMessage
+      title="ユーザーが見つかりません。"
+      description="お探しのユーザーが存在しないか、既に削除されています。"
+    />
+  );
+}
+
+// アクセス権がない場合のエラーメッセージ
+if (user.id !== session?.user.id) {
+  return (
+    <ErrorMessage
+      title="アクセス権限がありません。"
+      description="このページにアクセスする権限がありません。"
+    />
+  );
+}
 
   return (
     <Box
