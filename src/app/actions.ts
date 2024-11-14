@@ -1,7 +1,7 @@
 import { ExamSearchData } from "./types";
 
 export const getExams = async () => {
-    const res = await fetch('/api/exams/list', {
+    const res = await fetch('/api/exams', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
     });

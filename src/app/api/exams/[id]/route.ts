@@ -5,10 +5,13 @@ import { UpdateExamData } from '@/app/types';
 import { validationUploadExamSchema } from "@/validationSchema";
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+
+  const currentUserId = await getCurrentUserId();
+   if (!currentUserId) {
+     return new NextResponse(JSON.stringify({ message: '認証が必要です' }), { status: 401 });
+  }
+  
   const { id } = params;
 
   try {
@@ -50,7 +53,7 @@ export async function GET(
     console.error('試験の取得に失敗しました：', error);
     return new NextResponse(JSON.stringify({ message: '試験の取得に失敗しました。' }), { status: 500 });
   }
-}
+};
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
