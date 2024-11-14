@@ -546,13 +546,14 @@ export default function Home() {
                     "&::-webkit-scrollbar": { display: "none" },
                   }}
                 >
-                  {/* examsを6件ごとのチャンクに分割して表示 */}
+                  {/* examsを4件ごとのチャンクに分割して表示 */}
                   {chunkArray(exams, 4).map((examChunk, index) => (
                     <Box
                       key={index}
                       sx={{
                         flex: "none",
-                        width: "100%",
+                        width: "480px",
+                        mr: "5px",
                       }}
                     >
                       <Box
@@ -641,7 +642,8 @@ export default function Home() {
                                           color: "#fff",
                                           fontSize: "8px",
                                           fontWeight: 500,
-                                          boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)", // 軽い影をつける
+                                          boxShadow:
+                                            "0px 2px 10px rgba(0, 0, 0, 0.2)", // 軽い影をつける
                                         }}
                                       >
                                         詳細へ
@@ -1316,4 +1318,4 @@ export default function Home() {
       </Box>
     </>
   );
-};
+}
