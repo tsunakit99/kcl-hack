@@ -18,6 +18,7 @@ export async function GET(
         uploader: true,
         lecture: true,
         department: true,
+        tag: true,
       },
     });
 

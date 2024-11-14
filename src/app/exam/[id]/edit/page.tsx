@@ -1,13 +1,9 @@
 "use client";
 
+import ErrorMessage from "@/app/components/ErrorMessage";
 import { ExamData } from "@/app/types";
-import {
-  Box,
-  CircularProgress,
-  Container,
-  Divider,
-  Typography,
-} from "@mui/material";
+import { Box, CircularProgress, Container, Divider, Typography } from "@mui/material";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getExamById } from "../actions";
@@ -18,10 +14,12 @@ interface EditExamPageProps {
 }
 
 const EditExamPage = ({ params }: EditExamPageProps) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const { id } = params;
-  const [exam, setExam] = useState<ExamData>();
-  const [isLoading, setIsLoading] = useState(true);
+    const [isVisible, setIsVisible] = useState(false);
+    const { id } = params;
+    const [exam, setExam] = useState<ExamData>();
+    const { data: session } = useSession();
+    const [isLoading, setIsLoading] = useState(true);
+    const [resError, setResError] = useState<string | null>(null);
 
   useEffect(() => {
     // 画面遷移後にフェードインを開始
@@ -32,27 +30,64 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
     return () => clearTimeout(timer); // クリーンアップ
   }, []);
 
-  useEffect(() => {
-    const fetchExamData = async () => {
-      const result = await getExamById(id);
-      setExam(result);
-      setIsLoading(false);
-    };
-    fetchExamData();
-  }, []);
+    useEffect(() => {
+        const fetchExamData = async () => {
+            try {
+                const result = await getExamById(id);
+                if (!result) {
+                    setResError("過去問が見つかりません。")
+                }
+                setExam(result);
+            } catch (err: unknown) {
+                console.error("試験情報の取得中にエラーが発生しました：", err);
+                setResError("過去問情報の取得中にエラーが発生しました。もう一度お試しください。");
+            } finally {
+                setIsLoading(false);
+            };
+        };
+        fetchExamData();
+    }, []);
 
-  if (isLoading) {
+    if (isLoading) {
+        return (
+            <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                minHeight="100vh"
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (resError) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
-        <CircularProgress />
-      </Box>
+      <ErrorMessage
+        title="エラー"
+        description={resError}
+      />
     );
   }
+    
+    if (!exam) {
+        return (
+            <ErrorMessage
+                title="過去問が見つかりません。"
+                description="お探しの過去問が存在しないか、既に削除されています。"
+            />
+        );
+    }
+    
+    // アクセス権がない場合のエラーメッセージ
+    if (exam.uploader.id !== session?.user.id) {
+        return (
+            <ErrorMessage
+                title="アクセス権限がありません。"
+                description="このページにアクセスする権限がありません。"
+            />
+        );
+    }
 
   if (!exam) {
     return <Typography textAlign={"center"}>試験が見つかりません。</Typography>;
@@ -194,7 +229,7 @@ const EditExamPage = ({ params }: EditExamPageProps) => {
             id={exam.id}
             beforeLectureName={exam.lecture.name}
             beforeDepartmentId={exam.departmentId}
-            beforeTagId={exam.tagId}
+            beforeTagId={exam.tag.id}
             beforeYear={exam.year}
             beforeProfessor={exam.professor || ""}
             originalFileName={exam.originalFileName}
