@@ -1,7 +1,15 @@
-import { Box, Button, Card, CardContent, Divider, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Stack,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
-import Link from 'next/link';
-import { getExamById, getImageById } from './actions';
+import Link from "next/link";
+import { getExamById, getImageById } from "./actions";
 
 interface ExamPageProps {
   params: { id: string };
@@ -12,7 +20,11 @@ const ExamPage = async ({ params }: ExamPageProps) => {
     const exam = await getExamById(params.id);
 
     if (!exam) {
-      return <Typography textAlign={'center'}>過去問情報が見つかりませんでした。もう一度お試しください。</Typography>
+      return (
+        <Typography textAlign={"center"}>
+          過去問情報が見つかりませんでした。もう一度お試しください。
+        </Typography>
+      );
     }
 
     const imageUrl = await getImageById(exam.uploaderId);
@@ -28,21 +40,43 @@ const ExamPage = async ({ params }: ExamPageProps) => {
           justifyContent: "center",
         }}
       >
-        <Card sx={{
-          width: "40%",
-          margin: 'auto',
-          borderRadius: 2,
-          overflowY: "auto",
-          mt: 5,
-          mb: 5,
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.7)",
-        }}>
-          <CardContent sx={{ textAlign: 'center', p: 4 }}>
-            <Box sx={{
-              display: "flex",
-              justifyContent: "space-between"
-            }}>
-              <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', textAlign: "left" }}>
+        <Card
+          sx={{
+            width: "40%",
+            height: "95vh",
+            margin: "auto",
+            borderRadius: 2,
+            overflowY: "auto",
+            mt: 5,
+            mb: 5,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.7)",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            scrollbarWidth: "none", // Firefox対応
+            "@media(max-width: 1300px)": {
+              width: "50%",
+            },
+          }}
+        >
+          <CardContent sx={{ textAlign: "center", p: 4 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                gutterBottom
+                sx={{
+                  fontSize: "40px",
+                  fontWeight: "bold",
+                  textAlign: "left",
+                  "@media(max-width: 1000px)": {
+                    fontSize: "20px",
+                  },
+                }}
+              >
                 過去問詳細
               </Typography>
               <Link
@@ -53,40 +87,67 @@ const ExamPage = async ({ params }: ExamPageProps) => {
                   textDecoration: "none",
                 }}
               >
-                <Box sx={{
-                  display: "flex",
-                  justifyContent: "right",
-                  alignItems: "center"
-                }}>
-                  <Typography sx={{ color: "gray" }}>投稿者:</Typography>
-                  <Box
+                <Box
                   sx={{
-                    width: "50px",
-                    height: "50px",
-                    borderRadius: "50%",
-                    overflow: "hidden",
-                    ml: 2,
-                    border: "2px solid #000",
+                    display: "flex",
+                    justifyContent: "right",
+                    alignItems: "center",
                   }}
                 >
-                  <Image src={imageUrl || "/icon/default-profile.png"}
-                    alt="プロフィール画像"
-                    width={500}
-                    height={500}
+                  <Typography
+                    sx={{
+                      color: "gray",
+                      fontSize: "18px",
+                      "@media(max-width: 1000px)": {
+                        fontSize: "10px",
+                      },
+                    }}
+                  >
+                    投稿者:
+                  </Typography>
+                  <Box
+                    sx={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      ml: 2,
+                      border: "2px solid #000",
+                      "@media(max-width: 1300px)": {
+                        width: "20px",
+                        height: "20px",
+                        ml: 1,
+                      },
+                    }}
+                  >
+                    <Image
+                      src={imageUrl || "/icon/default-profile.png"}
+                      alt="プロフィール画像"
+                      width={500}
+                      height={500}
                       style={{
                         width: "100%",
                         height: "100%",
-                      objectFit: "cover",
-                    }}
+                        objectFit: "cover",
+                      }}
                     />
-                    </Box>
-                  <Typography sx={{ fontSize: "20px" }}>{exam.uploader.name}</Typography>
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontSize: "20px",
+                      "@media(max-width: 1000px)": {
+                        fontSize: "10px",
+                      },
+                    }}
+                  >
+                    {exam.uploader.name}
+                  </Typography>
                 </Box>
               </Link>
             </Box>
             <Divider sx={{ my: 2 }} />
 
-            <Stack direction="column" spacing={3} sx={{ textAlign: 'left' }}>
+            <Stack direction="column" spacing={2} sx={{ textAlign: "left" }}>
               <Box>
                 <Typography variant="subtitle1" color="textSecondary">
                   講義名
@@ -119,12 +180,21 @@ const ExamPage = async ({ params }: ExamPageProps) => {
                   教授名
                 </Typography>
                 <Typography variant="h6" gutterBottom>
-                  {exam.professor || '不明'}
+                  {exam.professor || "不明"}
                 </Typography>
               </Box>
 
               <Link href={exam.fileUrl} passHref>
-                <Button variant="contained" color="primary" sx={{ mt: 2, fontWeight: 'bold' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    mt: 1,
+                    fontWeight: "bold",
+                    width: "80%",
+                    minWidth: "130px",
+                  }}
+                >
                   {exam.originalFileName}を閲覧
                 </Button>
               </Link>
@@ -134,8 +204,12 @@ const ExamPage = async ({ params }: ExamPageProps) => {
       </Box>
     );
   } catch (error) {
-    console.error('試験情報の取得中にエラーが発生しました：', error);
-    return <Typography textAlign={'center'}>過去問情報取得中にエラーが発生しました。もう一度お試しください。</Typography>
+    console.error("試験情報の取得中にエラーが発生しました：", error);
+    return (
+      <Typography textAlign={"center"}>
+        過去問情報取得中にエラーが発生しました。もう一度お試しください。
+      </Typography>
+    );
   }
 };
 
