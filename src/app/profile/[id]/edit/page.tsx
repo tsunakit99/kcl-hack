@@ -24,11 +24,17 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
   }, []);
 
   if (!user) {
-    return <Typography textAlign={"center"}>ユーザーが見つかりません。</Typography>;
+    return (
+      <Typography textAlign={"center"}>ユーザーが見つかりません。</Typography>
+    );
   }
 
   if (user.id !== session?.user.id) {
-    return <Typography textAlign={"center"}>このページにアクセスする権限がありません。</Typography>;
+    return (
+      <Typography textAlign={"center"}>
+        このページにアクセスする権限がありません。
+      </Typography>
+    );
   }
 
   return (
@@ -60,10 +66,21 @@ const EditUserPage = ({ params }: EditUserPageProps) => {
             alignItems: "center",
           }}
         >
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mt: 4, mb: 1 }}>
-              プロフィール編集
-            </Typography>
-            <Divider sx={{ width: "100%"}} />
+          <Typography
+            gutterBottom
+            sx={{
+              fontSize: "40px",
+              fontWeight: "bold",
+              mt: 4,
+              mb: 1,
+              "@media(max-width: 1000px)": {
+                fontSize: "25px",
+              },
+            }}
+          >
+            プロフィール編集
+          </Typography>
+          <Divider sx={{ width: "100%" }} />
           <EditUserForm
             id={user.id}
             currentName={user.name || ""}

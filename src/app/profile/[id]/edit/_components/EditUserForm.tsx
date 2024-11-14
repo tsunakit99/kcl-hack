@@ -13,7 +13,7 @@ import {
   MenuItem,
   Select,
   Stack,
-  TextField
+  TextField,
 } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -102,7 +102,7 @@ const EditUserForm = ({
       component="form"
       onSubmit={handleSubmit(handleEdit)}
       sx={{
-        maxWidth: "90%",
+        width: "80%",
         margin: "auto",
         mt: 5,
       }}
@@ -111,7 +111,7 @@ const EditUserForm = ({
       <Stack
         spacing={2}
         sx={{
-          width: "500px",
+          width: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -119,124 +119,126 @@ const EditUserForm = ({
           gap: 2,
         }}
       >
-        {resError && (
-          <Alert severity="error">{resError}</Alert>
-        )}
-          {imagePreview ? (
-            <Box
-              sx={{
-                width: 150,
-                height: 150,
-                borderRadius: "50%",
-                overflow: "hidden",
-                mt: 5,
+        {resError && <Alert severity="error">{resError}</Alert>}
+        {imagePreview ? (
+          <Box
+            sx={{
+              width: 150,
+              height: 150,
+              borderRadius: "50%",
+              overflow: "hidden",
+              mt: 5,
+              mb: 5,
+              border: "2px solid #000",
+              "@media(max-width: 1000px)": {
+                margin: "0 auto",
+                width: 75,
+                height: 75,
                 mb: 5,
-                border: "2px solid #000",
-                "@media(max-width: 1000px)": {
-                  margin: "0 auto",
-                  mb: 5,
-                },
-              }}
-            >
-              <Image
-                src={imagePreview}
-                alt="プロフィール画像プレビュー"
-                width={500}
-                height={500}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </Box>
+              },
+            }}
+          >
+            <Image
+              src={imagePreview}
+              alt="プロフィール画像プレビュー"
+              width={500}
+              height={500}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </Box>
         ) : (
-            <Box
-              sx={{
-                width: 150,
-                height: 150,
-                borderRadius: "50%",
-                overflow: "hidden",
-                mt: 5,
+          <Box
+            sx={{
+              width: 150,
+              height: 150,
+              borderRadius: "50%",
+              overflow: "hidden",
+              mt: 5,
+              mb: 5,
+              border: "2px solid #000",
+              "@media(max-width: 1000px)": {
+                margin: "0 auto",
+                width: 75,
+                height: 75,
                 mb: 5,
-                border: "2px solid #000",
-                "@media(max-width: 1000px)": {
-                  margin: "0 auto",
-                  mb: 5,
-                },
-              }}
-            >
-              <Image
-                src="/icon/default-profile.png"
-                alt="プロフィール画像プレビュー"
-                width={500}
-                height={500}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </Box>
-          )}
-          <Controller
-            control={control}
-            name="image"
-            defaultValue={undefined}
-            render={({ field }) => (
-              <input
-                type="file"
-                accept="image/jpeg"
-                onChange={(e) => {
-                  const file = e.target.files?.[0] || undefined;
-                  field.onChange(file);
+              },
+            }}
+          >
+            <Image
+              src="/icon/default-profile.png"
+              alt="プロフィール画像プレビュー"
+              width={500}
+              height={500}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </Box>
+        )}
+        <Controller
+          control={control}
+          name="image"
+          defaultValue={undefined}
+          render={({ field }) => (
+            <input
+              type="file"
+              accept="image/jpeg"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || undefined;
+                field.onChange(file);
 
-                  // 画像プレビューを更新
-                  if (file) {
-                    const previewUrl = URL.createObjectURL(file);
-                    setImagePreview(previewUrl);
-                  }
-                }}
-              />
+                // 画像プレビューを更新
+                if (file) {
+                  const previewUrl = URL.createObjectURL(file);
+                  setImagePreview(previewUrl);
+                }
+              }}
+            />
+          )}
+        />
+        {errors.image && (
+          <FormHelperText error> {errors.image.message}</FormHelperText>
+        )}
+        <TextField
+          label="名前"
+          fullWidth
+          {...register("name")}
+          error={!!errors.name}
+          helperText={errors.name?.message as React.ReactNode}
+        />
+        {/* 学科はセレクトボックス？を使いたい */}
+        <FormControl fullWidth required error={!!errors.departmentId}>
+          <InputLabel id="department-label">学科</InputLabel>
+          <Controller
+            name="departmentId"
+            control={control}
+            defaultValue={departments[0]?.id || ""}
+            render={({ field }) => (
+              <Select
+                labelId="department-label"
+                label="学科"
+                {...field}
+                value={field.value || ""}
+              >
+                {departments.map((dept) => (
+                  <MenuItem key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </MenuItem>
+                ))}
+              </Select>
             )}
           />
-          {errors.image && (
-            <FormHelperText error> {errors.image.message}</FormHelperText>
+          {errors.departmentId && (
+            <FormHelperText>{errors.departmentId.message}</FormHelperText>
           )}
-            <TextField
-              label="名前"
-              fullWidth
-              {...register("name")}
-              error={!!errors.name}
-              helperText={errors.name?.message as React.ReactNode}
-            />
-            {/* 学科はセレクトボックス？を使いたい */}
-            <FormControl fullWidth required error={!!errors.departmentId}>
-              <InputLabel id="department-label">学科</InputLabel>
-              <Controller
-                name="departmentId"
-                control={control}
-                defaultValue={departments[0]?.id || ""}
-                render={({ field }) => (
-                  <Select
-                    labelId="department-label"
-                    label="学科"
-                    {...field}
-                    value={field.value || ""}
-                  >
-                    {departments.map((dept) => (
-                      <MenuItem key={dept.id} value={dept.id}>
-                        {dept.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-              {errors.departmentId && (
-                <FormHelperText>{errors.departmentId.message}</FormHelperText>
-              )}
-            </FormControl>
-            <TextField
-              label="自己紹介"
-              fullWidth
-              multiline
-              minRows={4}
-              {...register("introduction")}
-              error={!!errors.introduction}
-              helperText={errors.introduction?.message as React.ReactNode}
-            />
+        </FormControl>
+        <TextField
+          label="自己紹介"
+          fullWidth
+          multiline
+          minRows={4}
+          {...register("introduction")}
+          error={!!errors.introduction}
+          helperText={errors.introduction?.message as React.ReactNode}
+        />
       </Stack>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Button

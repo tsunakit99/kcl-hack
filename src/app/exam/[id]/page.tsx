@@ -54,6 +54,9 @@ const ExamPage = async ({ params }: ExamPageProps) => {
               display: "none",
             },
             scrollbarWidth: "none", // Firefox対応
+            "@media(max-width: 1300px)": {
+              width: "50%",
+            },
           }}
         >
           <CardContent sx={{ textAlign: "center", p: 4 }}>
@@ -64,9 +67,15 @@ const ExamPage = async ({ params }: ExamPageProps) => {
               }}
             >
               <Typography
-                variant="h4"
                 gutterBottom
-                sx={{ fontWeight: "bold", textAlign: "left" }}
+                sx={{
+                  fontSize: "40px",
+                  fontWeight: "bold",
+                  textAlign: "left",
+                  "@media(max-width: 1000px)": {
+                    fontSize: "20px",
+                  },
+                }}
               >
                 過去問詳細
               </Typography>
@@ -85,7 +94,17 @@ const ExamPage = async ({ params }: ExamPageProps) => {
                     alignItems: "center",
                   }}
                 >
-                  <Typography sx={{ color: "gray" }}>投稿者:</Typography>
+                  <Typography
+                    sx={{
+                      color: "gray",
+                      fontSize: "18px",
+                      "@media(max-width: 1000px)": {
+                        fontSize: "10px",
+                      },
+                    }}
+                  >
+                    投稿者:
+                  </Typography>
                   <Box
                     sx={{
                       width: "50px",
@@ -94,6 +113,11 @@ const ExamPage = async ({ params }: ExamPageProps) => {
                       overflow: "hidden",
                       ml: 2,
                       border: "2px solid #000",
+                      "@media(max-width: 1300px)": {
+                        width: "20px",
+                        height: "20px",
+                        ml: 1,
+                      },
                     }}
                   >
                     <Image
@@ -108,7 +132,14 @@ const ExamPage = async ({ params }: ExamPageProps) => {
                       }}
                     />
                   </Box>
-                  <Typography sx={{ fontSize: "20px" }}>
+                  <Typography
+                    sx={{
+                      fontSize: "20px",
+                      "@media(max-width: 1000px)": {
+                        fontSize: "10px",
+                      },
+                    }}
+                  >
                     {exam.uploader.name}
                   </Typography>
                 </Box>
@@ -157,7 +188,12 @@ const ExamPage = async ({ params }: ExamPageProps) => {
                 <Button
                   variant="contained"
                   color="primary"
-                  sx={{ mt: 1, fontWeight: "bold" }}
+                  sx={{
+                    mt: 1,
+                    fontWeight: "bold",
+                    width: "80%",
+                    minWidth: "130px",
+                  }}
                 >
                   {exam.originalFileName}を閲覧
                 </Button>
