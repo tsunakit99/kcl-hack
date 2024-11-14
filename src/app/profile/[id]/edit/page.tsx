@@ -87,10 +87,21 @@ if (user.id !== session?.user.id) {
             alignItems: "center",
           }}
         >
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mt: 4, mb: 1 }}>
-              プロフィール編集
-            </Typography>
-            <Divider sx={{ width: "100%"}} />
+          <Typography
+            gutterBottom
+            sx={{
+              fontSize: "40px",
+              fontWeight: "bold",
+              mt: 4,
+              mb: 1,
+              "@media(max-width: 1000px)": {
+                fontSize: "25px",
+              },
+            }}
+          >
+            プロフィール編集
+          </Typography>
+          <Divider sx={{ width: "100%" }} />
           <EditUserForm
             id={user.id}
             currentName={user.name || ""}

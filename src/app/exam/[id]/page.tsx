@@ -67,121 +67,179 @@ const ExamPage = ({ params }: ExamPageProps) => {
   }
 
   return (
-    <Box
-      sx={{
-        width: "100vw",
-        height: "100vh",
-        background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Card sx={{
-        width: "40%",
-        margin: 'auto',
-        borderRadius: 2,
-        overflowY: "auto",
-        mt: 5,
-        mb: 5,
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.7)",
-      }}>
-        <CardContent sx={{ textAlign: 'center', p: 4 }}>
-          <Box sx={{
-            display: "flex",
-            justifyContent: "space-between"
-          }}>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', textAlign: "left" }}>
-              過去問詳細
-            </Typography>
-            <Link
-              href={`/profile/${exam.uploader.id}`}
-              passHref
-              style={{
-                color: "inherit",
-                textDecoration: "none",
+       <Box
+        sx={{
+          width: "100vw",
+          height: "100vh",
+          background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Card
+          sx={{
+            width: "40%",
+            height: "95vh",
+            margin: "auto",
+            borderRadius: 2,
+            overflowY: "auto",
+            mt: 5,
+            mb: 5,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.7)",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            scrollbarWidth: "none", // Firefox対応
+            "@media(max-width: 1300px)": {
+              width: "50%",
+            },
+          }}
+        >
+          <CardContent sx={{ textAlign: "center", p: 4 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
               }}
             >
-              <Box sx={{
-                display: "flex",
-                justifyContent: "right",
-                alignItems: "center"
-              }}>
-                <Typography sx={{ color: "gray" }}>投稿者:</Typography>
+              <Typography
+                gutterBottom
+                sx={{
+                  fontSize: "40px",
+                  fontWeight: "bold",
+                  textAlign: "left",
+                  "@media(max-width: 1000px)": {
+                    fontSize: "20px",
+                  },
+                }}
+              >
+                過去問詳細
+              </Typography>
+              <Link
+                href={`/profile/${exam.uploader.id}`}
+                passHref
+                style={{
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              >
                 <Box
                   sx={{
-                    width: "50px",
-                    height: "50px",
-                    borderRadius: "50%",
-                    overflow: "hidden",
-                    ml: 2,
-                    border: "2px solid #000",
+                    display: "flex",
+                    justifyContent: "right",
+                    alignItems: "center",
                   }}
                 >
-                  <Image src={imageUrl}
-                    alt="プロフィール画像"
-                    width={500}
-                    height={500}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
+                  <Typography
+                    sx={{
+                      color: "gray",
+                      fontSize: "18px",
+                      "@media(max-width: 1000px)": {
+                        fontSize: "10px",
+                      },
                     }}
-                  />
+                  >
+                    投稿者:
+                  </Typography>
+                  <Box
+                    sx={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                      overflow: "hidden",
+                      ml: 2,
+                      border: "2px solid #000",
+                      "@media(max-width: 1300px)": {
+                        width: "20px",
+                        height: "20px",
+                        ml: 1,
+                      },
+                    }}
+                  >
+                    <Image
+                      src={imageUrl || "/icon/default-profile.png"}
+                      alt="プロフィール画像"
+                      width={500}
+                      height={500}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontSize: "20px",
+                      "@media(max-width: 1000px)": {
+                        fontSize: "10px",
+                      },
+                    }}
+                  >
+                    {exam.uploader.name}
+                  </Typography>
                 </Box>
-                <Typography sx={{ fontSize: "20px" }}>{exam.uploader.name}</Typography>
+              </Link>
+            </Box>
+            <Divider sx={{ my: 2 }} />
+
+            <Stack direction="column" spacing={2} sx={{ textAlign: "left" }}>
+              <Box>
+                <Typography variant="subtitle1" color="textSecondary">
+                  講義名
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {exam.lecture.name}
+                </Typography>
               </Box>
-            </Link>
-          </Box>
-          <Divider sx={{ my: 2 }} />
 
-          <Stack direction="column" spacing={3} sx={{ textAlign: 'left' }}>
-            <Box>
-              <Typography variant="subtitle1" color="textSecondary">
-                講義名
-              </Typography>
-              <Typography variant="h6" gutterBottom>
-                {exam.lecture.name}
-              </Typography>
-            </Box>
+              <Box>
+                <Typography variant="subtitle1" color="textSecondary">
+                  学科
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {exam.department.name}
+                </Typography>
+              </Box>
 
-            <Box>
-              <Typography variant="subtitle1" color="textSecondary">
-                学科
-              </Typography>
-              <Typography variant="h6" gutterBottom>
-                {exam.department.name}
-              </Typography>
-            </Box>
+              <Box>
+                <Typography variant="subtitle1" color="textSecondary">
+                  年度
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {exam.year}
+                </Typography>
+              </Box>
 
-            <Box>
-              <Typography variant="subtitle1" color="textSecondary">
-                年度
-              </Typography>
-              <Typography variant="h6" gutterBottom>
-                {exam.year}
-              </Typography>
-            </Box>
+              <Box>
+                <Typography variant="subtitle1" color="textSecondary">
+                  教授名
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {exam.professor || "不明"}
+                </Typography>
+              </Box>
 
-            <Box>
-              <Typography variant="subtitle1" color="textSecondary">
-                教授名
-              </Typography>
-              <Typography variant="h6" gutterBottom>
-                {exam.professor || '不明'}
-              </Typography>
-            </Box>
-
-            <Link href={exam.fileUrl} passHref>
-              <Button variant="contained" color="primary" sx={{ mt: 2, fontWeight: 'bold' }}>
-                {exam.originalFileName}を閲覧
-              </Button>
-            </Link>
-          </Stack>
-        </CardContent>
-      </Card>
-    </Box>
-  );
+              <Link href={exam.fileUrl} passHref>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    mt: 1,
+                    fontWeight: "bold",
+                    width: "80%",
+                    minWidth: "130px",
+                  }}
+                >
+                  {exam.originalFileName}を閲覧
+                </Button>
+              </Link>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Box>
+    );
 };
 
 export default ExamPage;

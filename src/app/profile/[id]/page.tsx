@@ -15,7 +15,7 @@ import {
   Popover,
   Snackbar,
   Stack,
-  Typography
+  Typography,
 } from "@mui/material";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -45,10 +45,9 @@ const UserProfile = ({ params }: UserProfileProps) => {
 
   const isSuccessful = searchParams.get("success") === "true";
 
-   // メニュー関連の状態管理
+  // メニュー関連の状態管理
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuExamId, setMenuExamId] = useState<string | null>(null);
-  
 
   useEffect(() => {
     // 画面遷移後にフェードインを開始
@@ -93,7 +92,10 @@ const UserProfile = ({ params }: UserProfileProps) => {
   };
 
   // メニューを開く
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, examId: string) => {
+  const handleOpenMenu = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    examId: string
+  ) => {
     setAnchorEl(event.currentTarget);
     setMenuExamId(examId);
   };
@@ -315,12 +317,15 @@ const UserProfile = ({ params }: UserProfileProps) => {
                   )}
                   {isSuccessful && (
                     <Snackbar
-          open={openProfSnackbar}
-          autoHideDuration={3000}
-          onClose={() => setOpenProfSnackbar(false)}
-          message="プロフィール編集が完了しました"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        />
+                      open={openProfSnackbar}
+                      autoHideDuration={3000}
+                      onClose={() => setOpenProfSnackbar(false)}
+                      message="プロフィール編集が完了しました"
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "center",
+                      }}
+                    />
                   )}
                 </Box>
               </Box>
@@ -402,70 +407,70 @@ const UserProfile = ({ params }: UserProfileProps) => {
           >
             投稿した過去問
           </Typography>
-            <List>
-              <Button
-                disabled
+          <List>
+            <Button
+              disabled
+              sx={{
+                width: "100%",
+              }}
+            >
+              <ListItem
                 sx={{
-                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 1,
+                  color: "black",
                 }}
               >
-                <ListItem
+                <ListItemText
+                  primary="講義名"
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: 1,
-                    color: "black",
+                    flexBasis: "6vw",
                   }}
-                >
-                  <ListItemText
-                    primary="講義名"
-                    sx={{
-                      flexBasis: "6vw",
-                    }}
-                    primaryTypographyProps={{
-                      sx: {
-                        "@media(max-width: 1000px)": { fontSize: "12px" },
-                      },
-                    }}
-                  />
-                  <ListItemText
-                    primary="学科"
-                    sx={{ flexBasis: "8vw" }}
-                    primaryTypographyProps={{
-                      sx: {
-                        "@media(max-width: 1000px)": { fontSize: "12px" },
-                      },
-                    }}
-                  />
-                  <ListItemText
-                    primary="担当教授"
-                    sx={{ flexBasis: "8vw" }}
-                    primaryTypographyProps={{
-                      sx: {
-                        "@media(max-width: 1000px)": { fontSize: "12px" },
-                      },
-                    }}
-                  />
-                  <ListItemText
-                    primary="年度"
-                    sx={{ flexBasis: "6vw" }}
-                    primaryTypographyProps={{
-                      sx: {
-                        "@media(max-width: 1000px)": { fontSize: "12px" },
-                      },
-                    }}
-                  />
-                </ListItem>
-              </Button>
-              <div
-                style={{
-                  width: "90%",
-                  height: "1px",
-                  backgroundColor: "#000",
-                  position: "relative",
-                  margin: "2px 0 4px 0",
-                }}
+                  primaryTypographyProps={{
+                    sx: {
+                      "@media(max-width: 1000px)": { fontSize: "12px" },
+                    },
+                  }}
+                />
+                <ListItemText
+                  primary="学科"
+                  sx={{ flexBasis: "8vw" }}
+                  primaryTypographyProps={{
+                    sx: {
+                      "@media(max-width: 1000px)": { fontSize: "12px" },
+                    },
+                  }}
+                />
+                <ListItemText
+                  primary="担当教授"
+                  sx={{ flexBasis: "8vw" }}
+                  primaryTypographyProps={{
+                    sx: {
+                      "@media(max-width: 1000px)": { fontSize: "12px" },
+                    },
+                  }}
+                />
+                <ListItemText
+                  primary="年度"
+                  sx={{ flexBasis: "6vw" }}
+                  primaryTypographyProps={{
+                    sx: {
+                      "@media(max-width: 1000px)": { fontSize: "12px" },
+                    },
+                  }}
+                />
+              </ListItem>
+            </Button>
+            <div
+              style={{
+                width: "90%",
+                height: "1px",
+                backgroundColor: "#000",
+                position: "relative",
+                margin: "2px 0 4px 0",
+              }}
             ></div>
             {exams ? (
               <List>
@@ -511,28 +516,36 @@ const UserProfile = ({ params }: UserProfileProps) => {
                           primary={exam.lectureName}
                           sx={{ flexBasis: "6vw" }}
                           primaryTypographyProps={{
-                            sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                            sx: {
+                              "@media(max-width: 1000px)": { fontSize: "12px" },
+                            },
                           }}
                         />
                         <ListItemText
                           primary={exam.departmentName}
                           sx={{ flexBasis: "8vw" }}
                           primaryTypographyProps={{
-                            sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                            sx: {
+                              "@media(max-width: 1000px)": { fontSize: "12px" },
+                            },
                           }}
                         />
                         <ListItemText
                           primary={exam.professor}
                           sx={{ flexBasis: "8vw" }}
                           primaryTypographyProps={{
-                            sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                            sx: {
+                              "@media(max-width: 1000px)": { fontSize: "12px" },
+                            },
                           }}
                         />
                         <ListItemText
                           primary={exam.year}
                           sx={{ flexBasis: "6vw" }}
                           primaryTypographyProps={{
-                            sx: { "@media(max-width: 1000px)": { fontSize: "12px" } },
+                            sx: {
+                              "@media(max-width: 1000px)": { fontSize: "12px" },
+                            },
                           }}
                         />
                       </Button>
@@ -561,14 +574,38 @@ const UserProfile = ({ params }: UserProfileProps) => {
                           },
                         }}
                       >
-                        <IconButton onClick={handleDetail} sx={{ margin: "0 8px" }}>
-                          <Image src="/icon/post2.png" alt="detail icon" width="24" height="24" />
+                        <IconButton
+                          onClick={handleDetail}
+                          sx={{ margin: "0 8px" }}
+                        >
+                          <Image
+                            src="/icon/post2.png"
+                            alt="detail icon"
+                            width="24"
+                            height="24"
+                          />
                         </IconButton>
-                        <IconButton onClick={handleEdit} sx={{ margin: "0 8px" }}>
-                          <Image src="/icon/pen2.png" alt="edit icon" width="24" height="24" />
+                        <IconButton
+                          onClick={handleEdit}
+                          sx={{ margin: "0 8px" }}
+                        >
+                          <Image
+                            src="/icon/pen2.png"
+                            alt="edit icon"
+                            width="24"
+                            height="24"
+                          />
                         </IconButton>
-                        <IconButton onClick={handleDelete} sx={{ margin: "0 8px" }}>
-                          <Image src="/icon/delete2.png" alt="delete icon" width="24" height="24" />
+                        <IconButton
+                          onClick={handleDelete}
+                          sx={{ margin: "0 8px" }}
+                        >
+                          <Image
+                            src="/icon/delete2.png"
+                            alt="delete icon"
+                            width="24"
+                            height="24"
+                          />
                         </IconButton>
                       </Popover>
 
