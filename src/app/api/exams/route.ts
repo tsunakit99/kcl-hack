@@ -1,8 +1,15 @@
+import { getCurrentUserId } from "@/app/lib/auth";
 import prisma from "@/app/lib/prisma";
 import { supabaseServer } from "@/app/lib/supabaseServerClient";
 import { NextResponse } from "next/server";
 
 export async function GET() {
+
+  const currentUserId = await getCurrentUserId();
+   if (!currentUserId) {
+     return new NextResponse(JSON.stringify({ message: '認証が必要です' }), { status: 401 });
+   }
+  
     const exams = await prisma.exam.findMany({
         include: {
             lecture: true,

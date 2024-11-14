@@ -7,6 +7,11 @@ import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const currentUserId = await getCurrentUserId();
+  if (!currentUserId) {
+    return new NextResponse(JSON.stringify({ message: '認証が必要です' }), { status: 401 });
+  }
+  
   const { id } = params;
 
   const user = await prisma.user.findUnique({
@@ -58,8 +63,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
   const currentUserId = await getCurrentUserId();
+  if (!currentUserId) {
+    return new NextResponse(JSON.stringify({ message: '認証が必要です' }), { status: 401 });
+  }
+  
+  const { id } = params;
 
   if (id !== currentUserId) {
     return new NextResponse(JSON.stringify({ message: '更新権限がありません' }), { status: 403 });

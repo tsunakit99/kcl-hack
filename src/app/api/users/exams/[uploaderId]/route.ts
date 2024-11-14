@@ -1,7 +1,13 @@
+import { getCurrentUserId } from "@/app/lib/auth";
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, { params }: { params: { uploaderId: string } }) {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) {
+        return new NextResponse(JSON.stringify({ message: '認証が必要です' }), { status: 401 });
+    }
+    
     const { uploaderId } = params;
     const exams = await prisma.exam.findMany({
         where: { uploaderId },
