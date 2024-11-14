@@ -170,6 +170,64 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+      const loadTags = async () => {
+        const data = await getTags();
+        setTags(data);
+      };
+      loadTags();
+  }, []);
+  
+  const tagColor = (id: string): string => {
+    switch (id) {
+      case 'cm3ft8mgr0060om2bhdfe4i9s':
+        return '#ff9e9e';
+      case 'cm3ft8mh10061om2bpl65w3kk':
+        return '#ff9ece';
+      case 'cm3ft8mh80062om2b5vbhoq1l':
+        return '#9e9eff';
+      case 'cm3ft8mhf0063om2buwr330u9':
+        return '#9eceff';
+      case 'cm3ft8mhk0064om2b2mhj36zm':
+        return '#9eff9e';
+      case 'cm3ft8mht0065om2buqo1a5qw':
+        return '#ceff9e'
+      case 'cm3ft8mi10066om2bbtcnvtic':
+        return '#ffff9e'
+      case 'cm3ft8mi90067om2bkqkgk6o6':
+        return '#e6e6e6';
+      default:
+        return '#e6e6e6';  // デフォルトの色
+    }
+  };
+
+    useEffect(() => {
+      const fetchLectureNames = async () => {
+        if (lectureName.length > 0) {
+          const data = await getLectureNames(lectureName);
+          setLectureOptions(data);
+        }
+      };
+      fetchLectureNames();
+    }, [lectureName]);
+
+    useEffect(() => {
+      const fetchExams = async () => {
+        setIsLoading(true);
+        try {
+          const examData = await getExams();
+          setExams(examData);
+          setOpenSnackbar(true);
+        } catch (error: unknown) {
+          console.error("データの取得に失敗しました:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchExams();
+    }, [updateFlag]);
+
+
+  useEffect(() => {
     const loadDepartments = async () => {
       const data = await getDepartments();
       setDepartments(data);
@@ -358,6 +416,26 @@ export default function Home() {
                           >
                             {exam.lecture.name} ({exam.year})
                           </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            学科: {exam.department.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            教授名: {exam.professor || "不明"}
+                          </Typography>
+                          <Box sx={{
+                            padding: "3px",
+                            width: "50%",
+                            position: "relative",
+                            bottom: "-10px",
+                            right: "0px",
+                            border: "medium solid gray",
+                            borderRadius: "10px",
+                            background: tagColor(exam.tag.id) || "#FFFFFF"
+                            }}>
+                          <Typography variant="body2" textAlign={"center"} color="text.primary">
+                          {exam.tag.name || "不明"}
+                          </Typography>
+                        </Box>
                           <Box
                             sx={{
                               display: "flex",
@@ -545,6 +623,26 @@ export default function Home() {
                                   >
                                     {exam.lecture.name} ({exam.year})
                                   </Typography>
+                                  <Typography variant="body2" color="text.secondary">
+                                    学科: {exam.department.name}
+                                  </Typography>
+                                  <Typography variant="body2" color="text.secondary">
+                                    教授名: {exam.professor || "不明"}
+                                  </Typography>
+                                  <Box sx={{
+                            padding: "3px",
+                            width: "50%",
+                          position: "relative",
+                          bottom: "-10px",
+                            right: "0px",
+                            border: "medium solid gray",
+                            borderRadius: "10px",
+                          background: tagColor(exam.tag.id) || "#FFFFFF",
+                        }}>
+                          <Typography variant="body2" textAlign={"center"} color="text.primary">
+                          {exam.tag.name || "不明"}
+                          </Typography>
+                        </Box>
                                   <Box
                                     sx={{
                                       display: "flex",

@@ -87,8 +87,11 @@ export interface ExamData {
   lecture: { name: string };
   departmentId: string;
   department: { name: string };
+  tag: {
+    id: string;
+    name: string;   
+  };
   tagId: string;
-  tag: { name: string };
   year: number;
   professor?: string;
   originalFileName: string;
