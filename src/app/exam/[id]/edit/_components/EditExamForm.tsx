@@ -4,25 +4,30 @@ import { Department, EditExamFormData, Tag } from "@/app/types";
 import { validationUploadExamSchema } from "@/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-    Alert,
-    Autocomplete,
-    Box,
-    Button,
-    FormControl,
-    FormHelperText,
-    InputLabel,
-    MenuItem,
-    Select,
-    Stack,
-    TextField,
-    Typography,
+  Alert,
+  Autocomplete,
+  Box,
+  Button,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
-import { EditExamInfo, getDepartments, getLectureNames, getTags } from "../actions";
+import {
+  EditExamInfo,
+  getDepartments,
+  getLectureNames,
+  getTags,
+} from "../actions";
 
 interface EditExamFormProps {
   id: string;
@@ -109,7 +114,9 @@ const EditExamForm = ({
           const response = await fetch(beforeFileUrl);
           if (response.ok) {
             const blob = await response.blob();
-            const existingFile = new File([blob], originalFileName, { type: 'application/pdf' });
+            const existingFile = new File([blob], originalFileName, {
+              type: "application/pdf",
+            });
             setFiles([existingFile]);
             setValue("file", [existingFile]);
           } else {
@@ -124,9 +131,6 @@ const EditExamForm = ({
     };
     fetchFile();
   }, [beforeFileUrl, originalFileName, setValue]);
-
-
-
 
   const onDrop = (acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
@@ -165,8 +169,8 @@ const EditExamForm = ({
 
   return (
     <Box component="form" onSubmit={handleSubmit(handleEdit)} noValidate>
-          <Stack spacing={6}>
-              {resError && <Alert severity="error">{resError}</Alert>}
+      <Stack spacing={4}>
+        {resError && <Alert severity="error">{resError}</Alert>}
         <Controller
           name="lectureName"
           control={control}
@@ -188,7 +192,13 @@ const EditExamForm = ({
             />
           )}
         />
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "30px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "30px",
+          }}
+        >
           <TextField
             label="年度"
             type="number"
@@ -223,7 +233,7 @@ const EditExamForm = ({
             )}
           </FormControl>
           <FormControl fullWidth required error={!!errors.tagId}>
-            <InputLabel id="tag-label">過去問タグ</InputLabel>
+            <InputLabel id="tag-label">タグ</InputLabel>
             <Controller
               name="tagId"
               control={control}
@@ -231,7 +241,7 @@ const EditExamForm = ({
               render={({ field }) => (
                 <Select
                   labelId="tag-label"
-                  label="過去問タグ"
+                  label="タグ"
                   {...field}
                   value={field.value || ""}
                 >
@@ -312,9 +322,18 @@ const EditExamForm = ({
           >
             <div
               className="button-content"
-              style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
-              <Image src="/icon/paper-plane.png" alt="icon" width={24} height={24} />
+              <Image
+                src="/icon/paper-plane.png"
+                alt="icon"
+                width={24}
+                height={24}
+              />
               <span>{isLoading ? "更新中..." : "更新"}</span>
             </div>
           </Button>
