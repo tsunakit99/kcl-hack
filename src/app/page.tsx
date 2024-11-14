@@ -122,7 +122,6 @@ export default function Home() {
 
   const handleSearch = async (data: ExamSearchData) => {
     try {
-      console.log(data);
       const examData = await searchExams(data);
       setExams(examData);
       setIsToggled(false); // 検索結果画面に切り替える
@@ -331,7 +330,7 @@ export default function Home() {
                     }}
                   >
                     <Link
-                      href={`/exam/${exam.id}`}
+                      href={exam.fileUrl}
                       style={{ textDecoration: "none" }}
                     >
                       <Card
@@ -514,7 +513,7 @@ export default function Home() {
                             }}
                           >
                             <Link
-                              href={`/exam/${exam.id}`}
+                              href={exam.fileUrl}
                               style={{ textDecoration: "none" }}
                             >
                               <Card
@@ -561,18 +560,35 @@ export default function Home() {
                                         height: "auto",
                                       }}
                                     >
-                                      <Box
-                                        component="img"
+                                      <Image
+                                        className="book-icon"
                                         src="/icon/book.png"
                                         alt="book"
-                                        sx={{
+                                        width={500}
+                                        height={500}
+                                        style={{
                                           position: "relative",
                                           top: "10%", // カード内で位置調整
                                           width: "100%", // 相対的にサイズを設定
                                           height: "auto", // アスペクト比を保つ
+                                          borderRadius: 3,
                                           objectFit: "contain", // 画像がコンテナに収まるようにする
                                         }}
                                       />
+                                      <Typography
+                                        sx={{
+                                          position: "relative",
+                                          top: "-20px",
+                                          left: "30px",
+                                          width: "30px",
+                                          color: "#fff",
+                                          fontSize: "8px",
+                                          fontWeight: 500,
+                                          boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)", // 軽い影をつける
+                                        }}
+                                      >
+                                        詳細へ
+                                      </Typography>
                                     </Link>
                                     <CardContent>
                                       <Typography
@@ -1244,4 +1260,4 @@ export default function Home() {
       </Box>
     </>
   );
-}
+};
