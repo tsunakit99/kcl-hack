@@ -120,16 +120,6 @@ export default function Home() {
     resolver: zodResolver(examSearchSchema),
   });
 
-  const handleSearch = async (data: ExamSearchData) => {
-    try {
-      const examData = await searchExams(data);
-      setExams(examData);
-      setIsToggled(false); // 検索結果画面に切り替える
-    } catch (error: unknown) {
-      console.error("検索エラー:", error);
-    }
-  };
-
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const totalPages = Math.ceil(exams.length / 4);
@@ -179,21 +169,21 @@ export default function Home() {
   
   const tagColor = (id: string): string => {
     switch (id) {
-      case 'cm3ft8mgr0060om2bhdfe4i9s':
+      case 'cm3cd3nzr0060yjz6gv2gh7uk':
         return '#ff9e9e';
-      case 'cm3ft8mh10061om2bpl65w3kk':
+      case 'cm3cd3o610061yjz6kj33e2qj':
         return '#ff9ece';
-      case 'cm3ft8mh80062om2b5vbhoq1l':
+      case 'cm3cd3o9z0062yjz644gpzanr':
         return '#9e9eff';
-      case 'cm3ft8mhf0063om2buwr330u9':
+      case 'cm3cd3oe10063yjz6dr6iz92n':
         return '#9eceff';
-      case 'cm3ft8mhk0064om2b2mhj36zm':
+      case 'cm3cd3ohy0064yjz6ubsumj2z':
         return '#9eff9e';
-      case 'cm3ft8mht0065om2buqo1a5qw':
+      case 'cm3cd3olx0065yjz6x71ptkt9':
         return '#ceff9e'
-      case 'cm3ft8mi10066om2bbtcnvtic':
+      case 'cm3cd3opx0066yjz6v7gbqg6l':
         return '#ffff9e'
-      case 'cm3ft8mi90067om2bkqkgk6o6':
+      case 'cm3cd3otv0067yjz6ixerekog':
         return '#e6e6e6';
       default:
         return '#e6e6e6';  // デフォルトの色
@@ -253,21 +243,15 @@ export default function Home() {
     fetchLectureNames();
   }, [lectureName]);
 
-  useEffect(() => {
-    const fetchExams = async () => {
-      setIsLoading(true);
-      try {
-        const examData = await getExams();
-        setExams(examData);
-        setOpenSnackbar(true);
-      } catch (error: unknown) {
-        console.error("データの取得に失敗しました:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchExams();
-  }, [updateFlag]);
+    const handleSearch = async (data: ExamSearchData) => {
+    try {
+      const examData = await searchExams(data);
+      setExams(examData);
+      setIsToggled(false); // 検索結果画面に切り替える
+    } catch (error: unknown) {
+      console.error("検索エラー:", error);
+    }
+  };
 
   const handleUpdate = () => {
     setUpdateFlag((prevFlag) => !prevFlag); // フラグをトグル
