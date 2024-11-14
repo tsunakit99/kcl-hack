@@ -406,7 +406,7 @@ export default function Home() {
                         }}
                       >
                         <Box sx={{ display: "flex", flexDirection: "column" }}>
-                          <Typography
+                           <Typography
                             component="div"
                             sx={{
                               padding: "15px",
@@ -416,26 +416,6 @@ export default function Home() {
                           >
                             {exam.lecture.name} ({exam.year})
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            学科: {exam.department.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            教授名: {exam.professor || "不明"}
-                          </Typography>
-                          <Box sx={{
-                            padding: "3px",
-                            width: "50%",
-                            position: "relative",
-                            bottom: "-10px",
-                            right: "0px",
-                            border: "medium solid gray",
-                            borderRadius: "10px",
-                            background: tagColor(exam.tag.id) || "#FFFFFF"
-                            }}>
-                          <Typography variant="body2" textAlign={"center"} color="text.primary">
-                          {exam.tag.name || "不明"}
-                          </Typography>
-                        </Box>
                           <Box
                             sx={{
                               display: "flex",
@@ -503,8 +483,7 @@ export default function Home() {
                                   right: "0px",
                                   border: "medium solid gray",
                                   borderRadius: "10px",
-                                  background:
-                                    "linear-gradient(45deg, #c0d7d2, #33d4e2)",
+                                  background: tagColor(exam.tag.id) || "#FFFFFF"
                                 }}
                               >
                                 <Typography
@@ -623,26 +602,6 @@ export default function Home() {
                                   >
                                     {exam.lecture.name} ({exam.year})
                                   </Typography>
-                                  <Typography variant="body2" color="text.secondary">
-                                    学科: {exam.department.name}
-                                  </Typography>
-                                  <Typography variant="body2" color="text.secondary">
-                                    教授名: {exam.professor || "不明"}
-                                  </Typography>
-                                  <Box sx={{
-                            padding: "3px",
-                            width: "50%",
-                          position: "relative",
-                          bottom: "-10px",
-                            right: "0px",
-                            border: "medium solid gray",
-                            borderRadius: "10px",
-                          background: tagColor(exam.tag.id) || "#FFFFFF",
-                        }}>
-                          <Typography variant="body2" textAlign={"center"} color="text.primary">
-                          {exam.tag.name || "不明"}
-                          </Typography>
-                        </Box>
                                   <Box
                                     sx={{
                                       display: "flex",
@@ -710,8 +669,7 @@ export default function Home() {
                                           right: "0px",
                                           border: "medium solid gray",
                                           borderRadius: "10px",
-                                          background:
-                                            "linear-gradient(45deg, #c0d7d2, #33d4e2)",
+                                          background: tagColor(exam.tag.id) || "#FFFFFF",
                                         }}
                                       >
                                         <Typography
