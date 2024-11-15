@@ -372,7 +372,7 @@ export default function Home() {
                     }}
                   >
                     <Link
-                      href={`/exam/${exam.id}`}
+                      href={exam.fileUrl}
                       style={{ textDecoration: "none" }}
                     >
                       <Card
@@ -445,30 +445,31 @@ export default function Home() {
                                 詳細へ
                               </Typography>
                             </Link>
-                            <CardContent>
-                              <Typography
-                                color="text.secondary"
-                                sx={{ fontSize: "12px" }}
-                              >
-                                学科: {exam.department.name}
-                              </Typography>
-                              <Typography
-                                color="text.secondary"
-                                sx={{ fontSize: "12px" }}
-                              >
-                                教授名: {exam.professor || "不明"}
-                              </Typography>
+                            <Box sx={{ width: "150px", display: "flex", flexDirection: "column" }}>
+                              <CardContent>
+                                <Typography
+                                  color="text.secondary"
+                                  sx={{ fontSize: "12px" }}
+                                >
+                                  学科: {exam.department.name}
+                                </Typography>
+                                <Typography
+                                  color="text.secondary"
+                                  sx={{ fontSize: "12px" }}
+                                >
+                                  教授名: {exam.professor || "不明"}
+                                </Typography>
+                              </CardContent>
                               <Box
                                 sx={{
                                   padding: "3px",
                                   width: "50%",
                                   position: "relative",
-                                  bottom: "-10px",
+                                  bottom: "10px",
                                   right: "0px",
                                   border: "medium solid gray",
                                   borderRadius: "10px",
-                                  background:
-                                    "linear-gradient(45deg, #c0d7d2, #33d4e2)",
+                                  background: tagColor(exam.tag.id) || "#FFFFFF"
                                 }}
                               >
                                 <Typography
@@ -479,7 +480,7 @@ export default function Home() {
                                   {exam.tag.name || "不明"}
                                 </Typography>
                               </Box>
-                            </CardContent>
+                            </Box>
                           </Box>
                         </Box>
                       </Card>
@@ -531,13 +532,14 @@ export default function Home() {
                     "&::-webkit-scrollbar": { display: "none" },
                   }}
                 >
-                  {/* examsを6件ごとのチャンクに分割して表示 */}
+                  {/* examsを4件ごとのチャンクに分割して表示 */}
                   {chunkArray(exams, 4).map((examChunk, index) => (
                     <Box
                       key={index}
                       sx={{
                         flex: "none",
-                        width: "100%",
+                        width: "480px",
+                        mr: "5px",
                       }}
                     >
                       <Box
@@ -555,7 +557,7 @@ export default function Home() {
                             }}
                           >
                             <Link
-                              href={`/exam/${exam.id}`}
+                              href={exam.fileUrl}
                               style={{ textDecoration: "none" }}
                             >
                               <Card
@@ -602,53 +604,73 @@ export default function Home() {
                                         height: "auto",
                                       }}
                                     >
-                                      <Box
-                                        component="img"
+                                      <Image
+                                        className="book-icon"
                                         src="/icon/book.png"
                                         alt="book"
-                                        sx={{
+                                        width={500}
+                                        height={500}
+                                        style={{
                                           position: "relative",
                                           top: "10%", // カード内で位置調整
                                           width: "100%", // 相対的にサイズを設定
                                           height: "auto", // アスペクト比を保つ
+                                          borderRadius: 3,
                                           objectFit: "contain", // 画像がコンテナに収まるようにする
                                         }}
                                       />
+                                      <Typography
+                                        sx={{
+                                          position: "relative",
+                                          top: "-20px",
+                                          left: "30px",
+                                          width: "30px",
+                                          color: "#fff",
+                                          fontSize: "8px",
+                                          fontWeight: 500,
+                                          boxShadow:
+                                            "0px 2px 10px rgba(0, 0, 0, 0.2)", // 軽い影をつける
+                                        }}
+                                      >
+                                        詳細へ
+                                      </Typography>
                                     </Link>
-                                    <CardContent>
-                                      <Typography
-                                        color="text.secondary"
-                                        sx={{ fontSize: "11px" }}
-                                      >
-                                        学科: {exam.department.name}
-                                      </Typography>
-                                      <Typography
-                                        color="text.secondary"
-                                        sx={{ fontSize: "11px" }}
-                                      >
-                                        教授名: {exam.professor || "不明"}
-                                      </Typography>
+                                    <Box sx={{ width: "150px", display: "flex", flexDirection: "column" }}>
+                                      <CardContent>
+                                        <Typography
+                                          color="text.secondary"
+                                          sx={{ fontSize: "11px" }}
+                                        >
+                                          学科: {exam.department.name}
+                                        </Typography>
+                                        <Typography
+                                          color="text.secondary"
+                                          sx={{ fontSize: "11px" }}
+                                        >
+                                          教授名: {exam.professor || "不明"}
+                                        </Typography>
+                                      </CardContent>
                                       <Box
                                         sx={{
                                           padding: "3px",
                                           width: "50%",
                                           position: "relative",
-                                          bottom: "-10px",
+                                          bottom: "10px",
                                           right: "0px",
                                           border: "medium solid gray",
                                           borderRadius: "10px",
-                                           background: tagColor(exam.tag.id) || "#FFFFFF"
+                                          background: tagColor(exam.tag.id) || "#FFFFFF"
                                         }}
                                       >
                                         <Typography
+                                          variant="body2"
                                           textAlign={"center"}
                                           color="text.primary"
-                                          sx={{ fontSize: "11px" }}
                                         >
                                           {exam.tag.name || "不明"}
                                         </Typography>
                                       </Box>
-                                    </CardContent>
+                                    </Box>
                                   </Box>
                                 </Box>
                               </Card>
@@ -1284,4 +1306,4 @@ export default function Home() {
       </Box>
     </>
   );
-}
+};
