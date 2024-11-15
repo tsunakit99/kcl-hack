@@ -219,8 +219,17 @@ const ExamPage = ({ params }: ExamPageProps) => {
                 <Typography variant="h6" gutterBottom>
                   {exam.professor || "不明"}
                 </Typography>
-              </Box>
-
+            </Box>
+            <Box sx={{display: "flex", alignItems: "center", gap: 2}}>
+              <Typography variant="h5" color="primary"
+                sx={{
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap", // テキストを1行に制限
+                  overflow: "hidden", // 表示範囲外を隠す
+                  textOverflow: "ellipsis" // 省略記号を表示
+              }}>
+                  {exam.originalFileName}
+                </Typography>
               <Link href={exam.fileUrl} passHref>
                 <Button
                   variant="contained"
@@ -228,13 +237,14 @@ const ExamPage = ({ params }: ExamPageProps) => {
                   sx={{
                     mt: 1,
                     fontWeight: "bold",
-                    width: "80%",
-                    minWidth: "130px",
+                    width: "100%",
+                    minWidth: "70px",
                   }}
-                >
-                  {exam.originalFileName}を閲覧
+              >
+                閲覧
                 </Button>
               </Link>
+              </Box>
             </Stack>
           </CardContent>
         </Card>
