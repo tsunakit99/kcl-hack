@@ -222,7 +222,12 @@ const UploadExamForm = () => {
           <Box>
             {files.length > 0 ? (
               <>
-                <Typography variant="h4" align="center" color="blue">
+                <Typography variant="h4" align="center" color="blue"
+                  sx={{
+                    whiteSpace: "nowrap", // テキストを1行に制限
+                    overflow: "hidden", // 表示範囲外を隠す
+                    textOverflow: "ellipsis" // 省略記号を表示
+                  }}>
                   <Image
                     src="/icon/pdf.png"
                     alt="PDF Icon"
