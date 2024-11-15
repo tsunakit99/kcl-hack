@@ -372,7 +372,7 @@ export default function Home() {
                     }}
                   >
                     <Link
-                      href={exam.fileUrl}
+                      href={`/exam/${exam.id}`}
                       style={{ textDecoration: "none" }}
                     >
                       <Card
@@ -390,7 +390,7 @@ export default function Home() {
                         }}
                       >
                         <Box sx={{ display: "flex", flexDirection: "column" }}>
-                           <Typography
+                          <Typography
                             component="div"
                             sx={{
                               padding: "15px",
@@ -467,7 +467,8 @@ export default function Home() {
                                   right: "0px",
                                   border: "medium solid gray",
                                   borderRadius: "10px",
-                                  background: tagColor(exam.tag.id) || "#FFFFFF"
+                                  background:
+                                    "linear-gradient(45deg, #c0d7d2, #33d4e2)",
                                 }}
                               >
                                 <Typography
@@ -530,14 +531,13 @@ export default function Home() {
                     "&::-webkit-scrollbar": { display: "none" },
                   }}
                 >
-                  {/* examsを4件ごとのチャンクに分割して表示 */}
+                  {/* examsを6件ごとのチャンクに分割して表示 */}
                   {chunkArray(exams, 4).map((examChunk, index) => (
                     <Box
                       key={index}
                       sx={{
                         flex: "none",
-                        width: "480px",
-                        mr: "5px",
+                        width: "100%",
                       }}
                     >
                       <Box
@@ -555,7 +555,7 @@ export default function Home() {
                             }}
                           >
                             <Link
-                              href={exam.fileUrl}
+                              href={`/exam/${exam.id}`}
                               style={{ textDecoration: "none" }}
                             >
                               <Card
@@ -602,36 +602,18 @@ export default function Home() {
                                         height: "auto",
                                       }}
                                     >
-                                      <Image
-                                        className="book-icon"
+                                      <Box
+                                        component="img"
                                         src="/icon/book.png"
                                         alt="book"
-                                        width={500}
-                                        height={500}
-                                        style={{
+                                        sx={{
                                           position: "relative",
                                           top: "10%", // カード内で位置調整
                                           width: "100%", // 相対的にサイズを設定
                                           height: "auto", // アスペクト比を保つ
-                                          borderRadius: 3,
                                           objectFit: "contain", // 画像がコンテナに収まるようにする
                                         }}
                                       />
-                                      <Typography
-                                        sx={{
-                                          position: "relative",
-                                          top: "-20px",
-                                          left: "30px",
-                                          width: "30px",
-                                          color: "#fff",
-                                          fontSize: "8px",
-                                          fontWeight: 500,
-                                          boxShadow:
-                                            "0px 2px 10px rgba(0, 0, 0, 0.2)", // 軽い影をつける
-                                        }}
-                                      >
-                                        詳細へ
-                                      </Typography>
                                     </Link>
                                     <CardContent>
                                       <Typography
@@ -655,7 +637,7 @@ export default function Home() {
                                           right: "0px",
                                           border: "medium solid gray",
                                           borderRadius: "10px",
-                                          background: tagColor(exam.tag.id) || "#FFFFFF",
+                                           background: tagColor(exam.tag.id) || "#FFFFFF"
                                         }}
                                       >
                                         <Typography
