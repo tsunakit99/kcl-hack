@@ -123,10 +123,7 @@ export async function POST(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE( req: NextRequest ) {
   const userId = await getCurrentUserId();
 
   if (!userId) {
@@ -159,4 +156,4 @@ export async function DELETE(
     console.error('コメント削除エラー:', error);
     return NextResponse.json({ error: 'コメントの削除に失敗しました' }, { status: 500 });
   }
-}
+};
