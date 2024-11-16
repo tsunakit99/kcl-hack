@@ -97,3 +97,10 @@ export const examSearchSchema = z.object({
         .optional(),
     professor: z.string().optional(),
 });
+
+export const commentSchema = z.object({
+  content: z
+    .string()
+    .min(1, 'コメントを入力してください')
+    .max(300, 'コメントは300文字以内で入力してください'),
+});

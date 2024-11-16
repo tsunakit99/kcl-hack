@@ -105,3 +105,18 @@ export interface ExamSearchData {
   year?: number;
   professor?: string;
 }
+
+export interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    imageUrl: string;
+  };
+}
+
+export interface CommentFormData{
+  content: string;
+}
