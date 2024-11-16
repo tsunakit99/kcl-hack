@@ -5,6 +5,7 @@ import { Box, Button, Card, CardContent, CircularProgress, Divider, Stack, Typog
 import Image from "next/image";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import CommentSection from './_components/CommentSection';
 import { getExamById, getImageById } from './actions';
 
 interface ExamPageProps {
@@ -74,32 +75,46 @@ const ExamPage = ({ params }: ExamPageProps) => {
           background: "linear-gradient(45deg, #c0d7d2, #444f7c)",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+        justifyContent: "center",
+        }}
+    >
+       <Box
+        sx={{
+          width: '90%',
+          display: 'flex',
+          ml: 9
         }}
       >
+        {/* 左側の過去問詳細 */}
+        <Box
+          sx={{
+            width: '60%',
+          }}
+        >
         <Card
           sx={{
-            width: "40%",
-            height: "95vh",
-            margin: "auto",
-            borderRadius: 2,
+            width: "100%",
+              height: "98vh",
+              margin: "auto",
+            background: "none",
             overflowY: "auto",
             mt: 5,
             mb: 5,
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.7)",
+            boxShadow: "none",
             "&::-webkit-scrollbar": {
               display: "none",
             },
             scrollbarWidth: "none", // Firefox対応
             "@media(max-width: 1300px)": {
-              width: "50%",
+              width: "600px",
             },
           }}
         >
           <CardContent sx={{ textAlign: "center", p: 4 }}>
             <Box
               sx={{
-                display: "flex",
+                  display: "flex",
+                alignItems: "flex-end",
                 justifyContent: "space-between",
               }}
             >
@@ -133,7 +148,7 @@ const ExamPage = ({ params }: ExamPageProps) => {
                 >
                   <Typography
                     sx={{
-                      color: "gray",
+                      color: "primary",
                       fontSize: "18px",
                       "@media(max-width: 1000px)": {
                         fontSize: "10px",
@@ -247,7 +262,22 @@ const ExamPage = ({ params }: ExamPageProps) => {
               </Box>
             </Stack>
           </CardContent>
-        </Card>
+          </Card>
+        </Box>
+        <Divider/>
+         {/* 右側のコメント欄 */}
+        <Box
+          sx={{
+            width: '50%',
+            height: "98vh",
+            display: 'flex',
+            flexDirection: 'column',
+            p: 5
+          }}
+        >
+          <CommentSection examId={params.id} />
+        </Box>
+        </Box>
       </Box>
     );
 };
